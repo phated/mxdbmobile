@@ -1,0 +1,44 @@
+{
+  "name": "mxdbmobile",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
+    "run-ios": "react-native run-ios",
+    "postinstall": "react-native link"
+  },
+  "dependencies": {
+    "bs-fetch": "^0.3.0",
+    "bs-platform": "^3.1.5",
+    "bs-react-native": "^0.8.0",
+    "native-base": "^2.5.2",
+    "react": "16.3.1",
+    "react-native": "0.55.4",
+    "react-native-gesture-handler": "^1.0.4",
+    "react-native-material-ui": "^1.22.4",
+    "react-native-vector-icons": "^4.6.0",
+    "reason-react": "^0.4.2",
+    "reroute-native": "0.0.5"
+  },
+  "devDependencies": {
+    "babel-jest": "23.0.1",
+    "babel-preset-react-native": "4.0.0",
+    "graphql_ppx": "^0.2.3",
+    "jest": "23.1.0",
+    "react-devtools": "^3.2.3",
+    "react-native-cli": "^2.0.1",
+    "react-test-renderer": "16.3.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./fonts"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "mxdbmobile",
+  "bsc-flags": [
+    "-bs-no-version-header",
+    "-bs-super-errors"
+  ],
+  "refmt": 3,
+  "bs-dependencies": [
+    "reason-react",
+    "bs-react-native",
+    "reroute-native",
+    "bs-fetch"
+  ],
+  "ppx-flags": [
+    "graphql_ppx/ppx"
+  ],
+  "namespace": true,
+  "reason": {
+    "react-jsx": 2
+  },
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": [
+        "native-base"
+      ]
+    }
+  ]
+}

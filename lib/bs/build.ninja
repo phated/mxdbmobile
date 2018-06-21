@@ -1,0 +1,110 @@
+bs_package_flags = -bs-package-map mxdbmobile
+src_root_dir = /Users/phated/projects/mxdbmobile
+bsc = /Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/bsc.exe
+bsdep = /Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/bsb_helper.exe
+warnings = -w -30-40+6+7+27+32..39+44+45+101
+bsc_flags = -nostdlib -I '/Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/ocaml' -bs-no-version-header -bs-super-errors -no-alias-deps -color always
+ppx_flags = -ppx /Users/phated/projects/mxdbmobile/node_modules/graphql_ppx/ppx
+bs_package_includes = -I /Users/phated/projects/mxdbmobile/node_modules/reason-react/lib/ocaml -I /Users/phated/projects/mxdbmobile/node_modules/bs-react-native/lib/ocaml -I /Users/phated/projects/mxdbmobile/node_modules/reroute-native/lib/ocaml -I /Users/phated/projects/mxdbmobile/node_modules/bs-fetch/lib/ocaml
+bs_package_dev_includes = 
+namespace = -ns Mxdbmobile
+bsb_dir_group = 0
+refmt = /Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/refmt.exe
+reason_react_jsx = -ppx '/Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/reactjs_jsx_ppx_2.exe'
+refmt_flags = --print binary
+bsc_lib_includes = -I . -I src/native-base -I src
+rule build_ast_and_module_sets_from_re
+  command = ${bsc} -pp "${refmt} ${refmt_flags}" ${reason_react_jsx}  ${ppx_flags} ${warnings} ${bsc_flags} -c -o ${out} -bs-syntax-only -bs-binary-ast -impl ${in}
+  description = [34mBuilding[39m [2m${out}[22m
+build src/App.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/App.re
+rule build_deps
+  command = ${bsdep} ${namespace} -g ${bsb_dir_group} -MD ${in}
+  description = [34mBuilding[39m [2m${out}[22m
+build src/App.mlast.d : build_deps src/App.mlast
+rule build_cmj_cmi
+  command = ${bsc} ${bs_package_flags} -bs-assume-no-mli -bs-no-builtin-ppx-ml -bs-no-implicit-include ${bs_package_includes} ${bsc_lib_includes} ${bsc_extra_includes} ${warnings} ${bsc_flags} -o ${out} -c  ${in} $postbuild
+  depfile = ${in}.d
+  description = [34mBuilding[39m [2m${out}[22m
+build src/App-Mxdbmobile.cmj |  $src_root_dir/src/App.js src/App-Mxdbmobile.cmi : build_cmj_cmi src/App.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src
+build src/Navigation.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/Navigation.re
+build src/Navigation.mlast.d : build_deps src/Navigation.mlast
+build src/Navigation-Mxdbmobile.cmj |  $src_root_dir/src/Navigation.js src/Navigation-Mxdbmobile.cmi : build_cmj_cmi src/Navigation.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src
+build src/native-base/NBBody.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBBody.re
+build src/native-base/NBBody.mlast.d : build_deps src/native-base/NBBody.mlast
+build src/native-base/NBBody-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBBody.js src/native-base/NBBody-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBBody.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBIcon.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBIcon.re
+build src/native-base/NBIcon.mlast.d : build_deps src/native-base/NBIcon.mlast
+build src/native-base/NBIcon-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBIcon.js src/native-base/NBIcon-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBIcon.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBItem.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBItem.re
+build src/native-base/NBItem.mlast.d : build_deps src/native-base/NBItem.mlast
+build src/native-base/NBItem-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBItem.js src/native-base/NBItem-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBItem.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBLeft.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBLeft.re
+build src/native-base/NBLeft.mlast.d : build_deps src/native-base/NBLeft.mlast
+build src/native-base/NBLeft-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBLeft.js src/native-base/NBLeft-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBLeft.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBList.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBList.re
+build src/native-base/NBList.mlast.d : build_deps src/native-base/NBList.mlast
+build src/native-base/NBList-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBList.js src/native-base/NBList-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBList.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBInput.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBInput.re
+build src/native-base/NBInput.mlast.d : build_deps src/native-base/NBInput.mlast
+build src/native-base/NBInput-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBInput.js src/native-base/NBInput-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBInput.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBRight.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBRight.re
+build src/native-base/NBRight.mlast.d : build_deps src/native-base/NBRight.mlast
+build src/native-base/NBRight-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBRight.js src/native-base/NBRight-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBRight.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBTitle.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBTitle.re
+build src/native-base/NBTitle.mlast.d : build_deps src/native-base/NBTitle.mlast
+build src/native-base/NBTitle-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBTitle.js src/native-base/NBTitle-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBTitle.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBButton.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBButton.re
+build src/native-base/NBButton.mlast.d : build_deps src/native-base/NBButton.mlast
+build src/native-base/NBButton-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBButton.js src/native-base/NBButton-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBButton.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBHeader.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBHeader.re
+build src/native-base/NBHeader.mlast.d : build_deps src/native-base/NBHeader.mlast
+build src/native-base/NBHeader-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBHeader.js src/native-base/NBHeader-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBHeader.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBContent.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBContent.re
+build src/native-base/NBContent.mlast.d : build_deps src/native-base/NBContent.mlast
+build src/native-base/NBContent-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBContent.js src/native-base/NBContent-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBContent.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBListItem.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBListItem.re
+build src/native-base/NBListItem.mlast.d : build_deps src/native-base/NBListItem.mlast
+build src/native-base/NBListItem-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBListItem.js src/native-base/NBListItem-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBListItem.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBContainer.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBContainer.re
+build src/native-base/NBContainer.mlast.d : build_deps src/native-base/NBContainer.mlast
+build src/native-base/NBContainer-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBContainer.js src/native-base/NBContainer-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBContainer.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+build src/native-base/NBThumbnail.mlast : build_ast_and_module_sets_from_re $src_root_dir/src/native-base/NBThumbnail.re
+build src/native-base/NBThumbnail.mlast.d : build_deps src/native-base/NBThumbnail.mlast
+build src/native-base/NBThumbnail-Mxdbmobile.cmj |  $src_root_dir/src/native-base/NBThumbnail.js src/native-base/NBThumbnail-Mxdbmobile.cmi : build_cmj_cmi src/native-base/NBThumbnail.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src/native-base
+rule build_package
+  command = ${bsc} -w -49 -no-alias-deps -c ${in}
+  description = [34mBuilding[39m [2m${out}[22m
+build Mxdbmobile.cmi : build_package Mxdbmobile.mlmap
+build build.ninja : phony  ||  Mxdbmobile.cmi src/native-base/NBThumbnail.mlast.d src/native-base/NBContainer.mlast.d src/native-base/NBListItem.mlast.d src/native-base/NBContent.mlast.d src/native-base/NBHeader.mlast.d src/native-base/NBButton.mlast.d src/native-base/NBTitle.mlast.d src/native-base/NBRight.mlast.d src/native-base/NBInput.mlast.d src/native-base/NBList.mlast.d src/native-base/NBLeft.mlast.d src/native-base/NBItem.mlast.d src/native-base/NBIcon.mlast.d src/native-base/NBBody.mlast.d src/Navigation.mlast.d src/App.mlast.d

@@ -1,0 +1,23 @@
+####{BSB GENERATED: NO EDIT
+B lib/bs
+FLG -open Mxdbmobile
+FLG -ppx /Users/phated/projects/mxdbmobile/node_modules/graphql_ppx/ppx
+FLG -ppx '/Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/reactjs_jsx_ppx_2.exe'
+FLG -ppx /Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/bsppx.exe
+S /Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/ocaml
+B /Users/phated/projects/mxdbmobile/node_modules/bs-platform/lib/ocaml
+FLG -nostdlib -no-alias-deps -color always
+FLG -w -30-40+6+7+27+32..39+44+45+101
+S /Users/phated/projects/mxdbmobile/node_modules/reason-react/lib/ocaml
+B /Users/phated/projects/mxdbmobile/node_modules/reason-react/lib/ocaml
+S /Users/phated/projects/mxdbmobile/node_modules/bs-react-native/lib/ocaml
+B /Users/phated/projects/mxdbmobile/node_modules/bs-react-native/lib/ocaml
+S /Users/phated/projects/mxdbmobile/node_modules/reroute-native/lib/ocaml
+B /Users/phated/projects/mxdbmobile/node_modules/reroute-native/lib/ocaml
+S /Users/phated/projects/mxdbmobile/node_modules/bs-fetch/lib/ocaml
+B /Users/phated/projects/mxdbmobile/node_modules/bs-fetch/lib/ocaml
+S src
+B lib/bs/src
+S src/native-base
+B lib/bs/src/native-base
+####BSB GENERATED: NO EDIT}

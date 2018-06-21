@@ -1,0 +1,1 @@
+src/native-base/NBThumbnail-Mxdbmobile.cmj :
