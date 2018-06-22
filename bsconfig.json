@@ -26,7 +26,8 @@
     {
       "dir": "src",
       "subdirs": [
-        "native-base"
+        "material",
+        "icon"
       ]
     }
   ]
