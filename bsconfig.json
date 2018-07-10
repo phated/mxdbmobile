@@ -8,7 +8,6 @@
   "bs-dependencies": [
     "reason-react",
     "bs-react-native",
-    "reroute-native",
     "bs-fetch",
     "@glennsl/bs-json"
   ],
@@ -27,7 +26,6 @@
     {
       "dir": "src",
       "subdirs": [
-        "material",
         "icon",
         "card"
       ]

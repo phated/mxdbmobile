@@ -30,533 +30,872 @@ function parse(value) {
   var match = Js_json.decodeObject(value);
   if (match) {
     var value$1 = match[0];
-    var value$2 = value$1["characters"];
-    var match$1 = Js_json.decodeArray(value$2);
+    var match$1 = value$1["characters"];
     var tmp;
-    if (match$1) {
-      tmp = match$1[0].map((function (value) {
-              var match = Js_json.decodeObject(value);
-              if (match) {
-                var value$1 = match[0];
-                var value$2 = value$1["uid"];
-                var match$1 = Js_json.decodeString(value$2);
-                var tmp;
-                if (match$1) {
-                  tmp = match$1[0];
-                } else {
-                  throw Graphql_error;
-                }
-                var value$3 = value$1["title"];
-                var match$2 = Js_json.decodeString(value$3);
-                var tmp$1;
-                if (match$2) {
-                  tmp$1 = match$2[0];
-                } else {
-                  throw Graphql_error;
-                }
-                var value$4 = value$1["subtitle"];
-                var match$3 = Js_json.decodeNull(value$4);
-                var tmp$2;
-                if (match$3) {
-                  tmp$2 = /* None */0;
-                } else {
-                  var match$4 = Js_json.decodeString(value$4);
-                  var tmp$3;
-                  if (match$4) {
-                    tmp$3 = match$4[0];
-                  } else {
-                    throw Graphql_error;
-                  }
-                  tmp$2 = /* Some */[tmp$3];
-                }
-                var value$5 = value$1["mp"];
-                var match$5 = Js_json.decodeNumber(value$5);
-                var tmp$4;
-                if (match$5) {
-                  tmp$4 = match$5[0] | 0;
-                } else {
-                  throw Graphql_error;
-                }
-                var value$6 = value$1["stats"];
-                var match$6 = Js_json.decodeNull(value$6);
-                var tmp$5;
-                if (match$6) {
-                  tmp$5 = /* None */0;
-                } else {
-                  var match$7 = Js_json.decodeArray(value$6);
-                  var tmp$6;
-                  if (match$7) {
-                    tmp$6 = match$7[0].map((function (value) {
-                            var match = Js_json.decodeObject(value);
-                            if (match) {
-                              var value$1 = match[0];
-                              var value$2 = value$1["type"];
-                              var match$1 = Js_json.decodeString(value$2);
-                              var tmp;
-                              if (match$1) {
-                                switch (match$1[0]) {
-                                  case "Intelligence" : 
-                                      tmp = /* Intelligence */860902239;
-                                      break;
-                                  case "Special" : 
-                                      tmp = /* Special */749117977;
-                                      break;
-                                  case "Strength" : 
-                                      tmp = /* Strength */-398422367;
-                                      break;
-                                  default:
-                                    throw Graphql_error;
-                                }
-                              } else {
-                                throw Graphql_error;
-                              }
-                              var value$3 = value$1["rank"];
-                              var match$2 = Js_json.decodeNumber(value$3);
-                              var tmp$1;
-                              if (match$2) {
-                                tmp$1 = match$2[0] | 0;
-                              } else {
-                                throw Graphql_error;
-                              }
-                              return {
-                                      type: tmp,
-                                      rank: tmp$1
-                                    };
-                            } else {
-                              throw Graphql_error;
-                            }
-                          }));
-                  } else {
-                    throw Graphql_error;
-                  }
-                  tmp$5 = /* Some */[tmp$6];
-                }
-                var value$7 = value$1["effect"];
-                var match$8 = Js_json.decodeNull(value$7);
-                var tmp$7;
-                if (match$8) {
-                  tmp$7 = /* None */0;
-                } else {
-                  var match$9 = Js_json.decodeObject(value$7);
-                  var tmp$8;
-                  if (match$9) {
-                    var value$8 = match$9[0];
-                    var value$9 = value$8["symbol"];
-                    var match$10 = Js_json.decodeString(value$9);
-                    var tmp$9;
-                    if (match$10) {
-                      switch (match$10[0]) {
-                        case "ATTACK" : 
-                            tmp$9 = /* ATTACK */311601096;
-                            break;
-                        case "CONSTANT" : 
-                            tmp$9 = /* CONSTANT */-14462620;
-                            break;
-                        case "DEFEND" : 
-                            tmp$9 = /* DEFEND */425991990;
-                            break;
-                        case "NONE" : 
-                            tmp$9 = /* NONE */868932280;
-                            break;
-                        case "PLAY" : 
-                            tmp$9 = /* PLAY */890959348;
-                            break;
-                        case "PUSH" : 
-                            tmp$9 = /* PUSH */891410906;
-                            break;
-                        default:
-                          throw Graphql_error;
-                      }
+    if (match$1 !== undefined) {
+      var match$2 = Js_json.decodeArray(match$1);
+      if (match$2) {
+        tmp = match$2[0].map((function (value) {
+                var match = Js_json.decodeObject(value);
+                if (match) {
+                  var value$1 = match[0];
+                  var match$1 = value$1["uid"];
+                  var tmp;
+                  if (match$1 !== undefined) {
+                    var match$2 = Js_json.decodeString(match$1);
+                    if (match$2) {
+                      tmp = match$2[0];
                     } else {
-                      throw Graphql_error;
+                      throw [
+                            Graphql_error,
+                            "Expected string, got " + JSON.stringify(match$1)
+                          ];
                     }
-                    var value$10 = value$8["text"];
-                    var match$11 = Js_json.decodeNull(value$10);
-                    var tmp$10;
-                    if (match$11) {
-                      tmp$10 = /* None */0;
-                    } else {
-                      var match$12 = Js_json.decodeString(value$10);
-                      var tmp$11;
-                      if (match$12) {
-                        tmp$11 = match$12[0];
-                      } else {
-                        throw Graphql_error;
-                      }
-                      tmp$10 = /* Some */[tmp$11];
-                    }
-                    tmp$8 = {
-                      symbol: tmp$9,
-                      text: tmp$10
-                    };
                   } else {
-                    throw Graphql_error;
+                    throw [
+                          Graphql_error,
+                          "Field uid on type Card is missing"
+                        ];
                   }
-                  tmp$7 = /* Some */[tmp$8];
-                }
-                var value$11 = value$1["image"];
-                var match$13 = Js_json.decodeNull(value$11);
-                var tmp$12;
-                if (match$13) {
-                  tmp$12 = /* None */0;
-                } else {
-                  var match$14 = Js_json.decodeObject(value$11);
-                  var tmp$13;
-                  if (match$14) {
-                    var value$12 = match$14[0]["thumbnail"];
-                    var match$15 = Js_json.decodeString(value$12);
-                    var tmp$14;
-                    if (match$15) {
-                      tmp$14 = match$15[0];
+                  var match$3 = value$1["title"];
+                  var tmp$1;
+                  if (match$3 !== undefined) {
+                    var match$4 = Js_json.decodeString(match$3);
+                    if (match$4) {
+                      tmp$1 = match$4[0];
                     } else {
-                      throw Graphql_error;
+                      throw [
+                            Graphql_error,
+                            "Expected string, got " + JSON.stringify(match$3)
+                          ];
                     }
-                    tmp$13 = {
-                      thumbnail: tmp$14
-                    };
                   } else {
-                    throw Graphql_error;
+                    throw [
+                          Graphql_error,
+                          "Field title on type Card is missing"
+                        ];
                   }
-                  tmp$12 = /* Some */[tmp$13];
-                }
-                return {
-                        uid: tmp,
-                        title: tmp$1,
-                        subtitle: tmp$2,
-                        mp: tmp$4,
-                        stats: tmp$5,
-                        effect: tmp$7,
-                        image: tmp$12
-                      };
-              } else {
-                throw Graphql_error;
-              }
-            }));
-    } else {
-      throw Graphql_error;
-    }
-    var value$3 = value$1["events"];
-    var match$2 = Js_json.decodeArray(value$3);
-    var tmp$1;
-    if (match$2) {
-      tmp$1 = match$2[0].map((function (value) {
-              var match = Js_json.decodeObject(value);
-              if (match) {
-                var value$1 = match[0];
-                var value$2 = value$1["uid"];
-                var match$1 = Js_json.decodeString(value$2);
-                var tmp;
-                if (match$1) {
-                  tmp = match$1[0];
-                } else {
-                  throw Graphql_error;
-                }
-                var value$3 = value$1["title"];
-                var match$2 = Js_json.decodeString(value$3);
-                var tmp$1;
-                if (match$2) {
-                  tmp$1 = match$2[0];
-                } else {
-                  throw Graphql_error;
-                }
-                var value$4 = value$1["mp"];
-                var match$3 = Js_json.decodeNumber(value$4);
-                var tmp$2;
-                if (match$3) {
-                  tmp$2 = match$3[0] | 0;
-                } else {
-                  throw Graphql_error;
-                }
-                var value$5 = value$1["effect"];
-                var match$4 = Js_json.decodeNull(value$5);
-                var tmp$3;
-                if (match$4) {
-                  tmp$3 = /* None */0;
-                } else {
-                  var match$5 = Js_json.decodeObject(value$5);
-                  var tmp$4;
-                  if (match$5) {
-                    var value$6 = match$5[0];
-                    var value$7 = value$6["symbol"];
-                    var match$6 = Js_json.decodeString(value$7);
-                    var tmp$5;
+                  var match$5 = value$1["subtitle"];
+                  var tmp$2;
+                  if (match$5 !== undefined) {
+                    var match$6 = Js_json.decodeNull(match$5);
                     if (match$6) {
-                      switch (match$6[0]) {
-                        case "ATTACK" : 
-                            tmp$5 = /* ATTACK */311601096;
-                            break;
-                        case "CONSTANT" : 
-                            tmp$5 = /* CONSTANT */-14462620;
-                            break;
-                        case "DEFEND" : 
-                            tmp$5 = /* DEFEND */425991990;
-                            break;
-                        case "NONE" : 
-                            tmp$5 = /* NONE */868932280;
-                            break;
-                        case "PLAY" : 
-                            tmp$5 = /* PLAY */890959348;
-                            break;
-                        case "PUSH" : 
-                            tmp$5 = /* PUSH */891410906;
-                            break;
-                        default:
-                          throw Graphql_error;
-                      }
+                      tmp$2 = /* None */0;
                     } else {
-                      throw Graphql_error;
-                    }
-                    var value$8 = value$6["text"];
-                    var match$7 = Js_json.decodeNull(value$8);
-                    var tmp$6;
-                    if (match$7) {
-                      tmp$6 = /* None */0;
-                    } else {
-                      var match$8 = Js_json.decodeString(value$8);
-                      var tmp$7;
-                      if (match$8) {
-                        tmp$7 = match$8[0];
+                      var match$7 = Js_json.decodeString(match$5);
+                      var tmp$3;
+                      if (match$7) {
+                        tmp$3 = match$7[0];
                       } else {
-                        throw Graphql_error;
+                        throw [
+                              Graphql_error,
+                              "Expected string, got " + JSON.stringify(match$5)
+                            ];
                       }
-                      tmp$6 = /* Some */[tmp$7];
+                      tmp$2 = /* Some */[tmp$3];
                     }
-                    tmp$4 = {
-                      symbol: tmp$5,
-                      text: tmp$6
-                    };
                   } else {
-                    throw Graphql_error;
+                    tmp$2 = /* None */0;
                   }
-                  tmp$3 = /* Some */[tmp$4];
-                }
-                var value$9 = value$1["image"];
-                var match$9 = Js_json.decodeNull(value$9);
-                var tmp$8;
-                if (match$9) {
-                  tmp$8 = /* None */0;
-                } else {
-                  var match$10 = Js_json.decodeObject(value$9);
-                  var tmp$9;
-                  if (match$10) {
-                    var value$10 = match$10[0]["thumbnail"];
-                    var match$11 = Js_json.decodeString(value$10);
-                    var tmp$10;
-                    if (match$11) {
-                      tmp$10 = match$11[0];
-                    } else {
-                      throw Graphql_error;
-                    }
-                    tmp$9 = {
-                      thumbnail: tmp$10
-                    };
-                  } else {
-                    throw Graphql_error;
-                  }
-                  tmp$8 = /* Some */[tmp$9];
-                }
-                return {
-                        uid: tmp,
-                        title: tmp$1,
-                        mp: tmp$2,
-                        effect: tmp$3,
-                        image: tmp$8
-                      };
-              } else {
-                throw Graphql_error;
-              }
-            }));
-    } else {
-      throw Graphql_error;
-    }
-    var value$4 = value$1["battles"];
-    var match$3 = Js_json.decodeArray(value$4);
-    var tmp$2;
-    if (match$3) {
-      tmp$2 = match$3[0].map((function (value) {
-              var match = Js_json.decodeObject(value);
-              if (match) {
-                var value$1 = match[0];
-                var value$2 = value$1["uid"];
-                var match$1 = Js_json.decodeString(value$2);
-                var tmp;
-                if (match$1) {
-                  tmp = match$1[0];
-                } else {
-                  throw Graphql_error;
-                }
-                var value$3 = value$1["title"];
-                var match$2 = Js_json.decodeString(value$3);
-                var tmp$1;
-                if (match$2) {
-                  tmp$1 = match$2[0];
-                } else {
-                  throw Graphql_error;
-                }
-                var value$4 = value$1["mp"];
-                var match$3 = Js_json.decodeNumber(value$4);
-                var tmp$2;
-                if (match$3) {
-                  tmp$2 = match$3[0] | 0;
-                } else {
-                  throw Graphql_error;
-                }
-                var value$5 = value$1["stats"];
-                var match$4 = Js_json.decodeNull(value$5);
-                var tmp$3;
-                if (match$4) {
-                  tmp$3 = /* None */0;
-                } else {
-                  var match$5 = Js_json.decodeArray(value$5);
+                  var match$8 = value$1["mp"];
                   var tmp$4;
-                  if (match$5) {
-                    tmp$4 = match$5[0].map((function (value) {
-                            var match = Js_json.decodeObject(value);
-                            if (match) {
-                              var value$1 = match[0];
-                              var value$2 = value$1["type"];
-                              var match$1 = Js_json.decodeString(value$2);
-                              var tmp;
-                              if (match$1) {
-                                switch (match$1[0]) {
-                                  case "Intelligence" : 
-                                      tmp = /* Intelligence */860902239;
-                                      break;
-                                  case "Special" : 
-                                      tmp = /* Special */749117977;
-                                      break;
-                                  case "Strength" : 
-                                      tmp = /* Strength */-398422367;
-                                      break;
-                                  default:
-                                    throw Graphql_error;
-                                }
-                              } else {
-                                throw Graphql_error;
-                              }
-                              var value$3 = value$1["rank"];
-                              var match$2 = Js_json.decodeNumber(value$3);
-                              var tmp$1;
-                              if (match$2) {
-                                tmp$1 = match$2[0] | 0;
-                              } else {
-                                throw Graphql_error;
-                              }
-                              return {
-                                      type: tmp,
-                                      rank: tmp$1
-                                    };
-                            } else {
-                              throw Graphql_error;
-                            }
-                          }));
-                  } else {
-                    throw Graphql_error;
-                  }
-                  tmp$3 = /* Some */[tmp$4];
-                }
-                var value$6 = value$1["effect"];
-                var match$6 = Js_json.decodeNull(value$6);
-                var tmp$5;
-                if (match$6) {
-                  tmp$5 = /* None */0;
-                } else {
-                  var match$7 = Js_json.decodeObject(value$6);
-                  var tmp$6;
-                  if (match$7) {
-                    var value$7 = match$7[0];
-                    var value$8 = value$7["symbol"];
-                    var match$8 = Js_json.decodeString(value$8);
-                    var tmp$7;
-                    if (match$8) {
-                      switch (match$8[0]) {
-                        case "ATTACK" : 
-                            tmp$7 = /* ATTACK */311601096;
-                            break;
-                        case "CONSTANT" : 
-                            tmp$7 = /* CONSTANT */-14462620;
-                            break;
-                        case "DEFEND" : 
-                            tmp$7 = /* DEFEND */425991990;
-                            break;
-                        case "NONE" : 
-                            tmp$7 = /* NONE */868932280;
-                            break;
-                        case "PLAY" : 
-                            tmp$7 = /* PLAY */890959348;
-                            break;
-                        case "PUSH" : 
-                            tmp$7 = /* PUSH */891410906;
-                            break;
-                        default:
-                          throw Graphql_error;
-                      }
-                    } else {
-                      throw Graphql_error;
-                    }
-                    var value$9 = value$7["text"];
-                    var match$9 = Js_json.decodeNull(value$9);
-                    var tmp$8;
+                  if (match$8 !== undefined) {
+                    var match$9 = Js_json.decodeNumber(match$8);
                     if (match$9) {
+                      tmp$4 = match$9[0] | 0;
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected int, got " + JSON.stringify(match$8)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field mp on type Card is missing"
+                        ];
+                  }
+                  var match$10 = value$1["stats"];
+                  var tmp$5;
+                  if (match$10 !== undefined) {
+                    var match$11 = Js_json.decodeNull(match$10);
+                    if (match$11) {
+                      tmp$5 = /* None */0;
+                    } else {
+                      var match$12 = Js_json.decodeArray(match$10);
+                      var tmp$6;
+                      if (match$12) {
+                        tmp$6 = match$12[0].map((function (value) {
+                                var match = Js_json.decodeObject(value);
+                                if (match) {
+                                  var value$1 = match[0];
+                                  var match$1 = value$1["type"];
+                                  var tmp;
+                                  if (match$1 !== undefined) {
+                                    var match$2 = Js_json.decodeString(match$1);
+                                    if (match$2) {
+                                      var value$2 = match$2[0];
+                                      switch (value$2) {
+                                        case "Intelligence" : 
+                                            tmp = /* Intelligence */860902239;
+                                            break;
+                                        case "Special" : 
+                                            tmp = /* Special */749117977;
+                                            break;
+                                        case "Strength" : 
+                                            tmp = /* Strength */-398422367;
+                                            break;
+                                        default:
+                                          throw [
+                                                Graphql_error,
+                                                "Unknown enum variant for CardStat: " + value$2
+                                              ];
+                                      }
+                                    } else {
+                                      throw [
+                                            Graphql_error,
+                                            "Expected enum value for CardStat, got " + JSON.stringify(match$1)
+                                          ];
+                                    }
+                                  } else {
+                                    throw [
+                                          Graphql_error,
+                                          "Field type on type Stat is missing"
+                                        ];
+                                  }
+                                  var match$3 = value$1["rank"];
+                                  var tmp$1;
+                                  if (match$3 !== undefined) {
+                                    var match$4 = Js_json.decodeNumber(match$3);
+                                    if (match$4) {
+                                      tmp$1 = match$4[0] | 0;
+                                    } else {
+                                      throw [
+                                            Graphql_error,
+                                            "Expected int, got " + JSON.stringify(match$3)
+                                          ];
+                                    }
+                                  } else {
+                                    throw [
+                                          Graphql_error,
+                                          "Field rank on type Stat is missing"
+                                        ];
+                                  }
+                                  return {
+                                          type: tmp,
+                                          rank: tmp$1
+                                        };
+                                } else {
+                                  throw [
+                                        Graphql_error,
+                                        "Object is not a value"
+                                      ];
+                                }
+                              }));
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Expected array, got " + JSON.stringify(match$10)
+                            ];
+                      }
+                      tmp$5 = /* Some */[tmp$6];
+                    }
+                  } else {
+                    tmp$5 = /* None */0;
+                  }
+                  var match$13 = value$1["effect"];
+                  var tmp$7;
+                  if (match$13 !== undefined) {
+                    var match$14 = Js_json.decodeNull(match$13);
+                    if (match$14) {
+                      tmp$7 = /* None */0;
+                    } else {
+                      var match$15 = Js_json.decodeObject(match$13);
+                      var tmp$8;
+                      if (match$15) {
+                        var value$2 = match$15[0];
+                        var match$16 = value$2["symbol"];
+                        var tmp$9;
+                        if (match$16 !== undefined) {
+                          var match$17 = Js_json.decodeString(match$16);
+                          if (match$17) {
+                            var value$3 = match$17[0];
+                            switch (value$3) {
+                              case "ATTACK" : 
+                                  tmp$9 = /* ATTACK */311601096;
+                                  break;
+                              case "CONSTANT" : 
+                                  tmp$9 = /* CONSTANT */-14462620;
+                                  break;
+                              case "DEFEND" : 
+                                  tmp$9 = /* DEFEND */425991990;
+                                  break;
+                              case "NONE" : 
+                                  tmp$9 = /* NONE */868932280;
+                                  break;
+                              case "PLAY" : 
+                                  tmp$9 = /* PLAY */890959348;
+                                  break;
+                              case "PUSH" : 
+                                  tmp$9 = /* PUSH */891410906;
+                                  break;
+                              default:
+                                throw [
+                                      Graphql_error,
+                                      "Unknown enum variant for CardSymbol: " + value$3
+                                    ];
+                            }
+                          } else {
+                            throw [
+                                  Graphql_error,
+                                  "Expected enum value for CardSymbol, got " + JSON.stringify(match$16)
+                                ];
+                          }
+                        } else {
+                          throw [
+                                Graphql_error,
+                                "Field symbol on type Effect is missing"
+                              ];
+                        }
+                        var match$18 = value$2["text"];
+                        var tmp$10;
+                        if (match$18 !== undefined) {
+                          var match$19 = Js_json.decodeNull(match$18);
+                          if (match$19) {
+                            tmp$10 = /* None */0;
+                          } else {
+                            var match$20 = Js_json.decodeString(match$18);
+                            var tmp$11;
+                            if (match$20) {
+                              tmp$11 = match$20[0];
+                            } else {
+                              throw [
+                                    Graphql_error,
+                                    "Expected string, got " + JSON.stringify(match$18)
+                                  ];
+                            }
+                            tmp$10 = /* Some */[tmp$11];
+                          }
+                        } else {
+                          tmp$10 = /* None */0;
+                        }
+                        tmp$8 = {
+                          symbol: tmp$9,
+                          text: tmp$10
+                        };
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Object is not a value"
+                            ];
+                      }
+                      tmp$7 = /* Some */[tmp$8];
+                    }
+                  } else {
+                    tmp$7 = /* None */0;
+                  }
+                  var match$21 = value$1["image"];
+                  var tmp$12;
+                  if (match$21 !== undefined) {
+                    var match$22 = Js_json.decodeNull(match$21);
+                    if (match$22) {
+                      tmp$12 = /* None */0;
+                    } else {
+                      var match$23 = Js_json.decodeObject(match$21);
+                      var tmp$13;
+                      if (match$23) {
+                        var match$24 = match$23[0]["thumbnail"];
+                        var tmp$14;
+                        if (match$24 !== undefined) {
+                          var match$25 = Js_json.decodeString(match$24);
+                          if (match$25) {
+                            tmp$14 = match$25[0];
+                          } else {
+                            throw [
+                                  Graphql_error,
+                                  "Expected string, got " + JSON.stringify(match$24)
+                                ];
+                          }
+                        } else {
+                          throw [
+                                Graphql_error,
+                                "Field thumbnail on type Image is missing"
+                              ];
+                        }
+                        tmp$13 = {
+                          thumbnail: tmp$14
+                        };
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Object is not a value"
+                            ];
+                      }
+                      tmp$12 = /* Some */[tmp$13];
+                    }
+                  } else {
+                    tmp$12 = /* None */0;
+                  }
+                  return {
+                          uid: tmp,
+                          title: tmp$1,
+                          subtitle: tmp$2,
+                          mp: tmp$4,
+                          stats: tmp$5,
+                          effect: tmp$7,
+                          image: tmp$12
+                        };
+                } else {
+                  throw [
+                        Graphql_error,
+                        "Object is not a value"
+                      ];
+                }
+              }));
+      } else {
+        throw [
+              Graphql_error,
+              "Expected array, got " + JSON.stringify(match$1)
+            ];
+      }
+    } else {
+      throw [
+            Graphql_error,
+            "Field characters on type Query is missing"
+          ];
+    }
+    var match$3 = value$1["events"];
+    var tmp$1;
+    if (match$3 !== undefined) {
+      var match$4 = Js_json.decodeArray(match$3);
+      if (match$4) {
+        tmp$1 = match$4[0].map((function (value) {
+                var match = Js_json.decodeObject(value);
+                if (match) {
+                  var value$1 = match[0];
+                  var match$1 = value$1["uid"];
+                  var tmp;
+                  if (match$1 !== undefined) {
+                    var match$2 = Js_json.decodeString(match$1);
+                    if (match$2) {
+                      tmp = match$2[0];
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected string, got " + JSON.stringify(match$1)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field uid on type Card is missing"
+                        ];
+                  }
+                  var match$3 = value$1["title"];
+                  var tmp$1;
+                  if (match$3 !== undefined) {
+                    var match$4 = Js_json.decodeString(match$3);
+                    if (match$4) {
+                      tmp$1 = match$4[0];
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected string, got " + JSON.stringify(match$3)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field title on type Card is missing"
+                        ];
+                  }
+                  var match$5 = value$1["mp"];
+                  var tmp$2;
+                  if (match$5 !== undefined) {
+                    var match$6 = Js_json.decodeNumber(match$5);
+                    if (match$6) {
+                      tmp$2 = match$6[0] | 0;
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected int, got " + JSON.stringify(match$5)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field mp on type Card is missing"
+                        ];
+                  }
+                  var match$7 = value$1["effect"];
+                  var tmp$3;
+                  if (match$7 !== undefined) {
+                    var match$8 = Js_json.decodeNull(match$7);
+                    if (match$8) {
+                      tmp$3 = /* None */0;
+                    } else {
+                      var match$9 = Js_json.decodeObject(match$7);
+                      var tmp$4;
+                      if (match$9) {
+                        var value$2 = match$9[0];
+                        var match$10 = value$2["symbol"];
+                        var tmp$5;
+                        if (match$10 !== undefined) {
+                          var match$11 = Js_json.decodeString(match$10);
+                          if (match$11) {
+                            var value$3 = match$11[0];
+                            switch (value$3) {
+                              case "ATTACK" : 
+                                  tmp$5 = /* ATTACK */311601096;
+                                  break;
+                              case "CONSTANT" : 
+                                  tmp$5 = /* CONSTANT */-14462620;
+                                  break;
+                              case "DEFEND" : 
+                                  tmp$5 = /* DEFEND */425991990;
+                                  break;
+                              case "NONE" : 
+                                  tmp$5 = /* NONE */868932280;
+                                  break;
+                              case "PLAY" : 
+                                  tmp$5 = /* PLAY */890959348;
+                                  break;
+                              case "PUSH" : 
+                                  tmp$5 = /* PUSH */891410906;
+                                  break;
+                              default:
+                                throw [
+                                      Graphql_error,
+                                      "Unknown enum variant for CardSymbol: " + value$3
+                                    ];
+                            }
+                          } else {
+                            throw [
+                                  Graphql_error,
+                                  "Expected enum value for CardSymbol, got " + JSON.stringify(match$10)
+                                ];
+                          }
+                        } else {
+                          throw [
+                                Graphql_error,
+                                "Field symbol on type Effect is missing"
+                              ];
+                        }
+                        var match$12 = value$2["text"];
+                        var tmp$6;
+                        if (match$12 !== undefined) {
+                          var match$13 = Js_json.decodeNull(match$12);
+                          if (match$13) {
+                            tmp$6 = /* None */0;
+                          } else {
+                            var match$14 = Js_json.decodeString(match$12);
+                            var tmp$7;
+                            if (match$14) {
+                              tmp$7 = match$14[0];
+                            } else {
+                              throw [
+                                    Graphql_error,
+                                    "Expected string, got " + JSON.stringify(match$12)
+                                  ];
+                            }
+                            tmp$6 = /* Some */[tmp$7];
+                          }
+                        } else {
+                          tmp$6 = /* None */0;
+                        }
+                        tmp$4 = {
+                          symbol: tmp$5,
+                          text: tmp$6
+                        };
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Object is not a value"
+                            ];
+                      }
+                      tmp$3 = /* Some */[tmp$4];
+                    }
+                  } else {
+                    tmp$3 = /* None */0;
+                  }
+                  var match$15 = value$1["image"];
+                  var tmp$8;
+                  if (match$15 !== undefined) {
+                    var match$16 = Js_json.decodeNull(match$15);
+                    if (match$16) {
                       tmp$8 = /* None */0;
                     } else {
-                      var match$10 = Js_json.decodeString(value$9);
+                      var match$17 = Js_json.decodeObject(match$15);
                       var tmp$9;
-                      if (match$10) {
-                        tmp$9 = match$10[0];
+                      if (match$17) {
+                        var match$18 = match$17[0]["thumbnail"];
+                        var tmp$10;
+                        if (match$18 !== undefined) {
+                          var match$19 = Js_json.decodeString(match$18);
+                          if (match$19) {
+                            tmp$10 = match$19[0];
+                          } else {
+                            throw [
+                                  Graphql_error,
+                                  "Expected string, got " + JSON.stringify(match$18)
+                                ];
+                          }
+                        } else {
+                          throw [
+                                Graphql_error,
+                                "Field thumbnail on type Image is missing"
+                              ];
+                        }
+                        tmp$9 = {
+                          thumbnail: tmp$10
+                        };
                       } else {
-                        throw Graphql_error;
+                        throw [
+                              Graphql_error,
+                              "Object is not a value"
+                            ];
                       }
                       tmp$8 = /* Some */[tmp$9];
                     }
-                    tmp$6 = {
-                      symbol: tmp$7,
-                      text: tmp$8
-                    };
                   } else {
-                    throw Graphql_error;
+                    tmp$8 = /* None */0;
                   }
-                  tmp$5 = /* Some */[tmp$6];
-                }
-                var value$10 = value$1["image"];
-                var match$11 = Js_json.decodeNull(value$10);
-                var tmp$10;
-                if (match$11) {
-                  tmp$10 = /* None */0;
+                  return {
+                          uid: tmp,
+                          title: tmp$1,
+                          mp: tmp$2,
+                          effect: tmp$3,
+                          image: tmp$8
+                        };
                 } else {
-                  var match$12 = Js_json.decodeObject(value$10);
-                  var tmp$11;
-                  if (match$12) {
-                    var value$11 = match$12[0]["thumbnail"];
-                    var match$13 = Js_json.decodeString(value$11);
-                    var tmp$12;
-                    if (match$13) {
-                      tmp$12 = match$13[0];
-                    } else {
-                      throw Graphql_error;
-                    }
-                    tmp$11 = {
-                      thumbnail: tmp$12
-                    };
-                  } else {
-                    throw Graphql_error;
-                  }
-                  tmp$10 = /* Some */[tmp$11];
+                  throw [
+                        Graphql_error,
+                        "Object is not a value"
+                      ];
                 }
-                return {
-                        uid: tmp,
-                        title: tmp$1,
-                        mp: tmp$2,
-                        stats: tmp$3,
-                        effect: tmp$5,
-                        image: tmp$10
-                      };
-              } else {
-                throw Graphql_error;
-              }
-            }));
+              }));
+      } else {
+        throw [
+              Graphql_error,
+              "Expected array, got " + JSON.stringify(match$3)
+            ];
+      }
     } else {
-      throw Graphql_error;
+      throw [
+            Graphql_error,
+            "Field events on type Query is missing"
+          ];
+    }
+    var match$5 = value$1["battles"];
+    var tmp$2;
+    if (match$5 !== undefined) {
+      var match$6 = Js_json.decodeArray(match$5);
+      if (match$6) {
+        tmp$2 = match$6[0].map((function (value) {
+                var match = Js_json.decodeObject(value);
+                if (match) {
+                  var value$1 = match[0];
+                  var match$1 = value$1["uid"];
+                  var tmp;
+                  if (match$1 !== undefined) {
+                    var match$2 = Js_json.decodeString(match$1);
+                    if (match$2) {
+                      tmp = match$2[0];
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected string, got " + JSON.stringify(match$1)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field uid on type Card is missing"
+                        ];
+                  }
+                  var match$3 = value$1["title"];
+                  var tmp$1;
+                  if (match$3 !== undefined) {
+                    var match$4 = Js_json.decodeString(match$3);
+                    if (match$4) {
+                      tmp$1 = match$4[0];
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected string, got " + JSON.stringify(match$3)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field title on type Card is missing"
+                        ];
+                  }
+                  var match$5 = value$1["mp"];
+                  var tmp$2;
+                  if (match$5 !== undefined) {
+                    var match$6 = Js_json.decodeNumber(match$5);
+                    if (match$6) {
+                      tmp$2 = match$6[0] | 0;
+                    } else {
+                      throw [
+                            Graphql_error,
+                            "Expected int, got " + JSON.stringify(match$5)
+                          ];
+                    }
+                  } else {
+                    throw [
+                          Graphql_error,
+                          "Field mp on type Card is missing"
+                        ];
+                  }
+                  var match$7 = value$1["stats"];
+                  var tmp$3;
+                  if (match$7 !== undefined) {
+                    var match$8 = Js_json.decodeNull(match$7);
+                    if (match$8) {
+                      tmp$3 = /* None */0;
+                    } else {
+                      var match$9 = Js_json.decodeArray(match$7);
+                      var tmp$4;
+                      if (match$9) {
+                        tmp$4 = match$9[0].map((function (value) {
+                                var match = Js_json.decodeObject(value);
+                                if (match) {
+                                  var value$1 = match[0];
+                                  var match$1 = value$1["type"];
+                                  var tmp;
+                                  if (match$1 !== undefined) {
+                                    var match$2 = Js_json.decodeString(match$1);
+                                    if (match$2) {
+                                      var value$2 = match$2[0];
+                                      switch (value$2) {
+                                        case "Intelligence" : 
+                                            tmp = /* Intelligence */860902239;
+                                            break;
+                                        case "Special" : 
+                                            tmp = /* Special */749117977;
+                                            break;
+                                        case "Strength" : 
+                                            tmp = /* Strength */-398422367;
+                                            break;
+                                        default:
+                                          throw [
+                                                Graphql_error,
+                                                "Unknown enum variant for CardStat: " + value$2
+                                              ];
+                                      }
+                                    } else {
+                                      throw [
+                                            Graphql_error,
+                                            "Expected enum value for CardStat, got " + JSON.stringify(match$1)
+                                          ];
+                                    }
+                                  } else {
+                                    throw [
+                                          Graphql_error,
+                                          "Field type on type Stat is missing"
+                                        ];
+                                  }
+                                  var match$3 = value$1["rank"];
+                                  var tmp$1;
+                                  if (match$3 !== undefined) {
+                                    var match$4 = Js_json.decodeNumber(match$3);
+                                    if (match$4) {
+                                      tmp$1 = match$4[0] | 0;
+                                    } else {
+                                      throw [
+                                            Graphql_error,
+                                            "Expected int, got " + JSON.stringify(match$3)
+                                          ];
+                                    }
+                                  } else {
+                                    throw [
+                                          Graphql_error,
+                                          "Field rank on type Stat is missing"
+                                        ];
+                                  }
+                                  return {
+                                          type: tmp,
+                                          rank: tmp$1
+                                        };
+                                } else {
+                                  throw [
+                                        Graphql_error,
+                                        "Object is not a value"
+                                      ];
+                                }
+                              }));
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Expected array, got " + JSON.stringify(match$7)
+                            ];
+                      }
+                      tmp$3 = /* Some */[tmp$4];
+                    }
+                  } else {
+                    tmp$3 = /* None */0;
+                  }
+                  var match$10 = value$1["effect"];
+                  var tmp$5;
+                  if (match$10 !== undefined) {
+                    var match$11 = Js_json.decodeNull(match$10);
+                    if (match$11) {
+                      tmp$5 = /* None */0;
+                    } else {
+                      var match$12 = Js_json.decodeObject(match$10);
+                      var tmp$6;
+                      if (match$12) {
+                        var value$2 = match$12[0];
+                        var match$13 = value$2["symbol"];
+                        var tmp$7;
+                        if (match$13 !== undefined) {
+                          var match$14 = Js_json.decodeString(match$13);
+                          if (match$14) {
+                            var value$3 = match$14[0];
+                            switch (value$3) {
+                              case "ATTACK" : 
+                                  tmp$7 = /* ATTACK */311601096;
+                                  break;
+                              case "CONSTANT" : 
+                                  tmp$7 = /* CONSTANT */-14462620;
+                                  break;
+                              case "DEFEND" : 
+                                  tmp$7 = /* DEFEND */425991990;
+                                  break;
+                              case "NONE" : 
+                                  tmp$7 = /* NONE */868932280;
+                                  break;
+                              case "PLAY" : 
+                                  tmp$7 = /* PLAY */890959348;
+                                  break;
+                              case "PUSH" : 
+                                  tmp$7 = /* PUSH */891410906;
+                                  break;
+                              default:
+                                throw [
+                                      Graphql_error,
+                                      "Unknown enum variant for CardSymbol: " + value$3
+                                    ];
+                            }
+                          } else {
+                            throw [
+                                  Graphql_error,
+                                  "Expected enum value for CardSymbol, got " + JSON.stringify(match$13)
+                                ];
+                          }
+                        } else {
+                          throw [
+                                Graphql_error,
+                                "Field symbol on type Effect is missing"
+                              ];
+                        }
+                        var match$15 = value$2["text"];
+                        var tmp$8;
+                        if (match$15 !== undefined) {
+                          var match$16 = Js_json.decodeNull(match$15);
+                          if (match$16) {
+                            tmp$8 = /* None */0;
+                          } else {
+                            var match$17 = Js_json.decodeString(match$15);
+                            var tmp$9;
+                            if (match$17) {
+                              tmp$9 = match$17[0];
+                            } else {
+                              throw [
+                                    Graphql_error,
+                                    "Expected string, got " + JSON.stringify(match$15)
+                                  ];
+                            }
+                            tmp$8 = /* Some */[tmp$9];
+                          }
+                        } else {
+                          tmp$8 = /* None */0;
+                        }
+                        tmp$6 = {
+                          symbol: tmp$7,
+                          text: tmp$8
+                        };
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Object is not a value"
+                            ];
+                      }
+                      tmp$5 = /* Some */[tmp$6];
+                    }
+                  } else {
+                    tmp$5 = /* None */0;
+                  }
+                  var match$18 = value$1["image"];
+                  var tmp$10;
+                  if (match$18 !== undefined) {
+                    var match$19 = Js_json.decodeNull(match$18);
+                    if (match$19) {
+                      tmp$10 = /* None */0;
+                    } else {
+                      var match$20 = Js_json.decodeObject(match$18);
+                      var tmp$11;
+                      if (match$20) {
+                        var match$21 = match$20[0]["thumbnail"];
+                        var tmp$12;
+                        if (match$21 !== undefined) {
+                          var match$22 = Js_json.decodeString(match$21);
+                          if (match$22) {
+                            tmp$12 = match$22[0];
+                          } else {
+                            throw [
+                                  Graphql_error,
+                                  "Expected string, got " + JSON.stringify(match$21)
+                                ];
+                          }
+                        } else {
+                          throw [
+                                Graphql_error,
+                                "Field thumbnail on type Image is missing"
+                              ];
+                        }
+                        tmp$11 = {
+                          thumbnail: tmp$12
+                        };
+                      } else {
+                        throw [
+                              Graphql_error,
+                              "Object is not a value"
+                            ];
+                      }
+                      tmp$10 = /* Some */[tmp$11];
+                    }
+                  } else {
+                    tmp$10 = /* None */0;
+                  }
+                  return {
+                          uid: tmp,
+                          title: tmp$1,
+                          mp: tmp$2,
+                          stats: tmp$3,
+                          effect: tmp$5,
+                          image: tmp$10
+                        };
+                } else {
+                  throw [
+                        Graphql_error,
+                        "Object is not a value"
+                      ];
+                }
+              }));
+      } else {
+        throw [
+              Graphql_error,
+              "Expected array, got " + JSON.stringify(match$5)
+            ];
+      }
+    } else {
+      throw [
+            Graphql_error,
+            "Field battles on type Query is missing"
+          ];
     }
     return {
             characters: tmp,
@@ -564,7 +903,10 @@ function parse(value) {
             battles: tmp$2
           };
   } else {
-    throw Graphql_error;
+    throw [
+          Graphql_error,
+          "Object is not a value"
+        ];
   }
 }
 

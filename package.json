@@ -17,15 +17,10 @@
     "bs-fetch": "^0.3.0",
     "bs-platform": "^3.1.5",
     "bs-react-native": "^0.8.0",
-    "native-base": "^2.5.2",
     "react": "16.3.1",
     "react-native": "0.55.4",
-    "react-native-fast-image": "^4.0.14",
-    "react-native-gesture-handler": "^1.0.4",
-    "react-native-material-ui": "^1.22.4",
     "react-native-vector-icons": "^4.6.0",
-    "reason-react": "^0.4.2",
-    "reroute-native": "0.0.5"
+    "reason-react": "^0.4.2"
   },
   "devDependencies": {
     "babel-jest": "23.0.1",
