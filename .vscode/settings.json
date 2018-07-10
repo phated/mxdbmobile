@@ -1,2 +1,9 @@
 {
+  "editor.formatOnSave": true,
+  "reason.codelens.enabled": true,
+  "reason.diagnostics.tools": [
+    "merlin",
+    "bsb"
+  ],
+  "reason_language_server.per_value_codelens": true,
 }

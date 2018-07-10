@@ -4,16 +4,10 @@ var Block = require("bs-platform/lib/js/block.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
 var View$BsReactNative = require("bs-react-native/src/components/view.js");
 var Image$BsReactNative = require("bs-react-native/src/components/image.js");
-var Style$BsReactNative = require("bs-react-native/src/style.js");
 
 var component = ReasonReact.statelessComponent("CardImage");
 
-var container = Style$BsReactNative.style(/* :: */[
-      Style$BsReactNative.flex(1),
-      /* [] */0
-    ]);
-
-var Styles = /* module */[/* container */container];
+var Styles = /* module */[];
 
 function make(src, style, _) {
   return /* record */[
@@ -27,7 +21,7 @@ function make(src, style, _) {
           /* willUpdate */component[/* willUpdate */7],
           /* shouldUpdate */component[/* shouldUpdate */8],
           /* render */(function () {
-              return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[ReasonReact.element(/* None */0, /* None */0, Image$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[/* URI */Block.__(0, [Image$BsReactNative.imageURISource(src, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0)])], /* Some */[style], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[]))]));
+              return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[ReasonReact.element(/* None */0, /* None */0, Image$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[/* URI */Block.__(0, [Image$BsReactNative.imageURISource(src, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0)])], /* Some */[style], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[]))]));
             }),
           /* initialState */component[/* initialState */10],
           /* retainedProps */component[/* retainedProps */11],

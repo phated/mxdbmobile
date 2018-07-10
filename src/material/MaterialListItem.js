@@ -8,7 +8,7 @@ function make(centerElement, leftElement, divider, _) {
               leftElement: leftElement,
               centerElement: centerElement,
               divider: divider,
-              numberOfLines: "dynamic"
+              numberOfLines: 3
             }, /* array */[]);
 }
 

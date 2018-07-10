@@ -6,17 +6,12 @@ type jsProps = {
   leftElement: ReasonReact.reactElement,
   centerElement: ReasonReact.reactElement,
   divider: bool,
-  numberOfLines: string,
+  numberOfLines: int,
 };
 
 let make = (~centerElement, ~leftElement, ~divider, _children) =>
   ReasonReact.wrapJsForReason(
     ~reactClass=listItem,
-    ~props=jsProps(
-      ~centerElement,
-      ~leftElement,
-      ~divider,
-      ~numberOfLines="dynamic",
-    ),
+    ~props=jsProps(~centerElement, ~leftElement, ~divider, ~numberOfLines=3),
     [||],
   );

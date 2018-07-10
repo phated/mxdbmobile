@@ -9,9 +9,11 @@
     "watch": "bsb -make-world -w",
     "clean": "bsb -clean-world",
     "run-ios": "react-native run-ios",
+    "run-android": "react-native run-android",
     "postinstall": "react-native link"
   },
   "dependencies": {
+    "@glennsl/bs-json": "^2.0.0",
     "bs-fetch": "^0.3.0",
     "bs-platform": "^3.1.5",
     "bs-react-native": "^0.8.0",

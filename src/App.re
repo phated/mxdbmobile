@@ -1,144 +1,6 @@
 open BsReactNative;
 
-module Routes = {
-  type route =
-    | CardList
-    | DeckList;
-};
-
-include RerouteNative.ReRoute.CreateNavigation(Routes);
-
-module CardEffect = {
-  let component = ReasonReact.statelessComponent("CardEffect");
-
-  module Styles = {
-    open Style;
-    let container =
-      style([
-        flex(1.),
-        justifyContent(FlexEnd),
-        flexDirection(Row),
-        alignItems(Center),
-        marginTop(Auto),
-      ]);
-
-    let effectWithoutSymbol = style([flex(1.)]);
-    let effectWithSymbol =
-      style([
-        flex(1.),
-        paddingLeft(Pt(4.)),
-        marginLeft(Pt(4.)),
-        borderLeftWidth(2.),
-        borderLeftColor(String("#d3d3d3")),
-        borderStyle(Solid),
-      ]);
-  };
-
-  let make = (~symbol, ~effect, _children) => {
-    let symbolImage =
-      switch (symbol) {
-      | `NONE => ReasonReact.null
-      | `ATTACK => <AttackIcon />
-      | `DEFEND => <DefendIcon />
-      | `CONSTANT => <ConstantIcon />
-      | `PLAY => <PlayIcon />
-      | `PUSH => <PushIcon />
-      };
-
-    let effectStyle =
-      switch (symbol) {
-      | `NONE => Styles.effectWithoutSymbol
-      | _ => Styles.effectWithSymbol
-      };
-
-    let c = {
-      ...component,
-      render: _self =>
-        <View style=Styles.container>
-          symbolImage
-          <View style=effectStyle>
-            <Text> (ReasonReact.string(effect)) </Text>
-          </View>
-        </View>,
-    };
-
-    c;
-  };
-};
-
-module CardDetails = {
-  let component = ReasonReact.statelessComponent("CardDetails");
-
-  module Styles = {
-    open Style;
-    let container =
-      style([flex(1.), flexDirection(Column), paddingLeft(Pt(8.))]);
-
-    let title = style([fontWeight(`Bold)]);
-  };
-
-  let make = (~title, ~subtitle, ~effect, ~symbol, _children) => {
-    ...component,
-    render: _self =>
-      <View style=Styles.container>
-        <Text style=Styles.title> (ReasonReact.string(title)) </Text>
-        <Text> (ReasonReact.string(subtitle)) </Text>
-        <CardEffect effect symbol />
-      </View>,
-  };
-};
-
-module CardListItem = {
-  let component = ReasonReact.statelessComponent("CardListItem");
-
-  module Styles = {
-    open Style;
-
-    let cardListItem =
-      style([
-        flex(1.),
-        flexDirection(Row),
-        marginLeft(Pt(8.)),
-        marginRight(Pt(8.)),
-        marginTop(Pt(4.)),
-        marginBottom(Pt(4.)),
-        padding(Pt(4.)),
-        borderStyle(Solid),
-        borderWidth(1.),
-        borderColor(String("#d3d3d3")),
-        borderRadius(3.),
-      ]);
-
-    let thumbnail = style([height(Pt(100.)), width(Pt(72.))]);
-  };
-
-  let make = (~title, ~subtitle, ~thumbnail, ~effect, ~symbol, _children) => {
-    ...component,
-    render: _self => {
-      let leftElement = <CardImage src=thumbnail style=Styles.thumbnail />;
-      let centerElement = <CardDetails title subtitle effect symbol />;
-
-      <MaterialListItem leftElement centerElement divider=true />;
-    },
-  };
-};
-
 module ListOfCards = {
-  type image = {. "thumbnail": string};
-  type effect = {
-    .
-    "symbol": [ | `ATTACK | `CONSTANT | `DEFEND | `NONE | `PLAY | `PUSH],
-    "text": option(string),
-  };
-  type card = {
-    .
-    "uid": string,
-    "title": string,
-    "subtitle": option(string),
-    "effect": option(effect),
-    "image": option(image),
-  };
-
   module CardQuery = [%graphql
     {|
     {
@@ -146,6 +8,11 @@ module ListOfCards = {
         uid
         title
         subtitle
+        mp
+        stats {
+          type
+          rank
+        }
         effect {
           symbol
           text
@@ -157,7 +24,7 @@ module ListOfCards = {
       events: allCards(filter: { type: Event }, orderBy: title_ASC) {
         uid
         title
-        subtitle
+        mp
         effect {
           symbol
           text
@@ -169,7 +36,11 @@ module ListOfCards = {
       battles: allCards(filter: { type: Battle }, orderBy: title_ASC) {
         uid
         title
-        subtitle
+        mp
+        stats(orderBy: type_ASC) {
+          type
+          rank
+        }
         effect {
           symbol
           text
@@ -182,92 +53,67 @@ module ListOfCards = {
     |}
   ];
 
-  type cardSections = {
-    .
-    "characters": array(card),
-    "events": array(card),
-    "battles": array(card),
-  };
-
   type state = {
-    characters: option(array(card)),
-    events: option(array(card)),
-    battles: option(array(card)),
+    characters: array(Character.t),
+    events: array(Event.t),
+    battles: array(Battle.t),
   };
   type action =
     | FetchCards
-    | StoreCards(cardSections);
+    | StoreCards(Query.topLevel);
 
   let component = ReasonReact.reducerComponent("ListOfCards");
 
   module Styles = {
     open Style;
-    let container =
+    let container = style([flex(1.)]);
+
+    let separator =
       style([
-        flex(1.),
-        /* justifyContent(Center), */
-        /* alignItems(Center), */
-        /* backgroundColor(String("tomato")), */
+        flex(1.0),
+        height(1.0 |. Pt),
+        backgroundColor(Colors.Css.gray),
+        /* marginLeft(16.0 |. Pt), */
       ]);
   };
-
-  let renderSectionHeader =
-    SectionList.renderAccessoryView(({section}) => {
-      let title =
-        switch (section.key) {
-        | Some(key) => key
-        | None => ""
-        };
-      <MaterialSubheader text=title />;
-    });
-
+  let itemSeparatorComponent =
+    FlatList.separatorComponent(_ => <View style=Styles.separator />);
   let renderItem =
-    SectionList.renderItem(({item}) => {
-      let thumbnail =
-        switch (item##image) {
-        | Some(image) => image##thumbnail
-        | None => ""
-        };
-      let title = item##title;
-      let subtitle =
-        switch (item##subtitle) {
-        | Some(subtitle) => subtitle
-        | None => ""
-        };
-      let effect =
-        switch (item##effect) {
-        | Some(effect) =>
-          switch (effect##text) {
-          | Some(text) => text
-          | None => ""
-          }
-        | None => ""
-        };
-      let symbol =
-        switch (item##effect) {
-        | Some(effect) => effect##symbol
-        | None => `NONE
-        };
-      <CardListItem title subtitle thumbnail effect symbol />;
+    FlatList.renderItem(bag => {
+      let card: Card.t = bag.item;
+      switch (card) {
+      | Character({title, subtitle, mp, stats, image, effect}) =>
+        <Character title subtitle mp stats image effect />
+      | Event({title, mp, image, effect}) => <Event title mp image effect />
+      | Battle({title, mp, stat, image, effect}) =>
+        <Battle title mp stat image effect />
+      };
     });
 
-  let maybeCards = cards =>
-    switch (Belt.Array.length(cards)) {
-    | 0 => None
-    | _ => Some(cards)
+  let getItemLayout = (_data, idx) => {
+    "length": 170,
+    "offset": 170 * idx,
+    "index": idx,
+  };
+
+  let getUid = card =>
+    switch (card) {
+    | Card.Character(character) => character.uid
+    | Card.Event(event) => event.uid
+    | Card.Battle(battle) => battle.uid
     };
 
   let make = _children => {
     ...component,
-    initialState: () => {characters: None, events: None, battles: None},
+    initialState: () => {characters: [||], events: [||], battles: [||]},
     didMount: self => self.send(FetchCards),
-    reducer: (action, state) =>
+    reducer: (action, _state) =>
       switch (action) {
       | StoreCards(cards) =>
         ReasonReact.Update({
-          characters: maybeCards(cards##characters),
-          events: maybeCards(cards##events),
-          battles: maybeCards(cards##battles),
+          characters: cards.characters,
+          events: cards.events,
+          battles: cards.battles,
         })
       | FetchCards =>
         ReasonReact.SideEffects(
@@ -285,79 +131,22 @@ module ListOfCards = {
       },
     render: self => {
       let sections =
-        [|
-          Belt.Option.map(self.state.characters, data =>
-            SectionList.section(~key="Characters", ~data, ())
-          ),
-          Belt.Option.map(self.state.events, data =>
-            SectionList.section(~key="Events", ~data, ())
-          ),
-          Belt.Option.map(self.state.battles, data =>
-            SectionList.section(~key="Battle Cards", ~data, ())
-          ),
-        |]
-        |. Belt.Array.keep(Belt.Option.isSome)
-        |. Belt.Array.map(Belt.Option.getExn)
-        |. SectionList.sections;
+        CardList.from(
+          self.state.characters,
+          self.state.events,
+          self.state.battles,
+        );
 
       <View style=Styles.container>
-        <SectionList
-          sections
-          stickySectionHeadersEnabled=true
-          keyExtractor=((item, int) => item##uid)
+        <FlatList
+          data=sections
+          getItemLayout
+          keyExtractor=((card, _idx) => getUid(card))
           renderItem
-          renderSectionHeader
+          itemSeparatorComponent
         />
       </View>;
     },
-  };
-};
-
-module CardList = {
-  let component = ReasonReact.statelessComponent("CardList");
-
-  let tabItem = ({isActive}: TabNavigator.tabItemProps) =>
-    <TabNavigator.TabBar.Item
-      label="Cards"
-      style=(Style.style([Style.color(String(isActive ? "blue" : "gray"))]))
-    />;
-
-  let make = (~navigation, _children) => {
-    ...component,
-    render: _self =>
-      <TabNavigator.Screen navigation tabItem>
-        ...(
-             () =>
-               if (false) {
-                 <GridOfCards />;
-               } else {
-                 <ListOfCards />;
-               }
-           )
-      </TabNavigator.Screen>,
-  };
-};
-
-module DeckList = {
-  let component = ReasonReact.statelessComponent("DeckList");
-
-  module Styles = {
-    open Style;
-    let container = style([flex(1.)]);
-  };
-
-  let tabItem = ({isActive}: TabNavigator.tabItemProps) =>
-    <TabNavigator.TabBar.Item
-      label="Deck (0)"
-      style=(Style.style([Style.color(String(isActive ? "blue" : "gray"))]))
-    />;
-
-  let make = (~navigation, _children) => {
-    ...component,
-    render: _self =>
-      <TabNavigator.Screen navigation tabItem>
-        ...(() => <Text> (ReasonReact.string("Deck")) </Text>)
-      </TabNavigator.Screen>,
   };
 };
 
@@ -372,28 +161,134 @@ module AppContainer = {
   let make = children => {
     ...component,
     render: _self =>
-      <MaterialThemeProvider>
-        <SafeAreaView style=Styles.container> ...children </SafeAreaView>
-      </MaterialThemeProvider>,
+      <SafeAreaView style=Styles.container> ...children </SafeAreaView>,
+  };
+};
+
+module Toolbar = {
+  module Styles = {
+    open Style;
+
+    let container =
+      style([
+        flexDirection(Row),
+        padding(16.0 |. Pt),
+        backgroundColor(Colors.Css.primary),
+      ]);
+
+    let title =
+      style([
+        color(Colors.Css.white),
+        fontSize(20.0 |. Float),
+        fontWeight(`Bold),
+        flex(1.0),
+      ]);
+
+    let search =
+      style([
+        flex(1.0),
+        marginLeft(8.0 |. Pt),
+        color(Colors.Css.white),
+        fontSize(20.0 |. Float),
+      ]);
+
+    let icon = style([color(Colors.Css.white)]);
+  };
+
+  type searchMode =
+    | Enabled
+    | Disabled;
+
+  type action =
+    | SearchMode(searchMode);
+
+  type state = {search: searchMode};
+
+  let component = ReasonReact.reducerComponent("Toolbar");
+
+  let make = _children => {
+    ...component,
+    initialState: () => {search: Disabled},
+    reducer: (action, _state) =>
+      switch (action) {
+      | SearchMode(mode) => ReasonReact.Update({search: mode})
+      },
+    render: self =>
+      switch (self.state.search) {
+      | Enabled =>
+        let onBack = () => self.send(SearchMode(Disabled));
+        <View style=Styles.container>
+          <MaterialIcon name="arrow-back" style=Styles.icon onPress=onBack />
+          <TextInput
+            style=Styles.search
+            autoFocus=true
+            placeholder="Search"
+            placeholderTextColor=Colors.gray
+          />
+        </View>;
+      | Disabled =>
+        let onSearch = () => self.send(SearchMode(Enabled));
+
+        <View style=Styles.container>
+          <Text style=Styles.title>
+            (ReasonReact.string("MetaX Deck Builder"))
+          </Text>
+          <MaterialIcon name="search" style=Styles.icon onPress=onSearch />
+        </View>;
+      },
+  };
+};
+
+module NavigationButton = {
+  module Styles = {
+    open Style;
+
+    let container =
+      style([flex(1.0), alignItems(Center), padding(8.0 |. Pt)]);
+
+    let icon = style([color(Colors.Css.white)]);
+    let label = style([fontSize(12.0 |. Float), color(Colors.Css.white)]);
+  };
+
+  let component = ReasonReact.statelessComponent("NavigationButton");
+
+  let make = (~icon, ~label, _children) => {
+    ...component,
+    render: _self =>
+      <View style=Styles.container>
+        <Icon name=icon style=Styles.icon />
+        <Text style=Styles.label> (ReasonReact.string(label)) </Text>
+      </View>,
+  };
+};
+
+module NavigationBar = {
+  module Styles = {
+    open Style;
+
+    let container =
+      style([
+        justifyContent(Center),
+        alignContent(Center),
+        flexDirection(Row),
+        backgroundColor(Colors.Css.primary),
+      ]);
+  };
+  let component = ReasonReact.statelessComponent("NavigationBar");
+
+  let make = children => {
+    ...component,
+    render: _self => <View style=Styles.container> ...children </View>,
   };
 };
 
 let app = () =>
   <AppContainer>
-    <MaterialToolbar
-      centerElement="MetaX Deck Builder"
-      rightElement="view-list"
-      search=true
-    />
-    <TabNavigator
-      initialRoute=Routes.CardList
-      routes=[|Routes.CardList, Routes.DeckList|]>
-      ...(
-           (~navigation) =>
-             switch (navigation.currentRoute) {
-             | Routes.CardList => <CardList navigation />
-             | Routes.DeckList => <DeckList navigation />
-             }
-         )
-    </TabNavigator>
+    <Toolbar />
+    <ListOfCards />
+    <NavigationBar>
+      <NavigationButton icon="cards" label="Cards" />
+      <NavigationButton icon="deck" label="Deck" />
+      <NavigationButton icon="info" label="Info" />
+    </NavigationBar>
   </AppContainer>;

@@ -82,19 +82,19 @@ let make = _children => {
         events: cards##events,
         battles: cards##battles,
       })
-    | FetchCards =>
-      ReasonReact.SideEffects(
-        (
-          self =>
-            Query.send(CardQuery.make())
-            |> Js.Promise.then_(Utils.tapLog)
-            |> Js.Promise.then_(cards => {
-                 self.send(StoreCards(cards));
-                 Js.Promise.resolve(cards);
-               })
-            |> ignore
-        ),
-      )
+    /* | FetchCards =>
+       ReasonReact.SideEffects(
+         (
+           self =>
+             Query.send(CardQuery.make())
+             |> Js.Promise.then_(Utils.tapLog)
+             |> Js.Promise.then_(cards => {
+                  self.send(StoreCards(cards));
+                  Js.Promise.resolve(cards);
+                })
+             |> ignore
+         ),
+       ) */
     },
   render: self => {
     let uris =

@@ -11,10 +11,10 @@ type searchableConfig = {
 type jsProps = {
   centerElement: string,
   searchable: Js.nullable(searchableConfig),
-  rightElement: string,
+  /* rightElement: string, */
 };
 
-let make = (~centerElement, ~search, ~rightElement, _children) => {
+let make = (~centerElement, ~search, _children) => {
   let searchableConfig =
     search ?
       Some(searchableConfig(~autoFocus=true, ~placeholder="Search")) : None;
@@ -24,7 +24,7 @@ let make = (~centerElement, ~search, ~rightElement, _children) => {
     ~props=
       jsProps(
         ~centerElement,
-        ~rightElement,
+        /* ~rightElement, */
         ~searchable=Js.Nullable.fromOption(searchableConfig),
       ),
     [||],

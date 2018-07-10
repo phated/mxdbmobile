@@ -6,12 +6,11 @@ var Js_json = require("bs-platform/lib/js/js_json.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
-var Query$Mxdbmobile = require("./Query.js");
-var Utils$Mxdbmobile = require("./Utils.js");
 var View$BsReactNative = require("bs-react-native/src/components/view.js");
 var Style$BsReactNative = require("bs-react-native/src/style.js");
 var FastImage$Mxdbmobile = require("./FastImage.js");
 var FlatList$BsReactNative = require("bs-react-native/src/components/flatList.js");
+var Caml_builtin_exceptions = require("bs-platform/lib/js/caml_builtin_exceptions.js");
 
 var Graphql_error = Caml_exceptions.create("GridOfCards-Mxdbmobile.CardQuery.Graphql_error");
 
@@ -304,13 +303,14 @@ function make$1() {
                             /* battles */cards.battles
                           ]]);
               } else {
-                return /* SideEffects */Block.__(1, [(function (self) {
-                              Query$Mxdbmobile.send(make(/* () */0)).then(Utils$Mxdbmobile.tapLog).then((function (cards) {
-                                      Curry._1(self[/* send */3], /* StoreCards */[cards]);
-                                      return Promise.resolve(cards);
-                                    }));
-                              return /* () */0;
-                            })]);
+                throw [
+                      Caml_builtin_exceptions.match_failure,
+                      [
+                        "GridOfCards.re",
+                        78,
+                        4
+                      ]
+                    ];
               }
             }),
           /* subscriptions */component[/* subscriptions */13],
