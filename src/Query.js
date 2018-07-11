@@ -25,18 +25,18 @@ function decode(json) {
         ];
 }
 
-function send(q) {
+function send(q, v) {
   return fetch("https://api.graph.cool/simple/v1/metaxdb", Fetch.RequestInit[/* make */0](/* Some */[/* Post */2], /* Some */[{
                         "Content-Type": "application/json"
                       }], /* Some */[JSON.stringify(Js_dict.fromList(/* :: */[
                                 /* tuple */[
                                   "query",
-                                  q.query
+                                  q
                                 ],
                                 /* :: */[
                                   /* tuple */[
                                     "variables",
-                                    q.variables
+                                    v
                                   ],
                                   /* [] */0
                                 ]

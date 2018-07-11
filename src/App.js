@@ -2,946 +2,25 @@
 
 var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
-var Js_json = require("bs-platform/lib/js/js_json.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
-var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
 var Icon$Mxdbmobile = require("./icon/Icon.js");
 var Event$Mxdbmobile = require("./card/Event.js");
 var Query$Mxdbmobile = require("./Query.js");
 var Utils$Mxdbmobile = require("./Utils.js");
 var Battle$Mxdbmobile = require("./card/Battle.js");
 var Colors$Mxdbmobile = require("./Colors.js");
+var Filter$Mxdbmobile = require("./Filter.js");
 var Text$BsReactNative = require("bs-react-native/src/components/text.js");
 var View$BsReactNative = require("bs-react-native/src/components/view.js");
 var CardList$Mxdbmobile = require("./CardList.js");
 var Style$BsReactNative = require("bs-react-native/src/style.js");
 var Character$Mxdbmobile = require("./card/Character.js");
 var FlatList$BsReactNative = require("bs-react-native/src/components/flatList.js");
-var MaterialIcon$Mxdbmobile = require("./icon/MaterialIcon.js");
 var TextInput$BsReactNative = require("bs-react-native/src/components/textInput.js");
 var SafeAreaView$BsReactNative = require("bs-react-native/src/components/safeAreaView.js");
 
-var Graphql_error = Caml_exceptions.create("App-Mxdbmobile.ListOfCards.CardQuery.Graphql_error");
-
-var ppx_printed_query = "query   {\ncharacters: allCards(filter: {type: Character}, orderBy: title_ASC)  {\nuid  \ntitle  \nsubtitle  \nmp  \nstats  {\ntype  \nrank  \n}\neffect  {\nsymbol  \ntext  \n}\nimage  {\nthumbnail  \n}\n}\nevents: allCards(filter: {type: Event}, orderBy: title_ASC)  {\nuid  \ntitle  \nmp  \neffect  {\nsymbol  \ntext  \n}\nimage  {\nthumbnail  \n}\n}\nbattles: allCards(filter: {type: Battle}, orderBy: title_ASC)  {\nuid  \ntitle  \nmp  \nstats(orderBy: type_ASC)  {\ntype  \nrank  \n}\neffect  {\nsymbol  \ntext  \n}\nimage  {\nthumbnail  \n}\n}\n}";
-
-function parse(value) {
-  var match = Js_json.decodeObject(value);
-  if (match) {
-    var value$1 = match[0];
-    var match$1 = value$1["characters"];
-    var tmp;
-    if (match$1 !== undefined) {
-      var match$2 = Js_json.decodeArray(match$1);
-      if (match$2) {
-        tmp = match$2[0].map((function (value) {
-                var match = Js_json.decodeObject(value);
-                if (match) {
-                  var value$1 = match[0];
-                  var match$1 = value$1["uid"];
-                  var tmp;
-                  if (match$1 !== undefined) {
-                    var match$2 = Js_json.decodeString(match$1);
-                    if (match$2) {
-                      tmp = match$2[0];
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected string, got " + JSON.stringify(match$1)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field uid on type Card is missing"
-                        ];
-                  }
-                  var match$3 = value$1["title"];
-                  var tmp$1;
-                  if (match$3 !== undefined) {
-                    var match$4 = Js_json.decodeString(match$3);
-                    if (match$4) {
-                      tmp$1 = match$4[0];
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected string, got " + JSON.stringify(match$3)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field title on type Card is missing"
-                        ];
-                  }
-                  var match$5 = value$1["subtitle"];
-                  var tmp$2;
-                  if (match$5 !== undefined) {
-                    var match$6 = Js_json.decodeNull(match$5);
-                    if (match$6) {
-                      tmp$2 = /* None */0;
-                    } else {
-                      var match$7 = Js_json.decodeString(match$5);
-                      var tmp$3;
-                      if (match$7) {
-                        tmp$3 = match$7[0];
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Expected string, got " + JSON.stringify(match$5)
-                            ];
-                      }
-                      tmp$2 = /* Some */[tmp$3];
-                    }
-                  } else {
-                    tmp$2 = /* None */0;
-                  }
-                  var match$8 = value$1["mp"];
-                  var tmp$4;
-                  if (match$8 !== undefined) {
-                    var match$9 = Js_json.decodeNumber(match$8);
-                    if (match$9) {
-                      tmp$4 = match$9[0] | 0;
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected int, got " + JSON.stringify(match$8)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field mp on type Card is missing"
-                        ];
-                  }
-                  var match$10 = value$1["stats"];
-                  var tmp$5;
-                  if (match$10 !== undefined) {
-                    var match$11 = Js_json.decodeNull(match$10);
-                    if (match$11) {
-                      tmp$5 = /* None */0;
-                    } else {
-                      var match$12 = Js_json.decodeArray(match$10);
-                      var tmp$6;
-                      if (match$12) {
-                        tmp$6 = match$12[0].map((function (value) {
-                                var match = Js_json.decodeObject(value);
-                                if (match) {
-                                  var value$1 = match[0];
-                                  var match$1 = value$1["type"];
-                                  var tmp;
-                                  if (match$1 !== undefined) {
-                                    var match$2 = Js_json.decodeString(match$1);
-                                    if (match$2) {
-                                      var value$2 = match$2[0];
-                                      switch (value$2) {
-                                        case "Intelligence" : 
-                                            tmp = /* Intelligence */860902239;
-                                            break;
-                                        case "Special" : 
-                                            tmp = /* Special */749117977;
-                                            break;
-                                        case "Strength" : 
-                                            tmp = /* Strength */-398422367;
-                                            break;
-                                        default:
-                                          throw [
-                                                Graphql_error,
-                                                "Unknown enum variant for CardStat: " + value$2
-                                              ];
-                                      }
-                                    } else {
-                                      throw [
-                                            Graphql_error,
-                                            "Expected enum value for CardStat, got " + JSON.stringify(match$1)
-                                          ];
-                                    }
-                                  } else {
-                                    throw [
-                                          Graphql_error,
-                                          "Field type on type Stat is missing"
-                                        ];
-                                  }
-                                  var match$3 = value$1["rank"];
-                                  var tmp$1;
-                                  if (match$3 !== undefined) {
-                                    var match$4 = Js_json.decodeNumber(match$3);
-                                    if (match$4) {
-                                      tmp$1 = match$4[0] | 0;
-                                    } else {
-                                      throw [
-                                            Graphql_error,
-                                            "Expected int, got " + JSON.stringify(match$3)
-                                          ];
-                                    }
-                                  } else {
-                                    throw [
-                                          Graphql_error,
-                                          "Field rank on type Stat is missing"
-                                        ];
-                                  }
-                                  return {
-                                          type: tmp,
-                                          rank: tmp$1
-                                        };
-                                } else {
-                                  throw [
-                                        Graphql_error,
-                                        "Object is not a value"
-                                      ];
-                                }
-                              }));
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Expected array, got " + JSON.stringify(match$10)
-                            ];
-                      }
-                      tmp$5 = /* Some */[tmp$6];
-                    }
-                  } else {
-                    tmp$5 = /* None */0;
-                  }
-                  var match$13 = value$1["effect"];
-                  var tmp$7;
-                  if (match$13 !== undefined) {
-                    var match$14 = Js_json.decodeNull(match$13);
-                    if (match$14) {
-                      tmp$7 = /* None */0;
-                    } else {
-                      var match$15 = Js_json.decodeObject(match$13);
-                      var tmp$8;
-                      if (match$15) {
-                        var value$2 = match$15[0];
-                        var match$16 = value$2["symbol"];
-                        var tmp$9;
-                        if (match$16 !== undefined) {
-                          var match$17 = Js_json.decodeString(match$16);
-                          if (match$17) {
-                            var value$3 = match$17[0];
-                            switch (value$3) {
-                              case "ATTACK" : 
-                                  tmp$9 = /* ATTACK */311601096;
-                                  break;
-                              case "CONSTANT" : 
-                                  tmp$9 = /* CONSTANT */-14462620;
-                                  break;
-                              case "DEFEND" : 
-                                  tmp$9 = /* DEFEND */425991990;
-                                  break;
-                              case "NONE" : 
-                                  tmp$9 = /* NONE */868932280;
-                                  break;
-                              case "PLAY" : 
-                                  tmp$9 = /* PLAY */890959348;
-                                  break;
-                              case "PUSH" : 
-                                  tmp$9 = /* PUSH */891410906;
-                                  break;
-                              default:
-                                throw [
-                                      Graphql_error,
-                                      "Unknown enum variant for CardSymbol: " + value$3
-                                    ];
-                            }
-                          } else {
-                            throw [
-                                  Graphql_error,
-                                  "Expected enum value for CardSymbol, got " + JSON.stringify(match$16)
-                                ];
-                          }
-                        } else {
-                          throw [
-                                Graphql_error,
-                                "Field symbol on type Effect is missing"
-                              ];
-                        }
-                        var match$18 = value$2["text"];
-                        var tmp$10;
-                        if (match$18 !== undefined) {
-                          var match$19 = Js_json.decodeNull(match$18);
-                          if (match$19) {
-                            tmp$10 = /* None */0;
-                          } else {
-                            var match$20 = Js_json.decodeString(match$18);
-                            var tmp$11;
-                            if (match$20) {
-                              tmp$11 = match$20[0];
-                            } else {
-                              throw [
-                                    Graphql_error,
-                                    "Expected string, got " + JSON.stringify(match$18)
-                                  ];
-                            }
-                            tmp$10 = /* Some */[tmp$11];
-                          }
-                        } else {
-                          tmp$10 = /* None */0;
-                        }
-                        tmp$8 = {
-                          symbol: tmp$9,
-                          text: tmp$10
-                        };
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Object is not a value"
-                            ];
-                      }
-                      tmp$7 = /* Some */[tmp$8];
-                    }
-                  } else {
-                    tmp$7 = /* None */0;
-                  }
-                  var match$21 = value$1["image"];
-                  var tmp$12;
-                  if (match$21 !== undefined) {
-                    var match$22 = Js_json.decodeNull(match$21);
-                    if (match$22) {
-                      tmp$12 = /* None */0;
-                    } else {
-                      var match$23 = Js_json.decodeObject(match$21);
-                      var tmp$13;
-                      if (match$23) {
-                        var match$24 = match$23[0]["thumbnail"];
-                        var tmp$14;
-                        if (match$24 !== undefined) {
-                          var match$25 = Js_json.decodeString(match$24);
-                          if (match$25) {
-                            tmp$14 = match$25[0];
-                          } else {
-                            throw [
-                                  Graphql_error,
-                                  "Expected string, got " + JSON.stringify(match$24)
-                                ];
-                          }
-                        } else {
-                          throw [
-                                Graphql_error,
-                                "Field thumbnail on type Image is missing"
-                              ];
-                        }
-                        tmp$13 = {
-                          thumbnail: tmp$14
-                        };
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Object is not a value"
-                            ];
-                      }
-                      tmp$12 = /* Some */[tmp$13];
-                    }
-                  } else {
-                    tmp$12 = /* None */0;
-                  }
-                  return {
-                          uid: tmp,
-                          title: tmp$1,
-                          subtitle: tmp$2,
-                          mp: tmp$4,
-                          stats: tmp$5,
-                          effect: tmp$7,
-                          image: tmp$12
-                        };
-                } else {
-                  throw [
-                        Graphql_error,
-                        "Object is not a value"
-                      ];
-                }
-              }));
-      } else {
-        throw [
-              Graphql_error,
-              "Expected array, got " + JSON.stringify(match$1)
-            ];
-      }
-    } else {
-      throw [
-            Graphql_error,
-            "Field characters on type Query is missing"
-          ];
-    }
-    var match$3 = value$1["events"];
-    var tmp$1;
-    if (match$3 !== undefined) {
-      var match$4 = Js_json.decodeArray(match$3);
-      if (match$4) {
-        tmp$1 = match$4[0].map((function (value) {
-                var match = Js_json.decodeObject(value);
-                if (match) {
-                  var value$1 = match[0];
-                  var match$1 = value$1["uid"];
-                  var tmp;
-                  if (match$1 !== undefined) {
-                    var match$2 = Js_json.decodeString(match$1);
-                    if (match$2) {
-                      tmp = match$2[0];
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected string, got " + JSON.stringify(match$1)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field uid on type Card is missing"
-                        ];
-                  }
-                  var match$3 = value$1["title"];
-                  var tmp$1;
-                  if (match$3 !== undefined) {
-                    var match$4 = Js_json.decodeString(match$3);
-                    if (match$4) {
-                      tmp$1 = match$4[0];
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected string, got " + JSON.stringify(match$3)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field title on type Card is missing"
-                        ];
-                  }
-                  var match$5 = value$1["mp"];
-                  var tmp$2;
-                  if (match$5 !== undefined) {
-                    var match$6 = Js_json.decodeNumber(match$5);
-                    if (match$6) {
-                      tmp$2 = match$6[0] | 0;
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected int, got " + JSON.stringify(match$5)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field mp on type Card is missing"
-                        ];
-                  }
-                  var match$7 = value$1["effect"];
-                  var tmp$3;
-                  if (match$7 !== undefined) {
-                    var match$8 = Js_json.decodeNull(match$7);
-                    if (match$8) {
-                      tmp$3 = /* None */0;
-                    } else {
-                      var match$9 = Js_json.decodeObject(match$7);
-                      var tmp$4;
-                      if (match$9) {
-                        var value$2 = match$9[0];
-                        var match$10 = value$2["symbol"];
-                        var tmp$5;
-                        if (match$10 !== undefined) {
-                          var match$11 = Js_json.decodeString(match$10);
-                          if (match$11) {
-                            var value$3 = match$11[0];
-                            switch (value$3) {
-                              case "ATTACK" : 
-                                  tmp$5 = /* ATTACK */311601096;
-                                  break;
-                              case "CONSTANT" : 
-                                  tmp$5 = /* CONSTANT */-14462620;
-                                  break;
-                              case "DEFEND" : 
-                                  tmp$5 = /* DEFEND */425991990;
-                                  break;
-                              case "NONE" : 
-                                  tmp$5 = /* NONE */868932280;
-                                  break;
-                              case "PLAY" : 
-                                  tmp$5 = /* PLAY */890959348;
-                                  break;
-                              case "PUSH" : 
-                                  tmp$5 = /* PUSH */891410906;
-                                  break;
-                              default:
-                                throw [
-                                      Graphql_error,
-                                      "Unknown enum variant for CardSymbol: " + value$3
-                                    ];
-                            }
-                          } else {
-                            throw [
-                                  Graphql_error,
-                                  "Expected enum value for CardSymbol, got " + JSON.stringify(match$10)
-                                ];
-                          }
-                        } else {
-                          throw [
-                                Graphql_error,
-                                "Field symbol on type Effect is missing"
-                              ];
-                        }
-                        var match$12 = value$2["text"];
-                        var tmp$6;
-                        if (match$12 !== undefined) {
-                          var match$13 = Js_json.decodeNull(match$12);
-                          if (match$13) {
-                            tmp$6 = /* None */0;
-                          } else {
-                            var match$14 = Js_json.decodeString(match$12);
-                            var tmp$7;
-                            if (match$14) {
-                              tmp$7 = match$14[0];
-                            } else {
-                              throw [
-                                    Graphql_error,
-                                    "Expected string, got " + JSON.stringify(match$12)
-                                  ];
-                            }
-                            tmp$6 = /* Some */[tmp$7];
-                          }
-                        } else {
-                          tmp$6 = /* None */0;
-                        }
-                        tmp$4 = {
-                          symbol: tmp$5,
-                          text: tmp$6
-                        };
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Object is not a value"
-                            ];
-                      }
-                      tmp$3 = /* Some */[tmp$4];
-                    }
-                  } else {
-                    tmp$3 = /* None */0;
-                  }
-                  var match$15 = value$1["image"];
-                  var tmp$8;
-                  if (match$15 !== undefined) {
-                    var match$16 = Js_json.decodeNull(match$15);
-                    if (match$16) {
-                      tmp$8 = /* None */0;
-                    } else {
-                      var match$17 = Js_json.decodeObject(match$15);
-                      var tmp$9;
-                      if (match$17) {
-                        var match$18 = match$17[0]["thumbnail"];
-                        var tmp$10;
-                        if (match$18 !== undefined) {
-                          var match$19 = Js_json.decodeString(match$18);
-                          if (match$19) {
-                            tmp$10 = match$19[0];
-                          } else {
-                            throw [
-                                  Graphql_error,
-                                  "Expected string, got " + JSON.stringify(match$18)
-                                ];
-                          }
-                        } else {
-                          throw [
-                                Graphql_error,
-                                "Field thumbnail on type Image is missing"
-                              ];
-                        }
-                        tmp$9 = {
-                          thumbnail: tmp$10
-                        };
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Object is not a value"
-                            ];
-                      }
-                      tmp$8 = /* Some */[tmp$9];
-                    }
-                  } else {
-                    tmp$8 = /* None */0;
-                  }
-                  return {
-                          uid: tmp,
-                          title: tmp$1,
-                          mp: tmp$2,
-                          effect: tmp$3,
-                          image: tmp$8
-                        };
-                } else {
-                  throw [
-                        Graphql_error,
-                        "Object is not a value"
-                      ];
-                }
-              }));
-      } else {
-        throw [
-              Graphql_error,
-              "Expected array, got " + JSON.stringify(match$3)
-            ];
-      }
-    } else {
-      throw [
-            Graphql_error,
-            "Field events on type Query is missing"
-          ];
-    }
-    var match$5 = value$1["battles"];
-    var tmp$2;
-    if (match$5 !== undefined) {
-      var match$6 = Js_json.decodeArray(match$5);
-      if (match$6) {
-        tmp$2 = match$6[0].map((function (value) {
-                var match = Js_json.decodeObject(value);
-                if (match) {
-                  var value$1 = match[0];
-                  var match$1 = value$1["uid"];
-                  var tmp;
-                  if (match$1 !== undefined) {
-                    var match$2 = Js_json.decodeString(match$1);
-                    if (match$2) {
-                      tmp = match$2[0];
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected string, got " + JSON.stringify(match$1)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field uid on type Card is missing"
-                        ];
-                  }
-                  var match$3 = value$1["title"];
-                  var tmp$1;
-                  if (match$3 !== undefined) {
-                    var match$4 = Js_json.decodeString(match$3);
-                    if (match$4) {
-                      tmp$1 = match$4[0];
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected string, got " + JSON.stringify(match$3)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field title on type Card is missing"
-                        ];
-                  }
-                  var match$5 = value$1["mp"];
-                  var tmp$2;
-                  if (match$5 !== undefined) {
-                    var match$6 = Js_json.decodeNumber(match$5);
-                    if (match$6) {
-                      tmp$2 = match$6[0] | 0;
-                    } else {
-                      throw [
-                            Graphql_error,
-                            "Expected int, got " + JSON.stringify(match$5)
-                          ];
-                    }
-                  } else {
-                    throw [
-                          Graphql_error,
-                          "Field mp on type Card is missing"
-                        ];
-                  }
-                  var match$7 = value$1["stats"];
-                  var tmp$3;
-                  if (match$7 !== undefined) {
-                    var match$8 = Js_json.decodeNull(match$7);
-                    if (match$8) {
-                      tmp$3 = /* None */0;
-                    } else {
-                      var match$9 = Js_json.decodeArray(match$7);
-                      var tmp$4;
-                      if (match$9) {
-                        tmp$4 = match$9[0].map((function (value) {
-                                var match = Js_json.decodeObject(value);
-                                if (match) {
-                                  var value$1 = match[0];
-                                  var match$1 = value$1["type"];
-                                  var tmp;
-                                  if (match$1 !== undefined) {
-                                    var match$2 = Js_json.decodeString(match$1);
-                                    if (match$2) {
-                                      var value$2 = match$2[0];
-                                      switch (value$2) {
-                                        case "Intelligence" : 
-                                            tmp = /* Intelligence */860902239;
-                                            break;
-                                        case "Special" : 
-                                            tmp = /* Special */749117977;
-                                            break;
-                                        case "Strength" : 
-                                            tmp = /* Strength */-398422367;
-                                            break;
-                                        default:
-                                          throw [
-                                                Graphql_error,
-                                                "Unknown enum variant for CardStat: " + value$2
-                                              ];
-                                      }
-                                    } else {
-                                      throw [
-                                            Graphql_error,
-                                            "Expected enum value for CardStat, got " + JSON.stringify(match$1)
-                                          ];
-                                    }
-                                  } else {
-                                    throw [
-                                          Graphql_error,
-                                          "Field type on type Stat is missing"
-                                        ];
-                                  }
-                                  var match$3 = value$1["rank"];
-                                  var tmp$1;
-                                  if (match$3 !== undefined) {
-                                    var match$4 = Js_json.decodeNumber(match$3);
-                                    if (match$4) {
-                                      tmp$1 = match$4[0] | 0;
-                                    } else {
-                                      throw [
-                                            Graphql_error,
-                                            "Expected int, got " + JSON.stringify(match$3)
-                                          ];
-                                    }
-                                  } else {
-                                    throw [
-                                          Graphql_error,
-                                          "Field rank on type Stat is missing"
-                                        ];
-                                  }
-                                  return {
-                                          type: tmp,
-                                          rank: tmp$1
-                                        };
-                                } else {
-                                  throw [
-                                        Graphql_error,
-                                        "Object is not a value"
-                                      ];
-                                }
-                              }));
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Expected array, got " + JSON.stringify(match$7)
-                            ];
-                      }
-                      tmp$3 = /* Some */[tmp$4];
-                    }
-                  } else {
-                    tmp$3 = /* None */0;
-                  }
-                  var match$10 = value$1["effect"];
-                  var tmp$5;
-                  if (match$10 !== undefined) {
-                    var match$11 = Js_json.decodeNull(match$10);
-                    if (match$11) {
-                      tmp$5 = /* None */0;
-                    } else {
-                      var match$12 = Js_json.decodeObject(match$10);
-                      var tmp$6;
-                      if (match$12) {
-                        var value$2 = match$12[0];
-                        var match$13 = value$2["symbol"];
-                        var tmp$7;
-                        if (match$13 !== undefined) {
-                          var match$14 = Js_json.decodeString(match$13);
-                          if (match$14) {
-                            var value$3 = match$14[0];
-                            switch (value$3) {
-                              case "ATTACK" : 
-                                  tmp$7 = /* ATTACK */311601096;
-                                  break;
-                              case "CONSTANT" : 
-                                  tmp$7 = /* CONSTANT */-14462620;
-                                  break;
-                              case "DEFEND" : 
-                                  tmp$7 = /* DEFEND */425991990;
-                                  break;
-                              case "NONE" : 
-                                  tmp$7 = /* NONE */868932280;
-                                  break;
-                              case "PLAY" : 
-                                  tmp$7 = /* PLAY */890959348;
-                                  break;
-                              case "PUSH" : 
-                                  tmp$7 = /* PUSH */891410906;
-                                  break;
-                              default:
-                                throw [
-                                      Graphql_error,
-                                      "Unknown enum variant for CardSymbol: " + value$3
-                                    ];
-                            }
-                          } else {
-                            throw [
-                                  Graphql_error,
-                                  "Expected enum value for CardSymbol, got " + JSON.stringify(match$13)
-                                ];
-                          }
-                        } else {
-                          throw [
-                                Graphql_error,
-                                "Field symbol on type Effect is missing"
-                              ];
-                        }
-                        var match$15 = value$2["text"];
-                        var tmp$8;
-                        if (match$15 !== undefined) {
-                          var match$16 = Js_json.decodeNull(match$15);
-                          if (match$16) {
-                            tmp$8 = /* None */0;
-                          } else {
-                            var match$17 = Js_json.decodeString(match$15);
-                            var tmp$9;
-                            if (match$17) {
-                              tmp$9 = match$17[0];
-                            } else {
-                              throw [
-                                    Graphql_error,
-                                    "Expected string, got " + JSON.stringify(match$15)
-                                  ];
-                            }
-                            tmp$8 = /* Some */[tmp$9];
-                          }
-                        } else {
-                          tmp$8 = /* None */0;
-                        }
-                        tmp$6 = {
-                          symbol: tmp$7,
-                          text: tmp$8
-                        };
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Object is not a value"
-                            ];
-                      }
-                      tmp$5 = /* Some */[tmp$6];
-                    }
-                  } else {
-                    tmp$5 = /* None */0;
-                  }
-                  var match$18 = value$1["image"];
-                  var tmp$10;
-                  if (match$18 !== undefined) {
-                    var match$19 = Js_json.decodeNull(match$18);
-                    if (match$19) {
-                      tmp$10 = /* None */0;
-                    } else {
-                      var match$20 = Js_json.decodeObject(match$18);
-                      var tmp$11;
-                      if (match$20) {
-                        var match$21 = match$20[0]["thumbnail"];
-                        var tmp$12;
-                        if (match$21 !== undefined) {
-                          var match$22 = Js_json.decodeString(match$21);
-                          if (match$22) {
-                            tmp$12 = match$22[0];
-                          } else {
-                            throw [
-                                  Graphql_error,
-                                  "Expected string, got " + JSON.stringify(match$21)
-                                ];
-                          }
-                        } else {
-                          throw [
-                                Graphql_error,
-                                "Field thumbnail on type Image is missing"
-                              ];
-                        }
-                        tmp$11 = {
-                          thumbnail: tmp$12
-                        };
-                      } else {
-                        throw [
-                              Graphql_error,
-                              "Object is not a value"
-                            ];
-                      }
-                      tmp$10 = /* Some */[tmp$11];
-                    }
-                  } else {
-                    tmp$10 = /* None */0;
-                  }
-                  return {
-                          uid: tmp,
-                          title: tmp$1,
-                          mp: tmp$2,
-                          stats: tmp$3,
-                          effect: tmp$5,
-                          image: tmp$10
-                        };
-                } else {
-                  throw [
-                        Graphql_error,
-                        "Object is not a value"
-                      ];
-                }
-              }));
-      } else {
-        throw [
-              Graphql_error,
-              "Expected array, got " + JSON.stringify(match$5)
-            ];
-      }
-    } else {
-      throw [
-            Graphql_error,
-            "Field battles on type Query is missing"
-          ];
-    }
-    return {
-            characters: tmp,
-            events: tmp$1,
-            battles: tmp$2
-          };
-  } else {
-    throw [
-          Graphql_error,
-          "Object is not a value"
-        ];
-  }
-}
-
-function make() {
-  return {
-          query: ppx_printed_query,
-          variables: null,
-          parse: parse
-        };
-}
-
-function makeWithVariables() {
-  return {
-          query: ppx_printed_query,
-          variables: null,
-          parse: parse
-        };
-}
-
-function ret_type() {
-  return /* module */[];
-}
-
-var MT_Ret = /* module */[];
-
-var CardQuery = /* module */[
-  /* Graphql_error */Graphql_error,
-  /* ppx_printed_query */ppx_printed_query,
-  /* query */ppx_printed_query,
-  /* parse */parse,
-  /* make */make,
-  /* makeWithVariables */makeWithVariables,
-  /* ret_type */ret_type,
-  /* MT_Ret */MT_Ret
-];
+var cardQuery = "\n    {\n      characters: allCards(filter: { type: Character }, orderBy: title_ASC) {\n        uid\n        title\n        subtitle\n        mp\n        stats {\n          type\n          rank\n        }\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n      events: allCards(filter: { type: Event }, orderBy: title_ASC) {\n        uid\n        title\n        mp\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n      battles: allCards(filter: { type: Battle }, orderBy: title_ASC) {\n        uid\n        title\n        mp\n        stats(orderBy: type_ASC) {\n          type\n          rank\n        }\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n    }\n    ";
 
 var component = ReasonReact.reducerComponent("ListOfCards");
 
@@ -1002,7 +81,7 @@ function getUid(card) {
   return card[0][/* uid */0];
 }
 
-function make$1() {
+function make() {
   return /* record */[
           /* debugName */component[/* debugName */0],
           /* reactClassInternal */component[/* reactClassInternal */1],
@@ -1039,7 +118,7 @@ function make$1() {
                           ]]);
               } else {
                 return /* SideEffects */Block.__(1, [(function (self) {
-                              Query$Mxdbmobile.send(make(/* () */0)).then(Utils$Mxdbmobile.tapLog).then((function (cards) {
+                              Query$Mxdbmobile.send(cardQuery, Filter$Mxdbmobile.empty).then(Utils$Mxdbmobile.tapLog).then((function (cards) {
                                       Curry._1(self[/* send */3], /* StoreCards */[cards]);
                                       return Promise.resolve(cards);
                                     }));
@@ -1053,14 +132,14 @@ function make$1() {
 }
 
 var ListOfCards = /* module */[
-  /* CardQuery */CardQuery,
+  /* cardQuery */cardQuery,
   /* component */component,
   /* Styles */Styles,
   /* itemSeparatorComponent */itemSeparatorComponent,
   /* renderItem */renderItem,
   /* getItemLayout */getItemLayout,
   /* getUid */getUid,
-  /* make */make$1
+  /* make */make
 ];
 
 var component$1 = ReasonReact.statelessComponent("AppContainer");
@@ -1072,7 +151,7 @@ var container$1 = Style$BsReactNative.style(/* :: */[
 
 var Styles$1 = /* module */[/* container */container$1];
 
-function make$2(children) {
+function make$1(children) {
   return /* record */[
           /* debugName */component$1[/* debugName */0],
           /* reactClassInternal */component$1[/* reactClassInternal */1],
@@ -1119,63 +198,33 @@ function make$2(children) {
 var AppContainer = /* module */[
   /* component */component$1,
   /* Styles */Styles$1,
-  /* make */make$2
+  /* make */make$1
 ];
-
-var container$2 = Style$BsReactNative.style(/* :: */[
-      Style$BsReactNative.flexDirection(/* Row */0),
-      /* :: */[
-        Style$BsReactNative.padding(/* Pt */Block.__(0, [16.0])),
-        /* :: */[
-          Style$BsReactNative.backgroundColor(Colors$Mxdbmobile.Css[/* primary */0]),
-          /* [] */0
-        ]
-      ]
-    ]);
-
-var title = Style$BsReactNative.style(/* :: */[
-      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* white */1]),
-      /* :: */[
-        Style$BsReactNative.fontSize(/* Float */Block.__(0, [20.0])),
-        /* :: */[
-          Style$BsReactNative.fontWeight(/* Bold */737455525),
-          /* :: */[
-            Style$BsReactNative.flex(1.0),
-            /* [] */0
-          ]
-        ]
-      ]
-    ]);
 
 var search = Style$BsReactNative.style(/* :: */[
       Style$BsReactNative.flex(1.0),
       /* :: */[
-        Style$BsReactNative.marginLeft(/* Pt */Block.__(0, [8.0])),
+        Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* white */1]),
         /* :: */[
-          Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* white */1]),
+          Style$BsReactNative.fontSize(/* Float */Block.__(0, [20.0])),
           /* :: */[
-            Style$BsReactNative.fontSize(/* Float */Block.__(0, [20.0])),
+            Style$BsReactNative.paddingVertical(/* Pt */Block.__(0, [8.0])),
             /* [] */0
           ]
         ]
       ]
     ]);
 
-var icon = Style$BsReactNative.style(/* :: */[
-      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* white */1]),
-      /* [] */0
-    ]);
+var Styles$2 = /* module */[/* search */search];
 
-var Styles$2 = /* module */[
-  /* container */container$2,
-  /* title */title,
-  /* search */search,
-  /* icon */icon
-];
+var component$2 = ReasonReact.reducerComponent("SearchInput");
 
-var component$2 = ReasonReact.reducerComponent("Toolbar");
+function noop() {
+  return /* () */0;
+}
 
-function make$3() {
+function make$2($staropt$star, _) {
+  var onSearch = $staropt$star ? $staropt$star[0] : noop;
   return /* record */[
           /* debugName */component$2[/* debugName */0],
           /* reactClassInternal */component$2[/* reactClassInternal */1],
@@ -1187,40 +236,136 @@ function make$3() {
           /* willUpdate */component$2[/* willUpdate */7],
           /* shouldUpdate */component$2[/* shouldUpdate */8],
           /* render */(function (self) {
-              var match = self[/* state */1][/* search */0];
-              if (match) {
-                var onSearch = function () {
-                  return Curry._1(self[/* send */3], /* SearchMode */[/* Enabled */0]);
-                };
-                return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$2], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                                ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[title], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */["MetaX Deck Builder"])),
-                                ReasonReact.element(/* None */0, /* None */0, MaterialIcon$Mxdbmobile.make("search", /* Some */[icon], /* Some */[onSearch], /* array */[]))
-                              ]));
-              } else {
-                var onBack = function () {
-                  return Curry._1(self[/* send */3], /* SearchMode */[/* Disabled */1]);
-                };
-                return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$2], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                                ReasonReact.element(/* None */0, /* None */0, MaterialIcon$Mxdbmobile.make("arrow-back", /* Some */[icon], /* Some */[onBack], /* array */[])),
-                                ReasonReact.element(/* None */0, /* None */0, TextInput$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[search], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[true], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */["Search"], /* Some */[Colors$Mxdbmobile.gray], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[]))
-                              ]));
-              }
+              return ReasonReact.element(/* None */0, /* None */0, TextInput$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[search], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[/* none */-922086728], /* Some */[false], /* Some */[true], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[(function (text) {
+                                    return Curry._1(self[/* send */3], /* UpdateText */[text]);
+                                  })], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[(function () {
+                                    return Curry._1(self[/* send */3], /* SubmitAndClear */0);
+                                  })], /* Some */["Search"], /* Some */[Colors$Mxdbmobile.gray], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */["transparent"], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[false])(/* array */[]));
             }),
           /* initialState */(function () {
-              return /* record */[/* search : Disabled */1];
+              return "";
             }),
           /* retainedProps */component$2[/* retainedProps */11],
-          /* reducer */(function (action, _) {
-              return /* Update */Block.__(0, [/* record */[/* search */action[0]]]);
+          /* reducer */(function (action, state) {
+              if (action) {
+                return /* Update */Block.__(0, [action[0]]);
+              } else {
+                return /* UpdateWithSideEffects */Block.__(2, [
+                          "",
+                          (function () {
+                              return Curry._1(onSearch, state);
+                            })
+                        ]);
+              }
             }),
           /* subscriptions */component$2[/* subscriptions */13],
           /* jsElementWrapped */component$2[/* jsElementWrapped */14]
         ];
 }
 
-var Toolbar = /* module */[
+var SearchInput = /* module */[
   /* Styles */Styles$2,
   /* component */component$2,
+  /* noop */noop,
+  /* make */make$2
+];
+
+var container$2 = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.flexDirection(/* Row */0),
+      /* :: */[
+        Style$BsReactNative.padding(/* Pt */Block.__(0, [8.0])),
+        /* :: */[
+          Style$BsReactNative.height(/* Pt */Block.__(0, [60.0])),
+          /* :: */[
+            Style$BsReactNative.backgroundColor(Colors$Mxdbmobile.Css[/* primary */0]),
+            /* [] */0
+          ]
+        ]
+      ]
+    ]);
+
+var title = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* white */1]),
+      /* :: */[
+        Style$BsReactNative.fontSize(/* Float */Block.__(0, [20.0])),
+        /* :: */[
+          Style$BsReactNative.margin(/* Pt */Block.__(0, [8.0])),
+          /* :: */[
+            Style$BsReactNative.fontWeight(/* Bold */737455525),
+            /* :: */[
+              Style$BsReactNative.flex(1.0),
+              /* [] */0
+            ]
+          ]
+        ]
+      ]
+    ]);
+
+var icon = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* white */1]),
+      /* :: */[
+        Style$BsReactNative.margin(/* Pt */Block.__(0, [8.0])),
+        /* :: */[
+          Style$BsReactNative.textAlignVertical(/* Center */3),
+          /* [] */0
+        ]
+      ]
+    ]);
+
+var Styles$3 = /* module */[
+  /* container */container$2,
+  /* title */title,
+  /* icon */icon
+];
+
+var component$3 = ReasonReact.reducerComponent("Toolbar");
+
+function make$3() {
+  return /* record */[
+          /* debugName */component$3[/* debugName */0],
+          /* reactClassInternal */component$3[/* reactClassInternal */1],
+          /* handedOffState */component$3[/* handedOffState */2],
+          /* willReceiveProps */component$3[/* willReceiveProps */3],
+          /* didMount */component$3[/* didMount */4],
+          /* didUpdate */component$3[/* didUpdate */5],
+          /* willUnmount */component$3[/* willUnmount */6],
+          /* willUpdate */component$3[/* willUpdate */7],
+          /* shouldUpdate */component$3[/* shouldUpdate */8],
+          /* render */(function (self) {
+              var match = self[/* state */1][/* search */0];
+              if (match) {
+                var enableSearch = function () {
+                  return Curry._1(self[/* send */3], /* SearchMode */[/* Enabled */0]);
+                };
+                return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$2], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
+                                ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[title], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */["MetaX Deck Builder"])),
+                                ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("search", /* Some */[icon], /* Some */[enableSearch], /* None */0, /* array */[]))
+                              ]));
+              } else {
+                var disableSearch = function () {
+                  return Curry._1(self[/* send */3], /* SearchMode */[/* Disabled */1]);
+                };
+                return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$2], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
+                                ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("arrow-back", /* Some */[icon], /* Some */[disableSearch], /* None */0, /* array */[])),
+                                ReasonReact.element(/* None */0, /* None */0, make$2(/* None */0, /* array */[]))
+                              ]));
+              }
+            }),
+          /* initialState */(function () {
+              return /* record */[/* search : Disabled */1];
+            }),
+          /* retainedProps */component$3[/* retainedProps */11],
+          /* reducer */(function (action, _) {
+              return /* Update */Block.__(0, [/* record */[/* search */action[0]]]);
+            }),
+          /* subscriptions */component$3[/* subscriptions */13],
+          /* jsElementWrapped */component$3[/* jsElementWrapped */14]
+        ];
+}
+
+var Toolbar = /* module */[
+  /* Styles */Styles$3,
+  /* component */component$3,
   /* make */make$3
 ];
 
@@ -1248,42 +393,42 @@ var label = Style$BsReactNative.style(/* :: */[
       ]
     ]);
 
-var Styles$3 = /* module */[
+var Styles$4 = /* module */[
   /* container */container$3,
   /* icon */icon$1,
   /* label */label
 ];
 
-var component$3 = ReasonReact.statelessComponent("NavigationButton");
+var component$4 = ReasonReact.statelessComponent("NavigationButton");
 
 function make$4(icon$2, label$1, _) {
   return /* record */[
-          /* debugName */component$3[/* debugName */0],
-          /* reactClassInternal */component$3[/* reactClassInternal */1],
-          /* handedOffState */component$3[/* handedOffState */2],
-          /* willReceiveProps */component$3[/* willReceiveProps */3],
-          /* didMount */component$3[/* didMount */4],
-          /* didUpdate */component$3[/* didUpdate */5],
-          /* willUnmount */component$3[/* willUnmount */6],
-          /* willUpdate */component$3[/* willUpdate */7],
-          /* shouldUpdate */component$3[/* shouldUpdate */8],
+          /* debugName */component$4[/* debugName */0],
+          /* reactClassInternal */component$4[/* reactClassInternal */1],
+          /* handedOffState */component$4[/* handedOffState */2],
+          /* willReceiveProps */component$4[/* willReceiveProps */3],
+          /* didMount */component$4[/* didMount */4],
+          /* didUpdate */component$4[/* didUpdate */5],
+          /* willUnmount */component$4[/* willUnmount */6],
+          /* willUpdate */component$4[/* willUpdate */7],
+          /* shouldUpdate */component$4[/* shouldUpdate */8],
           /* render */(function () {
               return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$3], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
                               ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make(icon$2, /* Some */[icon$1], /* None */0, /* None */0, /* array */[])),
                               ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[label], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[label$1]))
                             ]));
             }),
-          /* initialState */component$3[/* initialState */10],
-          /* retainedProps */component$3[/* retainedProps */11],
-          /* reducer */component$3[/* reducer */12],
-          /* subscriptions */component$3[/* subscriptions */13],
-          /* jsElementWrapped */component$3[/* jsElementWrapped */14]
+          /* initialState */component$4[/* initialState */10],
+          /* retainedProps */component$4[/* retainedProps */11],
+          /* reducer */component$4[/* reducer */12],
+          /* subscriptions */component$4[/* subscriptions */13],
+          /* jsElementWrapped */component$4[/* jsElementWrapped */14]
         ];
 }
 
 var NavigationButton = /* module */[
-  /* Styles */Styles$3,
-  /* component */component$3,
+  /* Styles */Styles$4,
+  /* component */component$4,
   /* make */make$4
 ];
 
@@ -1301,42 +446,42 @@ var container$4 = Style$BsReactNative.style(/* :: */[
       ]
     ]);
 
-var Styles$4 = /* module */[/* container */container$4];
+var Styles$5 = /* module */[/* container */container$4];
 
-var component$4 = ReasonReact.statelessComponent("NavigationBar");
+var component$5 = ReasonReact.statelessComponent("NavigationBar");
 
 function make$5(children) {
   return /* record */[
-          /* debugName */component$4[/* debugName */0],
-          /* reactClassInternal */component$4[/* reactClassInternal */1],
-          /* handedOffState */component$4[/* handedOffState */2],
-          /* willReceiveProps */component$4[/* willReceiveProps */3],
-          /* didMount */component$4[/* didMount */4],
-          /* didUpdate */component$4[/* didUpdate */5],
-          /* willUnmount */component$4[/* willUnmount */6],
-          /* willUpdate */component$4[/* willUpdate */7],
-          /* shouldUpdate */component$4[/* shouldUpdate */8],
+          /* debugName */component$5[/* debugName */0],
+          /* reactClassInternal */component$5[/* reactClassInternal */1],
+          /* handedOffState */component$5[/* handedOffState */2],
+          /* willReceiveProps */component$5[/* willReceiveProps */3],
+          /* didMount */component$5[/* didMount */4],
+          /* didUpdate */component$5[/* didUpdate */5],
+          /* willUnmount */component$5[/* willUnmount */6],
+          /* willUpdate */component$5[/* willUpdate */7],
+          /* shouldUpdate */component$5[/* shouldUpdate */8],
           /* render */(function () {
               return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$4], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(children));
             }),
-          /* initialState */component$4[/* initialState */10],
-          /* retainedProps */component$4[/* retainedProps */11],
-          /* reducer */component$4[/* reducer */12],
-          /* subscriptions */component$4[/* subscriptions */13],
-          /* jsElementWrapped */component$4[/* jsElementWrapped */14]
+          /* initialState */component$5[/* initialState */10],
+          /* retainedProps */component$5[/* retainedProps */11],
+          /* reducer */component$5[/* reducer */12],
+          /* subscriptions */component$5[/* subscriptions */13],
+          /* jsElementWrapped */component$5[/* jsElementWrapped */14]
         ];
 }
 
 var NavigationBar = /* module */[
-  /* Styles */Styles$4,
-  /* component */component$4,
+  /* Styles */Styles$5,
+  /* component */component$5,
   /* make */make$5
 ];
 
 function app() {
-  return ReasonReact.element(/* None */0, /* None */0, make$2(/* array */[
+  return ReasonReact.element(/* None */0, /* None */0, make$1(/* array */[
                   ReasonReact.element(/* None */0, /* None */0, make$3(/* array */[])),
-                  ReasonReact.element(/* None */0, /* None */0, make$1(/* array */[])),
+                  ReasonReact.element(/* None */0, /* None */0, make(/* array */[])),
                   ReasonReact.element(/* None */0, /* None */0, make$5(/* array */[
                             ReasonReact.element(/* None */0, /* None */0, make$4("cards", "Cards", /* array */[])),
                             ReasonReact.element(/* None */0, /* None */0, make$4("deck", "Deck", /* array */[])),
@@ -1347,6 +492,7 @@ function app() {
 
 exports.ListOfCards = ListOfCards;
 exports.AppContainer = AppContainer;
+exports.SearchInput = SearchInput;
 exports.Toolbar = Toolbar;
 exports.NavigationButton = NavigationButton;
 exports.NavigationBar = NavigationBar;

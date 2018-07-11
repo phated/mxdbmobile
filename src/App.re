@@ -1,8 +1,7 @@
 open BsReactNative;
 
 module ListOfCards = {
-  module CardQuery = [%graphql
-    {|
+  let cardQuery = {|
     {
       characters: allCards(filter: { type: Character }, orderBy: title_ASC) {
         uid
@@ -50,8 +49,7 @@ module ListOfCards = {
         }
       }
     }
-    |}
-  ];
+    |};
 
   type state = {
     characters: array(Character.t),
@@ -119,7 +117,7 @@ module ListOfCards = {
         ReasonReact.SideEffects(
           (
             self =>
-              Query.send(CardQuery.make())
+              Query.send(cardQuery, Filter.empty)
               |> Js.Promise.then_(Utils.tapLog)
               |> Js.Promise.then_(cards => {
                    self.send(StoreCards(cards));
@@ -165,6 +163,52 @@ module AppContainer = {
   };
 };
 
+module SearchInput = {
+  module Styles = {
+    open Style;
+
+    let search =
+      style([
+        flex(1.0),
+        color(Colors.Css.white),
+        fontSize(20.0 |. Float),
+        paddingVertical(8.0 |. Pt),
+      ]);
+  };
+
+  type state = string;
+  type action =
+    | UpdateText(string)
+    | SubmitAndClear;
+
+  let component = ReasonReact.reducerComponent("SearchInput");
+
+  let noop = _text => ();
+  let make = (~onSearch=noop, _children) => {
+    ...component,
+    initialState: () => "",
+    reducer: (action, state) =>
+      switch (action) {
+      | UpdateText(text) => ReasonReact.Update(text)
+      | SubmitAndClear =>
+        ReasonReact.UpdateWithSideEffects("", (_self => onSearch(state)))
+      },
+    render: self =>
+      <TextInput
+        style=Styles.search
+        autoFocus=true
+        autoCorrect=false
+        spellCheck=false
+        autoCapitalize=`none
+        underlineColorAndroid="transparent"
+        placeholder="Search"
+        placeholderTextColor=Colors.gray
+        onChangeText=(text => self.send(UpdateText(text)))
+        onSubmitEditing=(_ => self.send(SubmitAndClear))
+      />,
+  };
+};
+
 module Toolbar = {
   module Styles = {
     open Style;
@@ -172,7 +216,8 @@ module Toolbar = {
     let container =
       style([
         flexDirection(Row),
-        padding(16.0 |. Pt),
+        padding(8.0 |. Pt),
+        height(60.0 |. Pt),
         backgroundColor(Colors.Css.primary),
       ]);
 
@@ -180,19 +225,17 @@ module Toolbar = {
       style([
         color(Colors.Css.white),
         fontSize(20.0 |. Float),
+        margin(8.0 |. Pt),
         fontWeight(`Bold),
         flex(1.0),
       ]);
 
-    let search =
+    let icon =
       style([
-        flex(1.0),
-        marginLeft(8.0 |. Pt),
         color(Colors.Css.white),
-        fontSize(20.0 |. Float),
+        margin(8.0 |. Pt),
+        textAlignVertical(Center),
       ]);
-
-    let icon = style([color(Colors.Css.white)]);
   };
 
   type searchMode =
@@ -216,24 +259,19 @@ module Toolbar = {
     render: self =>
       switch (self.state.search) {
       | Enabled =>
-        let onBack = () => self.send(SearchMode(Disabled));
+        let disableSearch = () => self.send(SearchMode(Disabled));
         <View style=Styles.container>
-          <MaterialIcon name="arrow-back" style=Styles.icon onPress=onBack />
-          <TextInput
-            style=Styles.search
-            autoFocus=true
-            placeholder="Search"
-            placeholderTextColor=Colors.gray
-          />
+          <Icon name="arrow-back" style=Styles.icon onPress=disableSearch />
+          <SearchInput />
         </View>;
       | Disabled =>
-        let onSearch = () => self.send(SearchMode(Enabled));
+        let enableSearch = () => self.send(SearchMode(Enabled));
 
         <View style=Styles.container>
           <Text style=Styles.title>
             (ReasonReact.string("MetaX Deck Builder"))
           </Text>
-          <MaterialIcon name="search" style=Styles.icon onPress=onSearch />
+          <Icon name="search" style=Styles.icon onPress=enableSearch />
         </View>;
       },
   };

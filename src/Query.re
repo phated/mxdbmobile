@@ -16,7 +16,7 @@ let decode = json => {
     json |> Json.Decode.field("battles", Json.Decode.array(Battle.decoder)),
 };
 
-let send = q =>
+let send = (q, v) =>
   Fetch.(
     fetchWithInit(
       "https://api.graph.cool/simple/v1/metaxdb",
@@ -24,8 +24,8 @@ let send = q =>
         ~method_=Post,
         ~body=
           Js.Dict.fromList([
-            ("query", Js.Json.string(q##query)),
-            ("variables", q##variables),
+            ("query", Js.Json.string(q)),
+            ("variables", v),
           ])
           |> Js.Json.object_
           |> Js.Json.stringify
