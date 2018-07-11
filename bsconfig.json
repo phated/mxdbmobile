@@ -11,9 +11,6 @@
     "bs-fetch",
     "@glennsl/bs-json"
   ],
-  "ppx-flags": [
-    "graphql_ppx/ppx"
-  ],
   "namespace": true,
   "reason": {
     "react-jsx": 2
