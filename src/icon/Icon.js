@@ -7,10 +7,11 @@ var ReactNativeVectorIcons = require("react-native-vector-icons");
 
 var icon = ReactNativeVectorIcons.createIconSetFromFontello(ConfigJson);
 
-function make(name, style, onPress, _) {
+function make(name, style, onPress, $staropt$star, _) {
+  var size = $staropt$star ? $staropt$star[0] : 24;
   return ReasonReact.wrapJsForReason(icon, {
               name: name,
-              size: 24,
+              size: size,
               style: Js_null_undefined.fromOption(style),
               onPress: Js_null_undefined.fromOption(onPress)
             }, /* array */[]);

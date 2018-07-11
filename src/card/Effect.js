@@ -114,19 +114,19 @@ function make(effect, _) {
   var symbolImage;
   switch (match) {
     case 0 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("play", /* Some */[play], /* None */0, /* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("play", /* Some */[play], /* None */0, /* Some */[16], /* array */[]));
         break;
     case 1 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("push", /* Some */[push], /* None */0, /* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("push", /* Some */[push], /* None */0, /* Some */[16], /* array */[]));
         break;
     case 2 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("constant", /* Some */[constant], /* None */0, /* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("constant", /* Some */[constant], /* None */0, /* Some */[14], /* array */[]));
         break;
     case 3 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("attack", /* Some */[attack], /* None */0, /* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("attack", /* Some */[attack], /* None */0, /* Some */[16], /* array */[]));
         break;
     case 4 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("defend", /* Some */[defend], /* None */0, /* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("defend", /* Some */[defend], /* None */0, /* Some */[16], /* array */[]));
         break;
     case 5 : 
         symbolImage = null;

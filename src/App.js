@@ -1269,7 +1269,7 @@ function make$4(icon$2, label$1, _) {
           /* shouldUpdate */component$3[/* shouldUpdate */8],
           /* render */(function () {
               return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$3], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                              ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make(icon$2, /* Some */[icon$1], /* None */0, /* array */[])),
+                              ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make(icon$2, /* Some */[icon$1], /* None */0, /* None */0, /* array */[])),
                               ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[label], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[label$1]))
                             ]));
             }),

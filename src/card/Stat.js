@@ -101,17 +101,17 @@ function make(value, _) {
               switch (value.tag | 0) {
                 case 0 : 
                     return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                                    ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("strength", /* Some */[strength], /* None */0, /* array */[])),
+                                    ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("strength", /* Some */[strength], /* None */0, /* None */0, /* array */[])),
                                     ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[rank], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[String(value[0])]))
                                   ]));
                 case 1 : 
                     return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                                    ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("intelligence", /* Some */[intelligence], /* None */0, /* array */[])),
+                                    ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("intelligence", /* Some */[intelligence], /* None */0, /* None */0, /* array */[])),
                                     ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[rank], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[String(value[0])]))
                                   ]));
                 case 2 : 
                     return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                                    ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("special", /* Some */[special], /* None */0, /* array */[])),
+                                    ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("special", /* Some */[special], /* None */0, /* None */0, /* array */[])),
                                     ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[rank], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[String(value[0])]))
                                   ]));
                 

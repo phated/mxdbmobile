@@ -47,11 +47,11 @@ let component = ReasonReact.statelessComponent("Effect");
 let make = (~effect, _children) => {
   let symbolImage =
     switch (effect.symbol) {
-    | Attack => <Icon name="attack" style=Styles.attack />
-    | Defend => <Icon name="defend" style=Styles.defend />
-    | Constant => <Icon name="constant" style=Styles.constant />
-    | Play => <Icon name="play" style=Styles.play />
-    | Push => <Icon name="push" style=Styles.push />
+    | Attack => <Icon name="attack" style=Styles.attack size=16 />
+    | Defend => <Icon name="defend" style=Styles.defend size=16 />
+    | Constant => <Icon name="constant" style=Styles.constant size=14 />
+    | Play => <Icon name="play" style=Styles.play size=16 />
+    | Push => <Icon name="push" style=Styles.push size=16 />
     | None => ReasonReact.null
     };
 

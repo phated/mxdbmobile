@@ -13,13 +13,13 @@ type jsProps = {
 
 let icon = createIconSetFromFontello(config);
 
-let make = (~name, ~style=?, ~onPress=?, _children) =>
+let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) =>
   ReasonReact.wrapJsForReason(
     ~reactClass=icon,
     ~props=
       jsProps(
         ~name,
-        ~size=24,
+        ~size,
         ~style=Js.Nullable.fromOption(style),
         ~onPress=Js.Nullable.fromOption(onPress),
       ),
