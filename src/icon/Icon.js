@@ -4,12 +4,34 @@ var ReasonReact = require("reason-react/src/ReasonReact.js");
 var ConfigJson = require("./config.json");
 var Js_null_undefined = require("bs-platform/lib/js/js_null_undefined.js");
 var ReactNativeVectorIcons = require("react-native-vector-icons");
+var MaterialIcons = require("react-native-vector-icons/dist/MaterialIcons");
 
-var icon = ReactNativeVectorIcons.createIconSetFromFontello(ConfigJson);
+var customIcon = ReactNativeVectorIcons.createIconSetFromFontello(ConfigJson);
+
+function isCustom(name) {
+  switch (name) {
+    case "attack" : 
+    case "cards" : 
+    case "constant" : 
+    case "deck" : 
+    case "defend" : 
+    case "info" : 
+    case "intelligence" : 
+    case "play" : 
+    case "push" : 
+    case "special" : 
+    case "strength" : 
+        return true;
+    default:
+      return false;
+  }
+}
 
 function make(name, style, onPress, $staropt$star, _) {
   var size = $staropt$star ? $staropt$star[0] : 24;
-  return ReasonReact.wrapJsForReason(icon, {
+  var match = isCustom(name);
+  var reactClass = match ? customIcon : MaterialIcons.default;
+  return ReasonReact.wrapJsForReason(reactClass, {
               name: name,
               size: size,
               style: Js_null_undefined.fromOption(style),
@@ -17,6 +39,7 @@ function make(name, style, onPress, $staropt$star, _) {
             }, /* array */[]);
 }
 
-exports.icon = icon;
+exports.customIcon = customIcon;
+exports.isCustom = isCustom;
 exports.make = make;
-/* icon Not a pure module */
+/* customIcon Not a pure module */

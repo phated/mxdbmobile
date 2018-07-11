@@ -1,6 +1,9 @@
 [@bs.module "react-native-vector-icons"]
 external createIconSetFromFontello : Js.Json.t => ReasonReact.reactClass = "";
 
+[@bs.module "react-native-vector-icons/dist/MaterialIcons"]
+external materialIcon : ReasonReact.reactClass = "default";
+
 [@bs.module] external config : Js.Json.t = "./config.json";
 
 [@bs.deriving abstract]
@@ -11,11 +14,28 @@ type jsProps = {
   onPress: Js.nullable(unit => unit),
 };
 
-let icon = createIconSetFromFontello(config);
+let customIcon = createIconSetFromFontello(config);
 
-let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) =>
+let isCustom = name =>
+  switch (name) {
+  | "strength"
+  | "intelligence"
+  | "special" => true
+  | "constant"
+  | "play"
+  | "push" => true
+  | "attack"
+  | "defend" => true
+  | "cards"
+  | "deck"
+  | "info" => true
+  | _ => false
+  };
+
+let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) => {
+  let reactClass = isCustom(name) ? customIcon : materialIcon;
   ReasonReact.wrapJsForReason(
-    ~reactClass=icon,
+    ~reactClass,
     ~props=
       jsProps(
         ~name,
@@ -25,3 +45,4 @@ let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) =>
       ),
     [||],
   );
+};
