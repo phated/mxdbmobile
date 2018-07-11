@@ -34,6 +34,12 @@ module Styles = {
     ]);
 
   let effectText = style([fontSize(12.0 |. Float)]);
+
+  let attack = style([color(Colors.Css.attack)]);
+  let defend = style([color(Colors.Css.defend)]);
+  let constant = style([color(Colors.Css.constant)]);
+  let play = style([color(Colors.Css.play)]);
+  let push = style([color(Colors.Css.push)]);
 };
 
 let component = ReasonReact.statelessComponent("Effect");
@@ -41,11 +47,11 @@ let component = ReasonReact.statelessComponent("Effect");
 let make = (~effect, _children) => {
   let symbolImage =
     switch (effect.symbol) {
-    | Attack => <AttackIcon />
-    | Defend => <DefendIcon />
-    | Constant => <ConstantIcon />
-    | Play => <PlayIcon />
-    | Push => <PushIcon />
+    | Attack => <Icon name="attack" style=Styles.attack />
+    | Defend => <Icon name="defend" style=Styles.defend />
+    | Constant => <Icon name="constant" style=Styles.constant />
+    | Play => <Icon name="play" style=Styles.play />
+    | Push => <Icon name="push" style=Styles.push />
     | None => ReasonReact.null
     };
 

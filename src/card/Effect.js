@@ -4,16 +4,12 @@ var Block = require("bs-platform/lib/js/block.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
+var Icon$Mxdbmobile = require("../icon/Icon.js");
 var Colors$Mxdbmobile = require("../Colors.js");
 var Symbol$Mxdbmobile = require("./Symbol.js");
 var Text$BsReactNative = require("bs-react-native/src/components/text.js");
 var View$BsReactNative = require("bs-react-native/src/components/view.js");
-var PlayIcon$Mxdbmobile = require("../icon/PlayIcon.js");
-var PushIcon$Mxdbmobile = require("../icon/PushIcon.js");
 var Style$BsReactNative = require("bs-react-native/src/style.js");
-var AttackIcon$Mxdbmobile = require("../icon/AttackIcon.js");
-var DefendIcon$Mxdbmobile = require("../icon/DefendIcon.js");
-var ConstantIcon$Mxdbmobile = require("../icon/ConstantIcon.js");
 
 function decoder(json) {
   return /* record */[
@@ -73,12 +69,42 @@ var effectText = Style$BsReactNative.style(/* :: */[
       /* [] */0
     ]);
 
+var attack = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* attack */6]),
+      /* [] */0
+    ]);
+
+var defend = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* defend */7]),
+      /* [] */0
+    ]);
+
+var constant = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* constant */9]),
+      /* [] */0
+    ]);
+
+var play = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* play */10]),
+      /* [] */0
+    ]);
+
+var push = Style$BsReactNative.style(/* :: */[
+      Style$BsReactNative.color(Colors$Mxdbmobile.Css[/* push */8]),
+      /* [] */0
+    ]);
+
 var Styles = /* module */[
   /* container */container,
   /* effectContainer */effectContainer,
   /* effectWithoutSymbol */effectWithoutSymbol,
   /* effectWithSymbol */effectWithSymbol,
-  /* effectText */effectText
+  /* effectText */effectText,
+  /* attack */attack,
+  /* defend */defend,
+  /* constant */constant,
+  /* play */play,
+  /* push */push
 ];
 
 var component = ReasonReact.statelessComponent("Effect");
@@ -88,19 +114,19 @@ function make(effect, _) {
   var symbolImage;
   switch (match) {
     case 0 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, PlayIcon$Mxdbmobile.make(/* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("play", /* Some */[play], /* None */0, /* array */[]));
         break;
     case 1 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, PushIcon$Mxdbmobile.make(/* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("push", /* Some */[push], /* None */0, /* array */[]));
         break;
     case 2 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, ConstantIcon$Mxdbmobile.make(/* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("constant", /* Some */[constant], /* None */0, /* array */[]));
         break;
     case 3 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, AttackIcon$Mxdbmobile.make(/* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("attack", /* Some */[attack], /* None */0, /* array */[]));
         break;
     case 4 : 
-        symbolImage = ReasonReact.element(/* None */0, /* None */0, DefendIcon$Mxdbmobile.make(/* array */[]));
+        symbolImage = ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("defend", /* Some */[defend], /* None */0, /* array */[]));
         break;
     case 5 : 
         symbolImage = null;
