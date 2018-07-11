@@ -51,14 +51,10 @@ module ListOfCards = {
     }
     |};
 
-  type state = {
-    characters: array(Character.t),
-    events: array(Event.t),
-    battles: array(Battle.t),
-  };
+  type state = CardList.t;
   type action =
     | FetchCards
-    | StoreCards(Query.topLevel);
+    | StoreCards(CardList.t);
 
   let component = ReasonReact.reducerComponent("ListOfCards");
 
@@ -103,16 +99,11 @@ module ListOfCards = {
 
   let make = _children => {
     ...component,
-    initialState: () => {characters: [||], events: [||], battles: [||]},
+    initialState: () => CardList.empty,
     didMount: self => self.send(FetchCards),
     reducer: (action, _state) =>
       switch (action) {
-      | StoreCards(cards) =>
-        ReasonReact.Update({
-          characters: cards.characters,
-          events: cards.events,
-          battles: cards.battles,
-        })
+      | StoreCards(cards) => ReasonReact.Update(cards)
       | FetchCards =>
         ReasonReact.SideEffects(
           (
@@ -128,12 +119,7 @@ module ListOfCards = {
         )
       },
     render: self => {
-      let sections =
-        CardList.from(
-          self.state.characters,
-          self.state.events,
-          self.state.battles,
-        );
+      let sections = CardList.toArray(self.state);
 
       <View style=Styles.container>
         <FlatList

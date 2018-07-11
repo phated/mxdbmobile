@@ -95,27 +95,18 @@ function make() {
           /* willUpdate */component[/* willUpdate */7],
           /* shouldUpdate */component[/* shouldUpdate */8],
           /* render */(function (self) {
-              var sections = CardList$Mxdbmobile.from(self[/* state */1][/* characters */0], self[/* state */1][/* events */1], self[/* state */1][/* battles */2]);
+              var sections = CardList$Mxdbmobile.toArray(self[/* state */1]);
               return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[ReasonReact.element(/* None */0, /* None */0, FlatList$BsReactNative.make(sections, renderItem, (function (card, _) {
                                             return card[0][/* uid */0];
                                           }), /* Some */[itemSeparatorComponent], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[getItemLayout], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[]))]));
             }),
           /* initialState */(function () {
-              return /* record */[
-                      /* characters : array */[],
-                      /* events : array */[],
-                      /* battles : array */[]
-                    ];
+              return CardList$Mxdbmobile.empty;
             }),
           /* retainedProps */component[/* retainedProps */11],
           /* reducer */(function (action, _) {
               if (action) {
-                var cards = action[0];
-                return /* Update */Block.__(0, [/* record */[
-                            /* characters */cards[/* characters */0],
-                            /* events */cards[/* events */1],
-                            /* battles */cards[/* battles */2]
-                          ]]);
+                return /* Update */Block.__(0, [action[0]]);
               } else {
                 return /* SideEffects */Block.__(1, [(function (self) {
                               Query$Mxdbmobile.send(cardQuery, Filter$Mxdbmobile.empty).then(Utils$Mxdbmobile.tapLog).then((function (cards) {

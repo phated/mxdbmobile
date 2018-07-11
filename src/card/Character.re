@@ -5,7 +5,7 @@ type t = {
   mp: MP.t,
   stats: StatList.t,
   effect: Effect.t,
-  image: Image.t,
+  image: CardImage.t,
 };
 
 let decoder: Js.Json.t => t =
@@ -16,7 +16,7 @@ let decoder: Js.Json.t => t =
     mp: json |> Json.Decode.field("mp", MP.decoder),
     stats: json |> Json.Decode.field("stats", StatList.decoder),
     effect: json |> Json.Decode.field("effect", Effect.decoder),
-    image: json |> Json.Decode.field("image", Image.decoder),
+    image: json |> Json.Decode.field("image", CardImage.decoder),
   };
 
 module Styles = {
@@ -54,13 +54,12 @@ module Styles = {
 };
 
 let component = ReasonReact.statelessComponent("Character");
-let make =
-    (~title, ~subtitle, ~mp, ~stats, ~image: Image.t, ~effect, _children) => {
+let make = (~title, ~subtitle, ~mp, ~stats, ~image, ~effect, _children) => {
   ...component,
   render: _self => {
     open BsReactNative;
 
-    let cardImage = <CardImage src=image.thumbnail style=Styles.thumbnail />;
+    let cardImage = <CardImage image style=Styles.thumbnail />;
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title> (ReasonReact.string(title)) </Text>

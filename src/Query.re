@@ -1,21 +1,5 @@
 exception Graphql_error(string);
 
-type topLevel = {
-  characters: array(Character.t),
-  events: array(Event.t),
-  battles: array(Battle.t),
-};
-
-let decode = json => {
-  characters:
-    json
-    |> Json.Decode.field("characters", Json.Decode.array(Character.decoder)),
-  events:
-    json |> Json.Decode.field("events", Json.Decode.array(Event.decoder)),
-  battles:
-    json |> Json.Decode.field("battles", Json.Decode.array(Battle.decoder)),
-};
-
 let send = (q, v) =>
   Fetch.(
     fetchWithInit(
@@ -42,7 +26,7 @@ let send = (q, v) =>
                 switch (Js.Json.decodeObject(data)) {
                 | Some(obj) =>
                   Js.Dict.unsafeGet(obj, "data")
-                  |> decode
+                  |> CardList.decode
                   |> Js.Promise.resolve
                 | None =>
                   Js.Promise.reject(
