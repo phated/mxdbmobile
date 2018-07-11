@@ -10,7 +10,7 @@
     "clean": "bsb -clean-world",
     "run-ios": "react-native run-ios",
     "run-android": "react-native run-android",
-    "postinstall": "react-native link"
+    "link": "react-native link"
   },
   "dependencies": {
     "@glennsl/bs-json": "^2.0.0",
