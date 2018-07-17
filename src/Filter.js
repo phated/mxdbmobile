@@ -7,7 +7,7 @@ var listToObj = Js_dict.fromList;
 function wrap(filter) {
   return Js_dict.fromList(/* :: */[
               /* tuple */[
-                "filter",
+                "query",
                 filter
               ],
               /* [] */0
@@ -16,12 +16,22 @@ function wrap(filter) {
 
 var empty = wrap(Js_dict.fromList(/* [] */0));
 
+function effectText(search) {
+  return Js_dict.fromList(/* :: */[
+              /* tuple */[
+                "text_contains",
+                search
+              ],
+              /* [] */0
+            ]);
+}
+
 function create(search) {
   if (search) {
     return wrap(Js_dict.fromList(/* :: */[
                     /* tuple */[
-                      "type",
-                      search[0]
+                      "effect",
+                      effectText(search[0])
                     ],
                     /* [] */0
                   ]));
@@ -33,5 +43,6 @@ function create(search) {
 exports.listToObj = listToObj;
 exports.wrap = wrap;
 exports.empty = empty;
+exports.effectText = effectText;
 exports.create = create;
 /* empty Not a pure module */

@@ -2,15 +2,18 @@
 
 var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
+var Caml_obj = require("bs-platform/lib/js/caml_obj.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
 var Icon$Mxdbmobile = require("./icon/Icon.js");
+var Route$ReasonTea = require("reason-tea/src/Route.bs.js");
 var Event$Mxdbmobile = require("./card/Event.js");
 var Query$Mxdbmobile = require("./Query.js");
 var Utils$Mxdbmobile = require("./Utils.js");
 var Battle$Mxdbmobile = require("./card/Battle.js");
 var Colors$Mxdbmobile = require("./Colors.js");
 var Filter$Mxdbmobile = require("./Filter.js");
+var Program$ReasonTea = require("reason-tea/src/Program.bs.js");
 var Text$BsReactNative = require("bs-react-native/src/components/text.js");
 var View$BsReactNative = require("bs-react-native/src/components/view.js");
 var CardList$Mxdbmobile = require("./CardList.js");
@@ -20,9 +23,9 @@ var FlatList$BsReactNative = require("bs-react-native/src/components/flatList.js
 var TextInput$BsReactNative = require("bs-react-native/src/components/textInput.js");
 var SafeAreaView$BsReactNative = require("bs-react-native/src/components/safeAreaView.js");
 
-var cardQuery = "\n    {\n      characters: allCards(filter: { type: Character }, orderBy: title_ASC) {\n        uid\n        title\n        subtitle\n        mp\n        stats {\n          type\n          rank\n        }\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n      events: allCards(filter: { type: Event }, orderBy: title_ASC) {\n        uid\n        title\n        mp\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n      battles: allCards(filter: { type: Battle }, orderBy: title_ASC) {\n        uid\n        title\n        mp\n        stats(orderBy: type_ASC) {\n          type\n          rank\n        }\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n    }\n    ";
+var cardQuery = "\n    query CardList($query: CardFilter!) {\n      characters: allCards(filter: { AND: [{ type: Character }, $query] }, orderBy: title_ASC) {\n        uid\n        title\n        subtitle\n        mp\n        stats {\n          type\n          rank\n        }\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n      events: allCards(filter: { AND: [{ type: Event }, $query] }, orderBy: title_ASC) {\n        uid\n        title\n        mp\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n      battles: allCards(filter: { AND: [{ type: Battle }, $query] }, orderBy: title_ASC) {\n        uid\n        title\n        mp\n        stats(orderBy: type_ASC) {\n          type\n          rank\n        }\n        effect {\n          symbol\n          text\n        }\n        image {\n          thumbnail\n        }\n      }\n    }\n    ";
 
-var component = ReasonReact.reducerComponent("ListOfCards");
+var component = ReasonReact.statelessComponent("ListOfCards");
 
 var container = Style$BsReactNative.style(/* :: */[
       Style$BsReactNative.flex(1),
@@ -81,49 +84,32 @@ function getUid(card) {
   return card[0][/* uid */0];
 }
 
-function make() {
+function make(cards, _) {
   return /* record */[
           /* debugName */component[/* debugName */0],
           /* reactClassInternal */component[/* reactClassInternal */1],
           /* handedOffState */component[/* handedOffState */2],
           /* willReceiveProps */component[/* willReceiveProps */3],
-          /* didMount */(function (self) {
-              return Curry._1(self[/* send */3], /* FetchCards */0);
-            }),
+          /* didMount */component[/* didMount */4],
           /* didUpdate */component[/* didUpdate */5],
           /* willUnmount */component[/* willUnmount */6],
           /* willUpdate */component[/* willUpdate */7],
           /* shouldUpdate */component[/* shouldUpdate */8],
-          /* render */(function (self) {
-              var sections = CardList$Mxdbmobile.toArray(self[/* state */1]);
+          /* render */(function () {
+              var sections = CardList$Mxdbmobile.toArray(cards);
               return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[ReasonReact.element(/* None */0, /* None */0, FlatList$BsReactNative.make(sections, renderItem, (function (card, _) {
                                             return card[0][/* uid */0];
                                           }), /* Some */[itemSeparatorComponent], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[getItemLayout], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[]))]));
             }),
-          /* initialState */(function () {
-              return CardList$Mxdbmobile.empty;
-            }),
+          /* initialState */component[/* initialState */10],
           /* retainedProps */component[/* retainedProps */11],
-          /* reducer */(function (action, _) {
-              if (action) {
-                return /* Update */Block.__(0, [action[0]]);
-              } else {
-                return /* SideEffects */Block.__(1, [(function (self) {
-                              Query$Mxdbmobile.send(cardQuery, Filter$Mxdbmobile.empty).then(Utils$Mxdbmobile.tapLog).then((function (cards) {
-                                      Curry._1(self[/* send */3], /* StoreCards */[cards]);
-                                      return Promise.resolve(cards);
-                                    }));
-                              return /* () */0;
-                            })]);
-              }
-            }),
+          /* reducer */component[/* reducer */12],
           /* subscriptions */component[/* subscriptions */13],
           /* jsElementWrapped */component[/* jsElementWrapped */14]
         ];
 }
 
 var ListOfCards = /* module */[
-  /* cardQuery */cardQuery,
   /* component */component,
   /* Styles */Styles,
   /* itemSeparatorComponent */itemSeparatorComponent,
@@ -311,7 +297,7 @@ var Styles$3 = /* module */[
 
 var component$3 = ReasonReact.reducerComponent("Toolbar");
 
-function make$3() {
+function make$3(onSearch, _) {
   return /* record */[
           /* debugName */component$3[/* debugName */0],
           /* reactClassInternal */component$3[/* reactClassInternal */1],
@@ -336,9 +322,13 @@ function make$3() {
                 var disableSearch = function () {
                   return Curry._1(self[/* send */3], /* SearchMode */[/* Disabled */1]);
                 };
+                var performSearchAndHide = function (text) {
+                  Curry._1(self[/* send */3], /* SearchMode */[/* Disabled */1]);
+                  return Curry._1(onSearch, text);
+                };
                 return ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[container$2], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
                                 ReasonReact.element(/* None */0, /* None */0, Icon$Mxdbmobile.make("arrow-back", /* Some */[icon], /* Some */[disableSearch], /* None */0, /* array */[])),
-                                ReasonReact.element(/* None */0, /* None */0, make$2(/* None */0, /* array */[]))
+                                ReasonReact.element(/* None */0, /* None */0, make$2(/* Some */[performSearchAndHide], /* array */[]))
                               ]));
               }
             }),
@@ -469,23 +459,121 @@ var NavigationBar = /* module */[
   /* make */make$5
 ];
 
-function app() {
-  return ReasonReact.element(/* None */0, /* None */0, make$1(/* array */[
-                  ReasonReact.element(/* None */0, /* None */0, make$3(/* array */[])),
-                  ReasonReact.element(/* None */0, /* None */0, make(/* array */[])),
-                  ReasonReact.element(/* None */0, /* None */0, make$5(/* array */[
-                            ReasonReact.element(/* None */0, /* None */0, make$4("cards", "Cards", /* array */[])),
-                            ReasonReact.element(/* None */0, /* None */0, make$4("deck", "Deck", /* array */[])),
-                            ReasonReact.element(/* None */0, /* None */0, make$4("info", "Info", /* array */[]))
-                          ]))
-                ]));
+function application() {
+  var program = Program$ReasonTea.routerProgram("Main App");
+  return /* record */[
+          /* debug */program[/* debug */0],
+          /* fromRoute */(function (_, route) {
+              var match = route[/* path */0];
+              if (match && match[0] === "" && !match[1]) {
+                return /* Update */Block.__(0, [/* record */[
+                            /* query : None */0,
+                            /* cards */CardList$Mxdbmobile.empty
+                          ]]);
+              } else {
+                return /* NoUpdate */0;
+              }
+            }),
+          /* toRoute */(function (param) {
+              var next = param[/* next */1];
+              if (Caml_obj.caml_equal(param[/* previous */0], next)) {
+                return /* NoTransition */1;
+              } else {
+                var match = next[/* query */0];
+                var search = match ? match[0] : "";
+                return /* Push */Block.__(0, [Route$ReasonTea.make(/* :: */[
+                                "",
+                                /* [] */0
+                              ], "", search)]);
+              }
+            }),
+          /* update */(function (action, state) {
+              if (action.tag) {
+                return /* Update */Block.__(0, [/* record */[
+                            /* query */state[/* query */0],
+                            /* cards */action[0]
+                          ]]);
+              } else {
+                return /* UpdateWithSideEffects */Block.__(1, [
+                          /* record */[
+                            /* query : Some */[action[0]],
+                            /* cards */state[/* cards */1]
+                          ],
+                          (function (self) {
+                              Query$Mxdbmobile.send(cardQuery, Filter$Mxdbmobile.create(self[/* state */0][/* query */0])).then(Utils$Mxdbmobile.tapLog).then((function (cards) {
+                                      Curry._1(self[/* send */1], /* StoreCards */Block.__(1, [cards]));
+                                      return Promise.resolve(cards);
+                                    }));
+                              return /* () */0;
+                            })
+                        ]);
+              }
+            }),
+          /* view */(function (self) {
+              return ReasonReact.element(/* None */0, /* None */0, make$1(/* array */[
+                              ReasonReact.element(/* None */0, /* None */0, make$3((function (query) {
+                                          return Curry._1(self[/* send */1], /* Search */Block.__(0, [query]));
+                                        }), /* array */[])),
+                              ReasonReact.element(/* None */0, /* None */0, make(self[/* state */0][/* cards */1], /* array */[])),
+                              ReasonReact.element(/* None */0, /* None */0, make$5(/* array */[
+                                        ReasonReact.element(/* None */0, /* None */0, make$4("cards", "Cards", /* array */[])),
+                                        ReasonReact.element(/* None */0, /* None */0, make$4("deck", "Deck", /* array */[])),
+                                        ReasonReact.element(/* None */0, /* None */0, make$4("info", "Info", /* array */[]))
+                                      ]))
+                            ]));
+            })
+        ];
 }
 
+var component$6 = ReasonReact.reducerComponent("ApplicationContainer");
+
+function make$6(application, _) {
+  return /* record */[
+          /* debugName */component$6[/* debugName */0],
+          /* reactClassInternal */component$6[/* reactClassInternal */1],
+          /* handedOffState */component$6[/* handedOffState */2],
+          /* willReceiveProps */component$6[/* willReceiveProps */3],
+          /* didMount */(function (self) {
+              return Program$ReasonTea.startup(/* None */0, Curry._1(application, /* () */0), (function (view) {
+                            return Curry._1(self[/* send */3], /* Render */[view]);
+                          }));
+            }),
+          /* didUpdate */component$6[/* didUpdate */5],
+          /* willUnmount */component$6[/* willUnmount */6],
+          /* willUpdate */component$6[/* willUpdate */7],
+          /* shouldUpdate */component$6[/* shouldUpdate */8],
+          /* render */(function (self) {
+              return self[/* state */1];
+            }),
+          /* initialState */(function () {
+              return null;
+            }),
+          /* retainedProps */component$6[/* retainedProps */11],
+          /* reducer */(function (action, _) {
+              return /* Update */Block.__(0, [action[0]]);
+            }),
+          /* subscriptions */component$6[/* subscriptions */13],
+          /* jsElementWrapped */component$6[/* jsElementWrapped */14]
+        ];
+}
+
+var ApplicationContainer = /* module */[
+  /* component */component$6,
+  /* make */make$6
+];
+
+function app() {
+  return ReasonReact.element(/* None */0, /* None */0, make$6(application, /* array */[]));
+}
+
+exports.cardQuery = cardQuery;
 exports.ListOfCards = ListOfCards;
 exports.AppContainer = AppContainer;
 exports.SearchInput = SearchInput;
 exports.Toolbar = Toolbar;
 exports.NavigationButton = NavigationButton;
 exports.NavigationBar = NavigationBar;
+exports.application = application;
+exports.ApplicationContainer = ApplicationContainer;
 exports.app = app;
 /* component Not a pure module */

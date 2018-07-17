@@ -22,7 +22,8 @@ let send = (q, v) =>
     |> Js.Promise.then_(resp =>
          if (Response.ok(resp)) {
            Response.json(resp)
-           |> Js.Promise.then_(data =>
+           |> Js.Promise.then_(data => {
+                Js.log(data);
                 switch (Js.Json.decodeObject(data)) {
                 | Some(obj) =>
                   Js.Dict.unsafeGet(obj, "data")
@@ -32,8 +33,8 @@ let send = (q, v) =>
                   Js.Promise.reject(
                     Graphql_error("Response is not an object"),
                   )
-                }
-              );
+                };
+              });
          } else {
            Js.Promise.reject(
              Graphql_error("Request failed: " ++ Response.statusText(resp)),

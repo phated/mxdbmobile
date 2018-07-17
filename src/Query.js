@@ -26,6 +26,7 @@ function send(q, v) {
                               ]))], /* None */0, /* None */0, /* None */0, /* Some */[/* Include */2], /* None */0, /* None */0, /* None */0, /* None */0)(/* () */0)).then((function (resp) {
                 if (resp.ok) {
                   return resp.json().then((function (data) {
+                                console.log(data);
                                 var match = Js_json.decodeObject(data);
                                 if (match) {
                                   return Promise.resolve(CardList$Mxdbmobile.decode(match[0]["data"]));

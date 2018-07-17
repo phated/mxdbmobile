@@ -9,7 +9,9 @@
     "reason-react",
     "bs-react-native",
     "bs-fetch",
-    "@glennsl/bs-json"
+    "@glennsl/bs-json",
+    "bs-history",
+    "reason-tea"
   ],
   "namespace": true,
   "reason": {
