@@ -9,7 +9,7 @@ let send = (q, v) =>
         ~body=
           Js.Dict.fromList([
             ("query", Js.Json.string(q)),
-            ("variables", v),
+            ("variables", Filter.encode(v)),
           ])
           |> Js.Json.object_
           |> Js.Json.stringify

@@ -4,6 +4,7 @@ var Fetch = require("bs-fetch/src/Fetch.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
+var Filter$Mxdbmobile = require("./Filter.js");
 var CardList$Mxdbmobile = require("./CardList.js");
 
 var Graphql_error = Caml_exceptions.create("Query-Mxdbmobile.Graphql_error");
@@ -19,7 +20,7 @@ function send(q, v) {
                                 /* :: */[
                                   /* tuple */[
                                     "variables",
-                                    v
+                                    Filter$Mxdbmobile.encode(v)
                                   ],
                                   /* [] */0
                                 ]
