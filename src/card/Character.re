@@ -2,6 +2,7 @@ type t = {
   uid: string,
   title: string,
   subtitle: string,
+  trait: string,
   mp: MP.t,
   stats: StatList.t,
   effect: Effect.t,
@@ -13,6 +14,12 @@ let decoder: Js.Json.t => t =
     uid: json |> Json.Decode.field("uid", Json.Decode.string),
     title: json |> Json.Decode.field("title", Json.Decode.string),
     subtitle: json |> Json.Decode.field("subtitle", Json.Decode.string),
+    trait:
+      json
+      |> Json.Decode.field(
+           "trait",
+           Json.Decode.field("name", Json.Decode.string),
+         ),
     mp: json |> Json.Decode.field("mp", MP.decoder),
     stats: json |> Json.Decode.field("stats", StatList.decoder),
     effect: json |> Json.Decode.field("effect", Effect.decoder),
@@ -54,7 +61,8 @@ module Styles = {
 };
 
 let component = ReasonReact.statelessComponent("Character");
-let make = (~title, ~subtitle, ~mp, ~stats, ~image, ~effect, _children) => {
+let make =
+    (~title, ~subtitle, ~trait, ~mp, ~stats, ~image, ~effect, _children) => {
   ...component,
   render: _self => {
     open BsReactNative;
@@ -62,8 +70,12 @@ let make = (~title, ~subtitle, ~mp, ~stats, ~image, ~effect, _children) => {
     let cardImage = <CardImage image style=Styles.thumbnail />;
     let cardDetails =
       <View style=Styles.details>
-        <Text style=Styles.title> (ReasonReact.string(title)) </Text>
-        <Text> (ReasonReact.string(subtitle)) </Text>
+        <Text style=Styles.title>
+          (ReasonReact.string(title))
+          (ReasonReact.string(" - "))
+          (ReasonReact.string(subtitle))
+        </Text>
+        <Text> (ReasonReact.string(trait)) </Text>
         <Effect effect />
       </View>;
     let cardStats =

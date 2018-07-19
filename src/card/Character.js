@@ -16,6 +16,9 @@ function decoder(json) {
           /* uid */Json_decode.field("uid", Json_decode.string, json),
           /* title */Json_decode.field("title", Json_decode.string, json),
           /* subtitle */Json_decode.field("subtitle", Json_decode.string, json),
+          /* trait */Json_decode.field("trait", (function (param) {
+                  return Json_decode.field("name", Json_decode.string, param);
+                }), json),
           /* mp */Json_decode.field("mp", MP$Mxdbmobile.decoder, json),
           /* stats */Json_decode.field("stats", StatList$Mxdbmobile.decoder, json),
           /* effect */Json_decode.field("effect", Effect$Mxdbmobile.decoder, json),
@@ -79,7 +82,7 @@ var Styles = /* module */[
 
 var component = ReasonReact.statelessComponent("Character");
 
-function make(title$1, subtitle, mp, stats$1, image, effect, _) {
+function make(title$1, subtitle, trait, mp, stats$1, image, effect, _) {
   return /* record */[
           /* debugName */component[/* debugName */0],
           /* reactClassInternal */component[/* reactClassInternal */1],
@@ -93,8 +96,12 @@ function make(title$1, subtitle, mp, stats$1, image, effect, _) {
           /* render */(function () {
               var cardImage = ReasonReact.element(/* None */0, /* None */0, CardImage$Mxdbmobile.make(image, thumbnail, /* array */[]));
               var cardDetails = ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[details], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
-                        ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[title], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[title$1])),
-                        ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[subtitle])),
+                        ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[title], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[
+                                  title$1,
+                                  " - ",
+                                  subtitle
+                                ])),
+                        ReasonReact.element(/* None */0, /* None */0, Text$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* array */[trait])),
                         ReasonReact.element(/* None */0, /* None */0, Effect$Mxdbmobile.make(effect, /* array */[]))
                       ]));
               var cardStats = ReasonReact.element(/* None */0, /* None */0, View$BsReactNative.make(/* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* Some */[stats], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0)(/* array */[
