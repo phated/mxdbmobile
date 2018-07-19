@@ -1,9 +1,25 @@
 let cardQuery = {|
-    query CardList($query: CardFilter!) {
-      characters: allCards(filter: { AND: [{ type: Character }, $query] }, orderBy: title_ASC) {
+    query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $effect: String, $symbol: CardSymbol) {
+      characters: allCards(filter: {
+        AND: [
+          { type: Character },
+          { OR: [
+              { title_contains: $title },
+              { subtitle_contains: $subtitle },
+              { trait: { name_contains: $trait } },
+              { mp: $mp },
+              { effect: { text_contains: $effect } },
+            ]
+          },
+          { effect: { symbol: $symbol } }
+        ]
+      }, orderBy: title_ASC) {
         uid
         title
         subtitle
+        trait {
+          name
+        }
         mp
         stats {
           type
@@ -17,7 +33,18 @@ let cardQuery = {|
           thumbnail
         }
       }
-      events: allCards(filter: { AND: [{ type: Event }, $query] }, orderBy: title_ASC) {
+      events: allCards(filter: {
+        AND: [
+          { type: Event },
+          { OR: [
+              { title_contains: $title },
+              { mp: $mp },
+              { effect: { text_contains: $effect } }
+            ]
+          },
+          { effect: { symbol: $symbol } }
+        ]
+      }, orderBy: title_ASC) {
         uid
         title
         mp
@@ -29,7 +56,18 @@ let cardQuery = {|
           thumbnail
         }
       }
-      battles: allCards(filter: { AND: [{ type: Battle }, $query] }, orderBy: title_ASC) {
+      battles: allCards(filter: {
+        AND: [
+          { type: Battle },
+          { OR: [
+              { title_contains: $title },
+              { mp: $mp },
+              { effect: { text_contains: $effect } }
+            ]
+          },
+          { effect: { symbol: $symbol } }
+        ]
+      }, orderBy: title_ASC) {
         uid
         title
         mp
@@ -47,77 +85,6 @@ let cardQuery = {|
       }
     }
     |};
-
-module ListOfCards = {
-  /* type state = {
-       query: option(string),
-       cards: CardList.t,
-     };
-     type action =
-       | FetchCards
-       | StoreCards(CardList.t); */
-
-  let component = ReasonReact.statelessComponent("ListOfCards");
-
-  module Styles = {
-    open BsReactNative.Style;
-    let container = style([flex(1.)]);
-
-    let separator =
-      style([
-        flex(1.0),
-        height(1.0 |. Pt),
-        backgroundColor(Colors.Css.gray),
-        /* marginLeft(16.0 |. Pt), */
-      ]);
-  };
-  let itemSeparatorComponent =
-    BsReactNative.FlatList.separatorComponent(_ =>
-      BsReactNative.(<View style=Styles.separator />)
-    );
-  let renderItem =
-    BsReactNative.FlatList.renderItem(bag => {
-      let card: Card.t = bag.item;
-      switch (card) {
-      | Character({title, subtitle, mp, stats, image, effect}) =>
-        <Character title subtitle mp stats image effect />
-      | Event({title, mp, image, effect}) => <Event title mp image effect />
-      | Battle({title, mp, stat, image, effect}) =>
-        <Battle title mp stat image effect />
-      };
-    });
-
-  let getItemLayout = (_data, idx) => {
-    "length": 170,
-    "offset": 170 * idx,
-    "index": idx,
-  };
-
-  let getUid = card =>
-    switch (card) {
-    | Card.Character(character) => character.uid
-    | Card.Event(event) => event.uid
-    | Card.Battle(battle) => battle.uid
-    };
-
-  let make = (~cards, _children) => {
-    ...component,
-    render: self => {
-      open BsReactNative;
-      let sections = CardList.toArray(cards);
-
-      <View style=Styles.container>
-        <FlatList
-          data=sections
-          getItemLayout
-          keyExtractor=((card, _idx) => getUid(card))
-          renderItem
-          itemSeparatorComponent
-        />
-      </View>;
-    },
-  };
-};
 
 module AppContainer = {
   let component = ReasonReact.statelessComponent("AppContainer");
@@ -152,12 +119,13 @@ module SearchInput = {
   type state = string;
   type action =
     | UpdateText(string)
+    | Submit
     | SubmitAndClear;
 
   let component = ReasonReact.reducerComponent("SearchInput");
 
   let noop = _text => ();
-  let make = (~onSearch=noop, _children) => {
+  let make = (~onSearch=noop, ~onBlur=noop, _children) => {
     ...component,
     initialState: () => "",
     reducer: (action, state) =>
@@ -165,6 +133,7 @@ module SearchInput = {
       | UpdateText(text) => ReasonReact.Update(text)
       | SubmitAndClear =>
         ReasonReact.UpdateWithSideEffects("", (_self => onSearch(state)))
+      | Submit => ReasonReact.SideEffects((self => onSearch(self.state)))
       },
     render: self =>
       BsReactNative.(
@@ -177,8 +146,11 @@ module SearchInput = {
           underlineColorAndroid="transparent"
           placeholder="Search"
           placeholderTextColor=Colors.gray
+          onBlur
+          blurOnSubmit=true
+          value=self.state
           onChangeText=(text => self.send(UpdateText(text)))
-          onSubmitEditing=(_ => self.send(SubmitAndClear))
+          onSubmitEditing=(_ => self.send(Submit))
         />
       ),
   };
@@ -195,66 +167,40 @@ module Toolbar = {
         height(60.0 |. Pt),
         backgroundColor(Colors.Css.primary),
       ]);
-
-    let title =
-      style([
-        color(Colors.Css.white),
-        fontSize(20.0 |. Float),
-        margin(8.0 |. Pt),
-        fontWeight(`Bold),
-        flex(1.0),
-      ]);
-
-    let icon =
-      style([
-        color(Colors.Css.white),
-        margin(8.0 |. Pt),
-        textAlignVertical(Center),
-      ]);
   };
 
-  type searchMode =
+  type mode =
     | Enabled
     | Disabled;
 
   type action =
-    | SearchMode(searchMode);
-
-  type state = {search: searchMode};
+    | ChangeMode(mode);
 
   let component = ReasonReact.reducerComponent("Toolbar");
 
-  let make = (~onSearch, _children) => {
-    ...component,
-    initialState: () => {search: Disabled},
-    reducer: (action, _state) =>
-      switch (action) {
-      | SearchMode(mode) => ReasonReact.Update({search: mode})
-      },
-    render: self =>
-      BsReactNative.(
-        switch (self.state.search) {
-        | Enabled =>
-          let disableSearch = () => self.send(SearchMode(Disabled));
-          let performSearchAndHide = text => {
-            disableSearch();
-            onSearch(text);
-          };
-          <View style=Styles.container>
-            <Icon name="arrow-back" style=Styles.icon onPress=disableSearch />
-            <SearchInput onSearch=performSearchAndHide />
-          </View>;
-        | Disabled =>
-          let enableSearch = () => self.send(SearchMode(Enabled));
+  let make = renderChildren => {
+    let enable = (_event, self) =>
+      self.ReasonReact.send(ChangeMode(Enabled));
+    let disable = (_event, self) =>
+      self.ReasonReact.send(ChangeMode(Disabled));
 
-          <View style=Styles.container>
-            <Text style=Styles.title>
-              (ReasonReact.string("MetaX Deck Builder"))
-            </Text>
-            <Icon name="search" style=Styles.icon onPress=enableSearch />
-          </View>;
-        }
-      ),
+    {
+      ...component,
+      initialState: () => Disabled,
+      reducer: (action, _state) =>
+        switch (action) {
+        | ChangeMode(mode) => ReasonReact.Update(mode)
+        },
+      render: self => {
+        let children =
+          renderChildren(
+            ~enable=self.handle(enable),
+            ~disable=self.handle(disable),
+            self.state,
+          );
+        BsReactNative.(<View style=Styles.container> ...children </View>);
+      },
+    };
   };
 };
 
@@ -308,8 +254,27 @@ type action =
   | Search(string)
   | StoreCards(CardList.t);
 type state = {
-  query: option(string),
+  filter: Filter.t,
   cards: CardList.t,
+};
+module Styles = {
+  open BsReactNative.Style;
+
+  let title =
+    style([
+      color(Colors.Css.white),
+      fontSize(20.0 |. Float),
+      margin(8.0 |. Pt),
+      fontWeight(`Bold),
+      flex(1.0),
+    ]);
+
+  let icon =
+    style([
+      color(Colors.Css.white),
+      margin(8.0 |. Pt),
+      textAlignVertical(Center),
+    ]);
 };
 
 let application = () => {
@@ -317,9 +282,22 @@ let application = () => {
   {
     ...program,
     fromRoute: (action, route) =>
-      switch (route.path) {
-      | [""] =>
-        ReasonTea.Program.Update({query: None, cards: CardList.empty})
+      switch (action, route.path) {
+      | (Init, [""]) =>
+        ReasonTea.Program.UpdateWithSideEffects(
+          {filter: Filter.Empty, cards: CardList.empty},
+          (
+            self =>
+              Query.send(cardQuery, self.state.filter)
+              |> Js.Promise.then_(Utils.tapLog)
+              |> Js.Promise.then_(cards => {
+                   self.send(StoreCards(cards));
+                   Js.Promise.resolve(cards);
+                 })
+              |> ignore
+          ),
+        )
+      | (Push, _) => ReasonTea.Program.NoUpdate
       | _ => ReasonTea.Program.NoUpdate
       },
     toRoute: ({previous, next}) =>
@@ -327,9 +305,9 @@ let application = () => {
         ReasonTea.Program.NoTransition;
       } else {
         let search =
-          switch (next.query) {
-          | Some(query) => query
-          | None => ""
+          switch (next.filter) {
+          | FreeText(filter) => filter
+          | Empty => ""
           };
         ReasonTea.Program.Push(
           ReasonTea.Route.make(~path=[""], ~search, ~hash=""),
@@ -338,34 +316,49 @@ let application = () => {
     update: (action, state) =>
       switch (action) {
       | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
-      | Search(query) =>
+      | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
-          {...state, query: Some(query)},
+          {...state, filter: FreeText(filter)},
           (
-            self => {
-              let _ = ();
-              /* didMount: self => self.send(FetchCards),
-                 reducer: (action, state) =>
-                   switch (action) { */
-              /* | FetchCards => */
-              /* ReasonReact.SideEffects
-                 ( */
-              Query.send(cardQuery, Filter.create(self.state.query))
+            self =>
+              Query.send(cardQuery, self.state.filter)
               |> Js.Promise.then_(Utils.tapLog)
               |> Js.Promise.then_(cards => {
                    self.send(StoreCards(cards));
                    Js.Promise.resolve(cards);
                  })
-              |> ignore;
-            }
+              |> ignore
           ),
         )
       },
     view: self =>
       BsReactNative.(
         <AppContainer>
-          <Toolbar onSearch=(query => self.send(Search(query))) />
-          <ListOfCards cards=self.state.cards />
+          <Toolbar>
+            ...(
+                 (~enable, ~disable, mode) => {
+                   let onSearch = text => self.send(Search(text));
+
+                   switch (mode) {
+                   | Enabled => [|
+                       <Icon
+                         name="arrow-back"
+                         style=Styles.icon
+                         onPress=disable
+                       />,
+                       <SearchInput onBlur=disable onSearch />,
+                     |]
+                   | Disabled => [|
+                       <Text style=Styles.title>
+                         (ReasonReact.string("MetaX Deck Builder"))
+                       </Text>,
+                       <Icon name="search" style=Styles.icon onPress=enable />,
+                     |]
+                   };
+                 }
+               )
+          </Toolbar>
+          <CardList cards=self.state.cards />
           <NavigationBar>
             <NavigationButton icon="cards" label="Cards" />
             <NavigationButton icon="deck" label="Deck" />
