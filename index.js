@@ -1,4 +1,4 @@
 import { AppRegistry } from 'react-native';
-import { app } from './src/Main';
+import { run } from './src/Main';
 
-AppRegistry.registerComponent('mxdbmobile', () => app);
+AppRegistry.registerComponent('mxdbmobile', () => run);

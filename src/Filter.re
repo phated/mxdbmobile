@@ -24,6 +24,12 @@ let isSymbol = text =>
   /* | exception => false */
   };
 
+let toString = filter =>
+  switch (filter) {
+  | FreeText(searchString) => searchString
+  | Empty => ""
+  };
+
 let encode = filter => {
   let query =
     switch (filter) {

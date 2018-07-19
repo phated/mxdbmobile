@@ -132,6 +132,8 @@ function make(cards, _) {
         ];
 }
 
+var query = "\nquery CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $effect: String, $symbol: CardSymbol) {\n  characters: allCards(filter: {\n    AND: [\n      { type: Character },\n      { OR: [\n          { title_contains: $title },\n          { subtitle_contains: $subtitle },\n          { trait: { name_contains: $trait } },\n          { mp: $mp },\n          { effect: { text_contains: $effect } },\n        ]\n      },\n      { effect: { symbol: $symbol } }\n    ]\n  }, orderBy: title_ASC) {\n    uid\n    title\n    subtitle\n    trait {\n      name\n    }\n    mp\n    stats {\n      type\n      rank\n    }\n    effect {\n      symbol\n      text\n    }\n    image {\n      thumbnail\n    }\n  }\n  events: allCards(filter: {\n    AND: [\n      { type: Event },\n      { OR: [\n          { title_contains: $title },\n          { mp: $mp },\n          { effect: { text_contains: $effect } }\n        ]\n      },\n      { effect: { symbol: $symbol } }\n    ]\n  }, orderBy: title_ASC) {\n    uid\n    title\n    mp\n    effect {\n      symbol\n      text\n    }\n    image {\n      thumbnail\n    }\n  }\n  battles: allCards(filter: {\n    AND: [\n      { type: Battle },\n      { OR: [\n          { title_contains: $title },\n          { mp: $mp },\n          { effect: { text_contains: $effect } }\n        ]\n      },\n      { effect: { symbol: $symbol } }\n    ]\n  }, orderBy: title_ASC) {\n    uid\n    title\n    mp\n    stats(orderBy: type_ASC) {\n      type\n      rank\n    }\n    effect {\n      symbol\n      text\n    }\n    image {\n      thumbnail\n    }\n  }\n}\n";
+
 exports.empty = empty;
 exports.toArray = toArray;
 exports.decode = decode;
@@ -142,4 +144,5 @@ exports.getItemLayout = getItemLayout;
 exports.getUid = getUid;
 exports.component = component;
 exports.make = make;
+exports.query = query;
 /* container Not a pure module */

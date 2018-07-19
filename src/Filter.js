@@ -37,6 +37,14 @@ function isSymbol(text) {
   }
 }
 
+function toString(filter) {
+  if (filter) {
+    return filter[0];
+  } else {
+    return "";
+  }
+}
+
 function encode(filter) {
   var query;
   if (filter) {
@@ -92,5 +100,6 @@ function encode(filter) {
 
 exports.maybeEncodeMP = maybeEncodeMP;
 exports.isSymbol = isSymbol;
+exports.toString = toString;
 exports.encode = encode;
 /* Json_encode Not a pure module */

@@ -83,3 +83,91 @@ let make = (~cards, _children) => {
     </View>;
   },
 };
+
+let query = {|
+query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $effect: String, $symbol: CardSymbol) {
+  characters: allCards(filter: {
+    AND: [
+      { type: Character },
+      { OR: [
+          { title_contains: $title },
+          { subtitle_contains: $subtitle },
+          { trait: { name_contains: $trait } },
+          { mp: $mp },
+          { effect: { text_contains: $effect } },
+        ]
+      },
+      { effect: { symbol: $symbol } }
+    ]
+  }, orderBy: title_ASC) {
+    uid
+    title
+    subtitle
+    trait {
+      name
+    }
+    mp
+    stats {
+      type
+      rank
+    }
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+    }
+  }
+  events: allCards(filter: {
+    AND: [
+      { type: Event },
+      { OR: [
+          { title_contains: $title },
+          { mp: $mp },
+          { effect: { text_contains: $effect } }
+        ]
+      },
+      { effect: { symbol: $symbol } }
+    ]
+  }, orderBy: title_ASC) {
+    uid
+    title
+    mp
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+    }
+  }
+  battles: allCards(filter: {
+    AND: [
+      { type: Battle },
+      { OR: [
+          { title_contains: $title },
+          { mp: $mp },
+          { effect: { text_contains: $effect } }
+        ]
+      },
+      { effect: { symbol: $symbol } }
+    ]
+  }, orderBy: title_ASC) {
+    uid
+    title
+    mp
+    stats(orderBy: type_ASC) {
+      type
+      rank
+    }
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+    }
+  }
+}
+|};
