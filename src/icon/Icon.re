@@ -4,6 +4,9 @@ external createIconSetFromFontello : Js.Json.t => ReasonReact.reactClass = "";
 [@bs.module "react-native-vector-icons/dist/MaterialIcons"]
 external materialIcon : ReasonReact.reactClass = "default";
 
+[@bs.module "react-native-vector-icons/dist/MaterialCommunityIcons"]
+external communityIcon : ReasonReact.reactClass = "default";
+
 [@bs.module] external config : Js.Json.t = "./config.json";
 
 [@bs.deriving abstract]
@@ -32,8 +35,19 @@ let isCustom = name =>
   | _ => false
   };
 
+let isCommunity = name =>
+  switch (name) {
+  | "plus-circle-outline" => true
+  | _ => false
+  };
+
 let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) => {
-  let reactClass = isCustom(name) ? customIcon : materialIcon;
+  let reactClass =
+    switch (name) {
+    | name when isCustom(name) => customIcon
+    | name when isCommunity(name) => communityIcon
+    | name => materialIcon
+    };
   ReasonReact.wrapJsForReason(
     ~reactClass,
     ~props=
