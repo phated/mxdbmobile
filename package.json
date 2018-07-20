@@ -9,8 +9,8 @@
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
     "clean": "bsb -clean-world",
-    "run-ios": "react-native run-ios",
-    "run-android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "android": "react-native run-android",
     "link": "react-native link"
   },
   "dependencies": {
