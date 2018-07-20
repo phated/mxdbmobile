@@ -27,6 +27,8 @@ module Styles = {
   open BsReactNative.Style;
   let container = style([flex(1.)]);
 
+  let loadingContainer =
+    style([flex(1.), alignItems(Center), justifyContent(Center)]);
   let separator =
     style([
       flex(1.0),
@@ -72,15 +74,23 @@ let make = (~cards, _children) => {
     open BsReactNative;
     let sections = toArray(cards);
 
-    <View style=Styles.container>
-      <FlatList
-        data=sections
-        getItemLayout
-        keyExtractor=((card, _idx) => getUid(card))
-        renderItem
-        itemSeparatorComponent
-      />
-    </View>;
+    let children =
+      if (Belt.Array.length(sections) == 0) {
+        <View style=Styles.loadingContainer>
+          <ActivityIndicator size=`large color=Colors.ourBlue />
+        </View>;
+      } else {
+        <FlatList
+          data=sections
+          getItemLayout
+          removeClippedSubviews=true
+          keyExtractor=((card, _idx) => getUid(card))
+          renderItem
+          itemSeparatorComponent
+        />;
+      };
+
+    <View style=Styles.container> children </View>;
   },
 };
 

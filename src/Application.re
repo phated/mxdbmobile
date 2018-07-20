@@ -65,7 +65,7 @@ let create = () => {
       | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
-          {...state, filter: FreeText(filter)},
+          {cards: CardList.empty, filter: FreeText(filter)},
           (
             self =>
               Query.send(CardList.query, self.state.filter)
