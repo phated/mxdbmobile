@@ -2,6 +2,8 @@ let primary = "#303030";
 let white = "#fff";
 let gray = "#d3d3d3";
 
+let ourBlue = "#0064a7";
+
 let strength = "#d22130";
 let intelligence = "#0062A6";
 let special = "#008353";
