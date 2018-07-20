@@ -60,27 +60,19 @@ module Styles = {
       position(Absolute),
       top(5.0 |. Pt),
       left(0.0 |. Pt),
-      zIndex(2),
       borderRadius(12.0),
       backgroundColor(Colors.Css.white),
     ]);
-  let secondDouble =
-    style([position(Absolute), right(0.0 |. Pt), zIndex(1)]);
+  let secondDouble = style([position(Absolute), right(0.0 |. Pt)]);
 
   let tripleIcon =
     style([position(Relative), width(54.0 |. Pt), height(30.0 |. Pt)]);
   let firstTriple =
-    style([
-      position(Absolute),
-      top(5.0 |. Pt),
-      left(0.0 |. Pt),
-      zIndex(1),
-    ]);
+    style([position(Absolute), top(5.0 |. Pt), left(0.0 |. Pt)]);
   let secondTriple =
     style([
       position(Absolute),
       left(15.0 |. Pt),
-      zIndex(2),
       borderRadius(12.0),
       backgroundColor(Colors.Css.white),
     ]);
@@ -89,7 +81,6 @@ module Styles = {
       position(Absolute),
       top(5.0 |. Pt),
       right(0.0 |. Pt),
-      zIndex(3),
       borderRadius(12.0),
       backgroundColor(Colors.Css.white),
     ]);
@@ -113,6 +104,7 @@ let make = (~stat, _children) => {
   ...component,
   render: _self => {
     open BsReactNative;
+    /* Elements comprising Doubles are reveresed because zIndex doesn't work on Android */
     let child =
       switch (stat) {
       | Strength(rank) =>
@@ -139,11 +131,11 @@ let make = (~stat, _children) => {
       | StrengthIntelligence(rank) =>
         <View style=Styles.doubleIconContainer>
           <View style=Styles.doubleIcon>
-            <View style=Styles.firstDouble>
-              <Icon name="strength" style=Styles.strength />
-            </View>
             <View style=Styles.secondDouble>
               <Icon name="intelligence" style=Styles.intelligence />
+            </View>
+            <View style=Styles.firstDouble>
+              <Icon name="strength" style=Styles.strength />
             </View>
           </View>
           <Text style=Styles.rank>
@@ -153,11 +145,11 @@ let make = (~stat, _children) => {
       | IntelligenceSpecial(rank) =>
         <View style=Styles.doubleIconContainer>
           <View style=Styles.doubleIcon>
-            <View style=Styles.firstDouble>
-              <Icon name="intelligence" style=Styles.intelligence />
-            </View>
             <View style=Styles.secondDouble>
               <Icon name="special" style=Styles.special />
+            </View>
+            <View style=Styles.firstDouble>
+              <Icon name="intelligence" style=Styles.intelligence />
             </View>
           </View>
           <Text style=Styles.rank>
@@ -167,11 +159,11 @@ let make = (~stat, _children) => {
       | StrengthSpecial(rank) =>
         <View style=Styles.doubleIconContainer>
           <View style=Styles.doubleIcon>
-            <View style=Styles.firstDouble>
-              <Icon name="strength" style=Styles.strength />
-            </View>
             <View style=Styles.secondDouble>
               <Icon name="special" style=Styles.special />
+            </View>
+            <View style=Styles.firstDouble>
+              <Icon name="strength" style=Styles.strength />
             </View>
           </View>
           <Text style=Styles.rank>
