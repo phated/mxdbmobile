@@ -1,7 +1,11 @@
-type t = {thumbnail: string};
+type t = {
+  thumbnail: string,
+  small: string,
+};
 
 let decoder = json => {
   thumbnail: json |> Json.Decode.field("thumbnail", Json.Decode.string),
+  small: json |> Json.Decode.field("small", Json.Decode.string),
 };
 
 let component = ReasonReact.statelessComponent("CardImage");
@@ -19,7 +23,10 @@ let make = (~image, ~style, _children) => {
       <View>
         <Image
           style
-          source=(Image.URI(Image.imageURISource(~uri=image.thumbnail, ())))
+          defaultSource=(
+            Image.Required(Packager.require("../assets/card-back.jpg"))
+          )
+          source=(Image.URI(Image.imageURISource(~uri=image.small, ())))
         />
       </View>
     ),

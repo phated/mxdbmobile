@@ -19,27 +19,18 @@ module Styles = {
   open BsReactNative.Style;
 
   let details =
-    style([flex(1.0), flexDirection(Column), paddingLeft(8.0 |. Pt)]);
+    style([
+      flex(1.0),
+      flexDirection(Column),
+      paddingHorizontal(8.0 |. Pt),
+    ]);
 
   let title = style([fontWeight(`Bold)]);
 
   let cardListItem =
-    style([
-      /* flex(1.), */
-      height(170.0 |. Pt),
-      flexDirection(Row),
-      /* marginLeft(8.0 |. Pt), */
-      /* marginRight(8.0 |. Pt), */
-      /* marginTop(4.0 |. Pt), */
-      /* marginBottom(4.0 |. Pt), */
-      padding(16.0 |. Pt),
-      /* borderStyle(Solid), */
-      /* borderBottomWidth(2.0), */
-      /* borderColor(Colors.Css.gray), */
-      /* borderRadius(3.), */
-    ]);
+    style([height(182.0 |. Pt), flexDirection(Row), padding(16.0 |. Pt)]);
 
-  let thumbnail = style([height(100.0 |. Pt), width(72.0 |. Pt)]);
+  let image = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
 };
 
 let component = ReasonReact.statelessComponent("Event");
@@ -48,7 +39,7 @@ let make = (~title, ~mp, ~image, ~effect, _children) => {
   render: _self => {
     open BsReactNative;
 
-    let cardImage = <CardImage image style=Styles.thumbnail />;
+    let cardImage = <CardImage image style=Styles.image />;
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title> (ReasonReact.string(title)) </Text>

@@ -33,7 +33,7 @@ module Styles = {
       borderStyle(Solid),
     ]);
 
-  let effectText = style([fontSize(12.0 |. Float)]);
+  let effectText = style([fontSize(11.0 |. Float)]);
 
   let attack = style([color(Colors.Css.attack)]);
   let defend = style([color(Colors.Css.defend)]);
