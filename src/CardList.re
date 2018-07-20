@@ -54,8 +54,8 @@ let renderItem =
   });
 
 let getItemLayout = (_data, idx) => {
-  "length": 170,
-  "offset": 170 * idx,
+  "length": 183,
+  "offset": 183 * idx,
   "index": idx,
 };
 
@@ -127,6 +127,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     }
     image {
       thumbnail
+      small
     }
   }
   events: allCards(filter: {
@@ -150,6 +151,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     }
     image {
       thumbnail
+      small
     }
   }
   battles: allCards(filter: {
@@ -177,6 +179,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     }
     image {
       thumbnail
+      small
     }
   }
 }
