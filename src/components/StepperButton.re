@@ -43,7 +43,7 @@ let make = (~side, ~onPress, children) => {
     height: 30.0,
     borderRadius: 15.0,
   },
-  reducer: (action, state) =>
+  reducer: (action, _state) =>
     switch (action) {
     | Grow =>
       ReasonReact.Update({

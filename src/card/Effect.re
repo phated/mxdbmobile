@@ -63,7 +63,7 @@ let make = (~effect, _children) => {
 
   let effectText = Belt.Option.getWithDefault(effect.text, "");
 
-  let c = {
+  {
     ...component,
     render: _self =>
       BsReactNative.(
@@ -79,6 +79,4 @@ let make = (~effect, _children) => {
         </View>
       ),
   };
-
-  c;
 };

@@ -1,7 +1,7 @@
 module Styles = {
   open BsReactNative.Style;
 
-  let stepperIcon = style([color(Colors.Css.ourBlue)]);
+  let stepperIcon = style([color(Colors.Css.primary)]);
 
   let counter =
     style([
@@ -18,45 +18,29 @@ module Styles = {
     ]);
   let counterText =
     style([
-      color(Colors.Css.ourBlue),
+      color(Colors.Css.primary),
       fontSize(18.0 |. Float),
       fontWeight(`_900),
     ]);
 };
 
-type state = {counter: int};
+let component = ReasonReact.statelessComponent("CardCounter");
 
-type action =
-  | Increment
-  | Decrement;
-
-let component = ReasonReact.reducerComponent("CardCounter");
-
-let make = children => {
+let make = (~onIncrement, ~onDecrement, ~value, children) => {
   ...component,
-  initialState: () => {counter: 0},
-  reducer: (action, state) =>
-    switch (action) {
-    | Increment when state.counter < 3 =>
-      ReasonReact.Update({counter: state.counter + 1})
-    | Decrement when state.counter > 0 =>
-      ReasonReact.Update({counter: state.counter - 1})
-    | Increment
-    | Decrement => ReasonReact.NoUpdate
-    },
-  render: self =>
+  render: _self =>
     BsReactNative.(
       <View>
         children
-        <StepperButton side="left" onPress=(() => self.send(Decrement))>
+        <StepperButton side="left" onPress=onDecrement>
           <Icon style=Styles.stepperIcon name="remove" />
         </StepperButton>
-        <StepperButton side="right" onPress=(() => self.send(Increment))>
+        <StepperButton side="right" onPress=onIncrement>
           <Icon style=Styles.stepperIcon name="add" />
         </StepperButton>
         <View style=Styles.counter>
           <Text style=Styles.counterText>
-            (ReasonReact.string(string_of_int(self.state.counter)))
+            (ReasonReact.string(string_of_int(value)))
           </Text>
         </View>
       </View>

@@ -22,10 +22,14 @@ module Styles = {
 
 type action =
   | Search(string)
+  | Increment(Card.t)
+  | Decrement(Card.t)
   | StoreCards(CardList.t);
+
 type state = {
   filter: Filter.t,
   cards: CardList.t,
+  deck: Deck.t,
 };
 
 let create = () => {
@@ -36,15 +40,17 @@ let create = () => {
       switch (action, route.path) {
       | (Init, [""]) =>
         ReasonTea.Program.UpdateWithSideEffects(
-          {filter: Filter.Empty, cards: CardList.empty},
+          {filter: Filter.Empty, cards: CardList.empty, deck: Deck.empty},
           (
             self =>
               Query.send(CardList.query, self.state.filter)
               |> Js.Promise.then_(Utils.tapLog)
-              |> Js.Promise.then_(cards => {
-                   self.send(StoreCards(cards));
-                   Js.Promise.resolve(cards);
-                 })
+              |> Js.Promise.then_(
+                   cards => {
+                     self.send(StoreCards(cards));
+                     Js.Promise.resolve(cards);
+                   },
+                 )
               |> ignore
           ),
         )
@@ -63,22 +69,37 @@ let create = () => {
     update: (action, state) =>
       switch (action) {
       | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
+      | Increment(card) =>
+        ReasonTea.Program.Update({
+          ...state,
+          deck: Deck.increment(state.deck, card),
+        })
+      | Decrement(card) =>
+        ReasonTea.Program.Update({
+          ...state,
+          deck: Deck.decrement(state.deck, card),
+        })
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
-          {cards: CardList.empty, filter: FreeText(filter)},
+          {...state, cards: CardList.empty, filter: FreeText(filter)},
           (
             self =>
               Query.send(CardList.query, self.state.filter)
               |> Js.Promise.then_(Utils.tapLog)
-              |> Js.Promise.then_(cards => {
-                   self.send(StoreCards(cards));
-                   Js.Promise.resolve(cards);
-                 })
+              |> Js.Promise.then_(
+                   cards => {
+                     self.send(StoreCards(cards));
+                     Js.Promise.resolve(cards);
+                   },
+                 )
               |> ignore
           ),
         )
       },
-    view: self =>
+    view: self => {
+      /* Belt.Map.Dict.forEach(self.state.deck, Js.log2); */
+      let increment = (card, ()) => self.send(Increment(card));
+      let decrement = (card, ()) => self.send(Decrement(card));
       BsReactNative.(
         <SafeAreaView style=Styles.container>
           <Toolbar>
@@ -103,19 +124,29 @@ let create = () => {
                        <Text style=Styles.title>
                          (ReasonReact.string("MetaX Deck Builder"))
                        </Text>,
-                       <Icon name="search" style=Styles.icon onPress=enable />,
+                       <Icon
+                         name="search"
+                         style=Styles.icon
+                         onPress=enable
+                       />,
                      |]
                    };
                  }
                )
           </Toolbar>
-          <CardList cards=self.state.cards />
+          <CardList
+            cards=self.state.cards
+            deck=self.state.deck
+            onIncrement=increment
+            onDecrement=decrement
+          />
           <NavigationBar>
             <NavigationButton icon="cards" label="Cards" />
             <NavigationButton icon="deck" label="Deck" />
             <NavigationButton icon="info" label="Info" />
           </NavigationBar>
         </SafeAreaView>
-      ),
+      );
+    },
   };
 };

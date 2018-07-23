@@ -16,7 +16,10 @@ let toArray = cardList =>
 let decode = json => {
   characters:
     json
-    |> Json.Decode.field("characters", Json.Decode.array(Character.decoder)),
+    |> Json.Decode.field(
+         "characters",
+         Json.Decode.array(Character.decoder),
+       ),
   events:
     json |> Json.Decode.field("events", Json.Decode.array(Event.decoder)),
   battles:
@@ -41,17 +44,6 @@ let itemSeparatorComponent =
   BsReactNative.FlatList.separatorComponent(_ =>
     BsReactNative.(<View style=Styles.separator />)
   );
-let renderItem =
-  BsReactNative.FlatList.renderItem(bag => {
-    let card: Card.t = bag.item;
-    switch (card) {
-    | Character({title, subtitle, trait, mp, stats, image, effect}) =>
-      <Character title subtitle trait mp stats image effect />
-    | Event({title, mp, image, effect}) => <Event title mp image effect />
-    | Battle({title, mp, stat, image, effect}) =>
-      <Battle title mp stat image effect />
-    };
-  });
 
 let getItemLayout = (_data, idx) => {
   "length": 183,
@@ -68,9 +60,9 @@ let getUid = card =>
 
 let component = ReasonReact.statelessComponent("CardList");
 
-let make = (~cards, _children) => {
+let make = (~cards, ~deck, ~onIncrement, ~onDecrement, _children) => {
   ...component,
-  render: self => {
+  render: _self => {
     open BsReactNative;
     let sections = toArray(cards);
 
@@ -80,6 +72,51 @@ let make = (~cards, _children) => {
           <ActivityIndicator size=`large color=Colors.ourBlue />
         </View>;
       } else {
+        let renderItem =
+          BsReactNative.FlatList.renderItem(
+            bag => {
+              let card: Card.t = bag.item;
+              let onIncrement = onIncrement(card);
+              let onDecrement = onDecrement(card);
+              let count = Deck.find(deck, card);
+              switch (card) {
+              | Character({
+                  title,
+                  subtitle,
+                  trait,
+                  mp,
+                  stats,
+                  image,
+                  effect,
+                }) =>
+                <Character
+                  title
+                  subtitle
+                  trait
+                  mp
+                  stats
+                  image
+                  effect
+                  count
+                  onIncrement
+                  onDecrement
+                />
+              | Event({title, mp, image, effect}) =>
+                <Event title mp image effect count onIncrement onDecrement />
+              | Battle({title, mp, stat, image, effect}) =>
+                <Battle
+                  title
+                  mp
+                  stat
+                  image
+                  effect
+                  count
+                  onIncrement
+                  onDecrement
+                />
+              };
+            },
+          );
         <FlatList
           data=sections
           getItemLayout

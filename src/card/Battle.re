@@ -30,7 +30,11 @@ module Styles = {
   let title = style([fontWeight(`Bold)]);
 
   let cardListItem =
-    style([height(182.0 |. Pt), flexDirection(Row), padding(16.0 |. Pt)]);
+    style([
+      height(182.0 |. Pt),
+      flexDirection(Row),
+      padding(16.0 |. Pt),
+    ]);
 
   let image = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
 
@@ -38,12 +42,27 @@ module Styles = {
 };
 
 let component = ReasonReact.statelessComponent("Battle");
-let make = (~title, ~mp, ~stat, ~image, ~effect, _children) => {
+let make =
+    (
+      ~title,
+      ~mp,
+      ~stat,
+      ~image,
+      ~effect,
+      ~count,
+      ~onIncrement,
+      ~onDecrement,
+      _children,
+    ) => {
   ...component,
   render: _self => {
     open BsReactNative;
 
     let cardImage = <CardImage image style=Styles.image />;
+    let cardCounter =
+      <CardCounter onIncrement onDecrement value=count>
+        ...cardImage
+      </CardCounter>;
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title> (ReasonReact.string(title)) </Text>
@@ -52,6 +71,10 @@ let make = (~title, ~mp, ~stat, ~image, ~effect, _children) => {
     let cardStats =
       <View style=Styles.stats> <MP value=mp /> <BattleStat stat /> </View>;
 
-    <View style=Styles.cardListItem> cardImage cardDetails cardStats </View>;
+    <View style=Styles.cardListItem>
+      cardCounter
+      cardDetails
+      cardStats
+    </View>;
   },
 };
