@@ -19,6 +19,10 @@ module Css = {
   let white = String(white);
   let gray = String(gray);
 
+  let ourBlue = String(ourBlue);
+
+  let transparentWhite = String("rgba(255, 255, 255, 0.9)");
+
   let strength = String(strength);
   let intelligence = String(intelligence);
   let special = String(special);

@@ -7,6 +7,9 @@ external materialIcon : ReasonReact.reactClass = "default";
 [@bs.module "react-native-vector-icons/dist/MaterialCommunityIcons"]
 external communityIcon : ReasonReact.reactClass = "default";
 
+[@bs.module "react-native-vector-icons/dist/FontAwesome"]
+external faIcon : ReasonReact.reactClass = "default";
+
 [@bs.module] external config : Js.Json.t = "./config.json";
 
 [@bs.deriving abstract]
@@ -37,7 +40,16 @@ let isCustom = name =>
 
 let isCommunity = name =>
   switch (name) {
-  | "plus-circle-outline" => true
+  | "plus-circle"
+  | "plus-circle-outline"
+  | "minus-circle"
+  | "minus-circle-outline" => true
+  | _ => false
+  };
+let isFontAwesome = name =>
+  switch (name) {
+  | "plus"
+  | "minus" => true
   | _ => false
   };
 
@@ -46,6 +58,7 @@ let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) => {
     switch (name) {
     | name when isCustom(name) => customIcon
     | name when isCommunity(name) => communityIcon
+    | name when isFontAwesome(name) => faIcon
     | name => materialIcon
     };
   ReasonReact.wrapJsForReason(

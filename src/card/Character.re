@@ -54,6 +54,7 @@ let make =
     open BsReactNative;
 
     let cardImage = <CardImage image style=Styles.image />;
+    let cardCounter = <CardCounter> ...cardImage </CardCounter>;
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title>
@@ -67,6 +68,6 @@ let make =
     let cardStats =
       <View style=Styles.stats> <MP value=mp /> <StatList stats /> </View>;
 
-    <View style=Styles.cardListItem> cardImage cardDetails cardStats </View>;
+    <View style=Styles.cardListItem> cardCounter cardDetails cardStats </View>;
   },
 };
