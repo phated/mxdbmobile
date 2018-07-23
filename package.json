@@ -60,7 +60,8 @@
     "level-packager": "^4.0.1",
     "react-native-cli": "^2.0.1",
     "react-test-renderer": "16.3.1",
-    "subleveldown": "^3.0.1"
+    "subleveldown": "^3.0.1",
+    "jsc-android": "225067.x.x"
   },
   "jest": {
     "preset": "react-native",
