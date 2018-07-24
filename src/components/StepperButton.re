@@ -7,6 +7,9 @@ module Styles = {
       backgroundColor(Colors.Css.transparentWhite),
       alignItems(Center),
       justifyContent(Center),
+      top(60.0 |. Pt),
+      height(30.0 |. Pt),
+      width(35.0 |. Pt),
     ]);
 
   let left =
@@ -23,12 +26,7 @@ module Styles = {
     ]);
 };
 
-type state = {
-  top: float,
-  width: float,
-  height: float,
-  borderRadius: float,
-};
+type state = {scale: float};
 type action =
   | Grow
   | Shrink;
@@ -36,63 +34,41 @@ type action =
 let component = ReasonReact.reducerComponent("StepperButton");
 
 let make = (~side, ~onPress, children) => {
-  ...component,
-  initialState: () => {
-    top: 60.0,
-    width: 35.0,
-    height: 30.0,
-    borderRadius: 15.0,
-  },
-  reducer: (action, _state) =>
-    switch (action) {
-    | Grow =>
-      ReasonReact.Update({
-        top: 55.0,
-        width: 40.0,
-        height: 40.0,
-        borderRadius: 20.0,
-      })
-    | Shrink =>
-      ReasonReact.Update({
-        top: 60.0,
-        width: 35.0,
-        height: 30.0,
-        borderRadius: 15.0,
-      })
+  let directional =
+    switch (side) {
+    | "left" => Styles.left
+    | "right" => Styles.right
+    };
+  let grow = (_, self) => self.ReasonReact.send(Grow);
+  let shrink = (_, self) => self.ReasonReact.send(Shrink);
+
+  let makeScale = scale =>
+    BsReactNative.Style.(
+      style([Transform.make(~scaleX=scale, ~scaleY=scale, ())])
+    );
+
+  {
+    ...component,
+    initialState: () => {scale: 1.0},
+    reducer: (action, _state) =>
+      switch (action) {
+      | Grow => ReasonReact.Update({scale: 1.33})
+      | Shrink => ReasonReact.Update({scale: 1.0})
+      },
+    render: self => {
+      open BsReactNative;
+
+      let scale = makeScale(self.state.scale);
+
+      let style =
+        StyleSheet.flatten([scale, directional, Styles.container]);
+
+      <TouchableWithoutFeedback
+        onPress
+        onPressIn=(self.handle(grow))
+        onPressOut=(self.handle(shrink))>
+        <View style> ...children </View>
+      </TouchableWithoutFeedback>;
     },
-  render: self => {
-    open BsReactNative;
-    open BsReactNative.Style;
-
-    let positional =
-      style([
-        top(self.state.top |. Pt),
-        width(self.state.width |. Pt),
-        height(self.state.height |. Pt),
-      ]);
-    let directional =
-      switch (side) {
-      | "left" =>
-        style([
-          left(0.0 |. Pt),
-          borderTopRightRadius(self.state.borderRadius),
-          borderBottomRightRadius(self.state.borderRadius),
-        ])
-      | "right" =>
-        style([
-          right(0.0 |. Pt),
-          borderTopLeftRadius(self.state.borderRadius),
-          borderBottomLeftRadius(self.state.borderRadius),
-        ])
-      };
-    let style =
-      StyleSheet.flatten([positional, directional, Styles.container]);
-
-    <TouchableWithoutFeedback
-      onPress
-      onPressIn=(() => self.send(Grow))
-      onPressOut=(() => self.send(Shrink))>
-      <View style> ...children </View>
-    </TouchableWithoutFeedback>;
-  },
+  };
 };

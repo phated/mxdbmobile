@@ -18,6 +18,8 @@ let decoder: Js.Json.t => t =
 module Styles = {
   open BsReactNative.Style;
 
+  let container = style([flex(1.0)]);
+
   let details =
     style([
       flex(1.0),
@@ -38,26 +40,14 @@ module Styles = {
 };
 
 let component = ReasonReact.statelessComponent("Event");
-let make =
-    (
-      ~title,
-      ~mp,
-      ~image,
-      ~effect,
-      ~count,
-      ~onIncrement,
-      ~onDecrement,
-      _children,
-    ) => {
+let make = (~card, _children) => {
   ...component,
+  shouldUpdate: _ => false,
   render: _self => {
     open BsReactNative;
 
-    let cardImage = <CardImage image style=Styles.image />;
-    let cardCounter =
-      <CardCounter onIncrement onDecrement value=count>
-        ...cardImage
-      </CardCounter>;
+    let {title, effect, mp} = card;
+
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title> (ReasonReact.string(title)) </Text>
@@ -65,10 +55,6 @@ let make =
       </View>;
     let cardStats = <View> <MP value=mp /> </View>;
 
-    <View style=Styles.cardListItem>
-      cardCounter
-      cardDetails
-      cardStats
-    </View>;
+    <View style=Styles.container> cardDetails cardStats </View>;
   },
 };

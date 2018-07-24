@@ -40,11 +40,6 @@ module Styles = {
       /* marginLeft(16.0 |. Pt), */
     ]);
 };
-let itemSeparatorComponent =
-  BsReactNative.FlatList.separatorComponent(_ =>
-    BsReactNative.(<View style=Styles.separator />)
-  );
-
 let getItemLayout = (_data, idx) => {
   "length": 183,
   "offset": 183 * idx,
@@ -60,75 +55,50 @@ let getUid = card =>
 
 let component = ReasonReact.statelessComponent("CardList");
 
-let make = (~cards, ~deck, ~onIncrement, ~onDecrement, _children) => {
-  ...component,
-  render: _self => {
-    open BsReactNative;
-    let sections = toArray(cards);
+let make = (~cards, renderChild) => {
+  let itemSeparatorComponent =
+    BsReactNative.FlatList.separatorComponent(_ =>
+      BsReactNative.(<View style=Styles.separator />)
+    );
 
-    let children =
-      if (Belt.Array.length(sections) == 0) {
-        <View style=Styles.loadingContainer>
-          <ActivityIndicator size=`large color=Colors.ourBlue />
-        </View>;
-      } else {
-        let renderItem =
-          BsReactNative.FlatList.renderItem(
-            bag => {
-              let card: Card.t = bag.item;
-              let onIncrement = onIncrement(card);
-              let onDecrement = onDecrement(card);
-              let count = Deck.find(deck, card);
-              switch (card) {
-              | Character({
-                  title,
-                  subtitle,
-                  trait,
-                  mp,
-                  stats,
-                  image,
-                  effect,
-                }) =>
-                <Character
-                  title
-                  subtitle
-                  trait
-                  mp
-                  stats
-                  image
-                  effect
-                  count
-                  onIncrement
-                  onDecrement
-                />
-              | Event({title, mp, image, effect}) =>
-                <Event title mp image effect count onIncrement onDecrement />
-              | Battle({title, mp, stat, image, effect}) =>
-                <Battle
-                  title
-                  mp
-                  stat
-                  image
-                  effect
-                  count
-                  onIncrement
-                  onDecrement
-                />
-              };
-            },
-          );
-        <FlatList
-          data=sections
-          getItemLayout
-          removeClippedSubviews=true
-          keyExtractor=((card, _idx) => getUid(card))
-          renderItem
-          itemSeparatorComponent
-        />;
-      };
+  {
+    ...component,
+    render: _self => {
+      /* Js.log("rendering card list"); */
 
-    <View style=Styles.container> children </View>;
-  },
+      open BsReactNative;
+
+      let children =
+        if (Belt.Array.length(cards) == 0) {
+          <View style=Styles.loadingContainer>
+            <ActivityIndicator size=`large color=Colors.ourBlue />
+          </View>;
+        } else {
+          let renderItem =
+            FlatList.renderItem(
+              ({item}) => {
+                let (card, count) = item;
+                renderChild(card, count);
+              },
+            );
+          <FlatList
+            data=cards
+            getItemLayout
+            initialNumToRender=4
+            keyExtractor=(
+              (item, _idx) => {
+                let (card, _count) = item;
+                getUid(card);
+              }
+            )
+            renderItem
+            itemSeparatorComponent
+          />;
+        };
+
+      <View style=Styles.container> children </View>;
+    },
+  };
 };
 
 let query = {|

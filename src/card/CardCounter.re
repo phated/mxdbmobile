@@ -28,10 +28,11 @@ let component = ReasonReact.statelessComponent("CardCounter");
 
 let make = (~onIncrement, ~onDecrement, ~value, children) => {
   ...component,
-  render: _self =>
+  render: _self => {
+    let [|image|] = children;
     BsReactNative.(
       <View>
-        children
+        image
         <StepperButton side="left" onPress=onDecrement>
           <Icon style=Styles.stepperIcon name="remove" />
         </StepperButton>
@@ -44,5 +45,6 @@ let make = (~onIncrement, ~onDecrement, ~value, children) => {
           </Text>
         </View>
       </View>
-    ),
+    );
+  },
 };

@@ -20,6 +20,8 @@ let decoder: Js.Json.t => t =
 module Styles = {
   open BsReactNative.Style;
 
+  let container = style([flex(1.0)]);
+
   let details =
     style([
       flex(1.0),
@@ -29,40 +31,20 @@ module Styles = {
 
   let title = style([fontWeight(`Bold)]);
 
-  let cardListItem =
-    style([
-      height(182.0 |. Pt),
-      flexDirection(Row),
-      padding(16.0 |. Pt),
-    ]);
-
   let image = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
 
   let stats = style([alignItems(FlexEnd)]);
 };
 
 let component = ReasonReact.statelessComponent("Battle");
-let make =
-    (
-      ~title,
-      ~mp,
-      ~stat,
-      ~image,
-      ~effect,
-      ~count,
-      ~onIncrement,
-      ~onDecrement,
-      _children,
-    ) => {
+let make = (~card, _children) => {
   ...component,
+  shouldUpdate: _ => false,
   render: _self => {
     open BsReactNative;
 
-    let cardImage = <CardImage image style=Styles.image />;
-    let cardCounter =
-      <CardCounter onIncrement onDecrement value=count>
-        ...cardImage
-      </CardCounter>;
+    let {title, effect, mp, stat} = card;
+
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title> (ReasonReact.string(title)) </Text>
@@ -71,10 +53,6 @@ let make =
     let cardStats =
       <View style=Styles.stats> <MP value=mp /> <BattleStat stat /> </View>;
 
-    <View style=Styles.cardListItem>
-      cardCounter
-      cardDetails
-      cardStats
-    </View>;
+    <View style=Styles.container> cardDetails cardStats </View>;
   },
 };

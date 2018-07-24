@@ -34,6 +34,12 @@ type state = {
 
 let create = () => {
   let program = ReasonTea.Program.routerProgram("Main App");
+
+  let increment = (card, self) =>
+    self.ReasonTea.Program.send(Increment(card));
+  let decrement = (card, self) =>
+    self.ReasonTea.Program.send(Decrement(card));
+
   {
     ...program,
     fromRoute: (action, route) =>
@@ -70,15 +76,15 @@ let create = () => {
       switch (action) {
       | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
       | Increment(card) =>
-        ReasonTea.Program.Update({
-          ...state,
-          deck: Deck.increment(state.deck, card),
-        })
+        ReasonTea.Program.UpdateWithSideEffects(
+          {...state, deck: state.deck},
+          (self => Deck.increment(self.state.deck, card)),
+        )
       | Decrement(card) =>
-        ReasonTea.Program.Update({
-          ...state,
-          deck: Deck.decrement(state.deck, card),
-        })
+        ReasonTea.Program.UpdateWithSideEffects(
+          {...state, deck: state.deck},
+          (self => Deck.decrement(self.state.deck, card)),
+        )
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
           {...state, cards: CardList.empty, filter: FreeText(filter)},
@@ -97,9 +103,17 @@ let create = () => {
         )
       },
     view: self => {
-      /* Belt.Map.Dict.forEach(self.state.deck, Js.log2); */
-      let increment = (card, ()) => self.send(Increment(card));
-      let decrement = (card, ()) => self.send(Decrement(card));
+      let _ = ();
+
+      let cards = CardList.toArray(self.state.cards);
+      let cardsWithCount =
+        Belt.Array.map(
+          cards,
+          card => {
+            let count = Deck.find(self.state.deck, card);
+            (card, count);
+          },
+        );
       BsReactNative.(
         <SafeAreaView style=Styles.container>
           <Toolbar>
@@ -134,12 +148,17 @@ let create = () => {
                  }
                )
           </Toolbar>
-          <CardList
-            cards=self.state.cards
-            deck=self.state.deck
-            onIncrement=increment
-            onDecrement=decrement
-          />
+          <CardList cards=cardsWithCount>
+            ...(
+                 (card, count) =>
+                   <Card
+                     card
+                     count
+                     onIncrement=(self.handle(increment))
+                     onDecrement=(self.handle(decrement))
+                   />
+               )
+          </CardList>
           <NavigationBar>
             <NavigationButton icon="cards" label="Cards" />
             <NavigationButton icon="deck" label="Deck" />

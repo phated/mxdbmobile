@@ -34,9 +34,9 @@ module Comparator =
     };
   });
 
-type t = Belt.Map.Dict.t(Comparator.t, int, Comparator.identity);
+type t = Belt.MutableMap.t(Comparator.t, int, Comparator.identity);
 
-let empty = Belt.Map.Dict.empty;
+let empty: t = Belt.MutableMap.make(~id=(module Comparator));
 
 let maybeInc = maybeCount =>
   switch (maybeCount) {
@@ -51,10 +51,9 @@ let maybeDec = maybeCount =>
   | None => None
   };
 
-let find = (deck, card) =>
-  Belt.Map.Dict.getWithDefault(deck, card, 0, ~cmp=Comparator.cmp);
+let find = (deck, card) => Belt.MutableMap.getWithDefault(deck, card, 0);
 
 let increment = (deck, card) =>
-  Belt.Map.Dict.update(deck, card, maybeInc, ~cmp=Comparator.cmp);
+  Belt.MutableMap.update(deck, card, maybeInc);
 let decrement = (deck, card) =>
-  Belt.Map.Dict.update(deck, card, maybeDec, ~cmp=Comparator.cmp);
+  Belt.MutableMap.update(deck, card, maybeDec);
