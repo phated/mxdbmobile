@@ -76,15 +76,15 @@ let create = () => {
       switch (action) {
       | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
       | Increment(card) =>
-        ReasonTea.Program.UpdateWithSideEffects(
-          {...state, deck: state.deck},
-          (self => Deck.increment(self.state.deck, card)),
-        )
+        ReasonTea.Program.Update({
+          ...state,
+          deck: Deck.increment(state.deck, card),
+        })
       | Decrement(card) =>
-        ReasonTea.Program.UpdateWithSideEffects(
-          {...state, deck: state.deck},
-          (self => Deck.decrement(self.state.deck, card)),
-        )
+        ReasonTea.Program.Update({
+          ...state,
+          deck: Deck.decrement(state.deck, card),
+        })
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
           {...state, cards: CardList.empty, filter: FreeText(filter)},
