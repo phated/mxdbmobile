@@ -91,7 +91,7 @@ let create = () => {
           (
             self =>
               Query.send(CardList.query, self.state.filter)
-              |> Js.Promise.then_(Utils.tapLog)
+              /* |> Js.Promise.then_(Utils.tapLog) */
               |> Js.Promise.then_(
                    cards => {
                      self.send(StoreCards(cards));
