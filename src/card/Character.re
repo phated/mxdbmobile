@@ -29,7 +29,7 @@ let decoder: Js.Json.t => t =
 module Styles = {
   open BsReactNative.Style;
 
-  let container = style([flex(1.0)]);
+  let container = style([flex(1.0), flexDirection(Row)]);
 
   let details =
     style([
