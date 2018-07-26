@@ -10,13 +10,13 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("NavigationButton");
 
-let make = (~icon, ~label, _children) => {
+let make = (~icon, ~label, ~onPress, _children) => {
   ...component,
   render: _self =>
     BsReactNative.(
-      <View style=Styles.container>
+      <TouchableOpacity style=Styles.container onPress>
         <Icon name=icon style=Styles.icon />
         <Text style=Styles.label> (ReasonReact.string(label)) </Text>
-      </View>
+      </TouchableOpacity>
     ),
 };

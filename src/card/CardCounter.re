@@ -22,6 +22,9 @@ module Styles = {
       fontSize(18.0 |. Float),
       fontWeight(`_900),
     ]);
+
+  let isZero = style([opacity(0.5 |. Float)]);
+  let notZero = style([]);
 };
 
 let component = ReasonReact.statelessComponent("CardCounter");
@@ -29,22 +32,25 @@ let component = ReasonReact.statelessComponent("CardCounter");
 let make = (~onIncrement, ~onDecrement, ~value, children) => {
   ...component,
   render: _self => {
+    open BsReactNative;
     let [|image|] = children;
-    BsReactNative.(
-      <View>
-        image
-        <StepperButton side="left" onPress=onDecrement>
-          <Icon style=Styles.stepperIcon name="remove" />
-        </StepperButton>
-        <StepperButton side="right" onPress=onIncrement>
-          <Icon style=Styles.stepperIcon name="add" />
-        </StepperButton>
-        <View style=Styles.counter>
-          <Text style=Styles.counterText>
-            (ReasonReact.string(string_of_int(value)))
-          </Text>
-        </View>
+
+    let opac = value == 0 ? Styles.isZero : Styles.notZero;
+    let counterStyle = StyleSheet.flatten([opac, Styles.counter]);
+
+    <View>
+      image
+      <StepperButton side="left" onPress=onDecrement disabled=(value == 0)>
+        <Icon style=Styles.stepperIcon name="remove" />
+      </StepperButton>
+      <StepperButton side="right" onPress=onIncrement disabled=(value == 3)>
+        <Icon style=Styles.stepperIcon name="add" />
+      </StepperButton>
+      <View style=counterStyle>
+        <Text style=Styles.counterText>
+          (ReasonReact.string(string_of_int(value)))
+        </Text>
       </View>
-    );
+    </View>;
   },
 };

@@ -7,6 +7,13 @@ let character = character => Character(character);
 let event = event => Event(event);
 let battle = battle => Battle(battle);
 
+let getUid = card =>
+  switch (card) {
+  | Character(character) => character.uid
+  | Event(event) => event.uid
+  | Battle(battle) => battle.uid
+  };
+
 let getImage = card =>
   switch (card) {
   | Character({image}) => image

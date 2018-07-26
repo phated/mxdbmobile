@@ -21,32 +21,46 @@ module Styles = {
 };
 
 type action =
+  | NavigateTo(Page.t)
   | Search(string)
   | Increment(Card.t)
   | Decrement(Card.t)
   | StoreCards(CardList.t);
 
 type state = {
+  page: Page.t,
   filter: Filter.t,
   cards: CardList.t,
   deck: Deck.t,
+  deckSize: int,
 };
 
 let create = () => {
   let program = ReasonTea.Program.routerProgram("Main App");
 
+  let search = (text, self) => self.ReasonTea.Program.send(Search(text));
   let increment = (card, self) =>
     self.ReasonTea.Program.send(Increment(card));
   let decrement = (card, self) =>
     self.ReasonTea.Program.send(Decrement(card));
+  let toCards = (_, self) =>
+    self.ReasonTea.Program.send(NavigateTo(Cards));
+  let toDeck = (_, self) => self.ReasonTea.Program.send(NavigateTo(Deck));
+  let toInfo = (_, self) => self.ReasonTea.Program.send(NavigateTo(Info));
 
   {
     ...program,
     fromRoute: (action, route) =>
-      switch (action, route.path) {
-      | (Init, [""]) =>
+      switch (action) {
+      | Init =>
         ReasonTea.Program.UpdateWithSideEffects(
-          {filter: Filter.Empty, cards: CardList.empty, deck: Deck.empty},
+          {
+            page: Page.fromPath(route.path),
+            filter: Filter.Empty,
+            cards: CardList.empty,
+            deck: Deck.empty,
+            deckSize: 0,
+          },
           (
             self =>
               Query.send(CardList.query, self.state.filter)
@@ -60,7 +74,7 @@ let create = () => {
               |> ignore
           ),
         )
-      | (Push, _) => ReasonTea.Program.NoUpdate
+      | Push => ReasonTea.Program.NoUpdate
       | _ => ReasonTea.Program.NoUpdate
       },
     toRoute: ({previous, next}) =>
@@ -69,22 +83,25 @@ let create = () => {
       } else {
         let search = Filter.toString(next.filter);
         ReasonTea.Program.Push(
-          ReasonTea.Route.make(~path=[""], ~search, ~hash=""),
+          ReasonTea.Route.make(
+            ~path=Page.toPath(next.page),
+            ~search,
+            ~hash="",
+          ),
         );
       },
     update: (action, state) =>
       switch (action) {
+      | NavigateTo(page) => ReasonTea.Program.Update({...state, page})
       | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
       | Increment(card) =>
-        ReasonTea.Program.Update({
-          ...state,
-          deck: Deck.increment(state.deck, card),
-        })
+        let deck = Deck.increment(state.deck, card);
+        let deckSize = Deck.total(deck);
+        ReasonTea.Program.Update({...state, deck, deckSize});
       | Decrement(card) =>
-        ReasonTea.Program.Update({
-          ...state,
-          deck: Deck.decrement(state.deck, card),
-        })
+        let deck = Deck.decrement(state.deck, card);
+        let deckSize = Deck.total(deck);
+        ReasonTea.Program.Update({...state, deck, deckSize});
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
           {...state, cards: CardList.empty, filter: FreeText(filter)},
@@ -102,70 +119,74 @@ let create = () => {
           ),
         )
       },
-    view: self => {
-      let _ = ();
+    view: ({state, handle}) => {
+      open BsReactNative;
 
-      let cards = CardList.toArray(self.state.cards);
+      let {cards, deck, filter, deckSize} = state;
+
       let cardsWithCount =
-        Belt.Array.map(
+        CardList.map(
           cards,
           card => {
-            let count = Deck.find(self.state.deck, card);
+            let count = Deck.count(deck, card);
             (card, count);
           },
         );
-      BsReactNative.(
-        <SafeAreaView style=Styles.container>
-          <Toolbar>
-            ...(
-                 (~enable, ~disable, mode) => {
-                   let onSearch = text => self.send(Search(text));
 
-                   switch (mode) {
-                   | Enabled => [|
-                       <Icon
-                         name="arrow-back"
-                         style=Styles.icon
-                         onPress=disable
-                       />,
-                       <SearchInput
-                         previous=(Filter.toString(self.state.filter))
-                         onBlur=disable
-                         onSearch
-                       />,
-                     |]
-                   | Disabled => [|
-                       <Text style=Styles.title>
-                         (ReasonReact.string("MetaX Deck Builder"))
-                       </Text>,
-                       <Icon
-                         name="search"
-                         style=Styles.icon
-                         onPress=enable
-                       />,
-                     |]
-                   };
-                 }
-               )
-          </Toolbar>
-          <CardList cards=cardsWithCount>
-            ...(
-                 (card, count) =>
-                   <Card
-                     card
-                     count
-                     onIncrement=(self.handle(increment))
-                     onDecrement=(self.handle(decrement))
-                   />
-               )
-          </CardList>
-          <NavigationBar>
-            <NavigationButton icon="cards" label="Cards" />
-            <NavigationButton icon="deck" label="Deck" />
-            <NavigationButton icon="info" label="Info" />
-          </NavigationBar>
-        </SafeAreaView>
-      );
+      let renderCard = (card, count) =>
+        <Card
+          card
+          count
+          onIncrement=(handle(increment))
+          onDecrement=(handle(decrement))
+        />;
+
+      let toolbarRender = (~enable, ~disable, mode) =>
+        switch (mode) {
+        | Toolbar.Enabled => [|
+            <Icon name="arrow-back" style=Styles.icon onPress=disable />,
+            <SearchInput
+              previous=(Filter.toString(filter))
+              onBlur=disable
+              onSearch=(handle(search))
+            />,
+          |]
+        | Toolbar.Disabled => [|
+            <Text style=Styles.title>
+              (ReasonReact.string("MetaX Deck Builder"))
+            </Text>,
+            <Icon name="search" style=Styles.icon onPress=enable />,
+          |]
+        };
+
+      let body =
+        switch (state.page) {
+        | Cards => <CardList cards=cardsWithCount> ...renderCard </CardList>
+        | Deck => <Deck deck> ...renderCard </Deck>
+        | Info => <Info />
+        };
+
+      <SafeAreaView style=Styles.container>
+        <Toolbar> ...toolbarRender </Toolbar>
+        body
+        <NavigationBar>
+          <NavigationButton
+            icon="cards"
+            label="Cards"
+            onPress=(handle(toCards))
+          />
+          <NavigationButton
+            icon="deck"
+            label={j|Deck ($deckSize)|j}
+            onPress=(handle(toDeck))
+          />
+          <NavigationButton
+            icon="info"
+            label="Info"
+            onPress=(handle(toInfo))
+          />
+        </NavigationBar>
+      </SafeAreaView>;
     },
   };
 };

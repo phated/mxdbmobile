@@ -6,11 +6,11 @@ type t = {
 
 let empty = {characters: [||], events: [||], battles: [||]};
 
-let toArray = cardList =>
+let map = ({characters, events, battles}, mapper) =>
   Belt.Array.concatMany([|
-    Belt.Array.map(cardList.characters, Card.character),
-    Belt.Array.map(cardList.events, Card.event),
-    Belt.Array.map(cardList.battles, Card.battle),
+    Belt.Array.map(characters, card => mapper(Card.character(card))),
+    Belt.Array.map(events, card => mapper(Card.event(card))),
+    Belt.Array.map(battles, card => mapper(Card.battle(card))),
   |]);
 
 let decode = json => {
@@ -45,13 +45,6 @@ let getItemLayout = (_data, idx) => {
   "offset": 183 * idx,
   "index": idx,
 };
-
-let getUid = card =>
-  switch (card) {
-  | Card.Character(character) => character.uid
-  | Card.Event(event) => event.uid
-  | Card.Battle(battle) => battle.uid
-  };
 
 let component = ReasonReact.statelessComponent("CardList");
 
@@ -88,7 +81,7 @@ let make = (~cards, renderChild) => {
             keyExtractor=(
               (item, _idx) => {
                 let (card, _count) = item;
-                getUid(card);
+                Card.getUid(card);
               }
             )
             renderItem

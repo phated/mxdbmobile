@@ -12,6 +12,9 @@ module Styles = {
       width(35.0 |. Pt),
     ]);
 
+  let disabled = style([opacity(0.5 |. Float)]);
+  let enabled = style([]);
+
   let left =
     style([
       left(0.0 |. Pt),
@@ -26,6 +29,8 @@ module Styles = {
     ]);
 };
 
+let hitSlop = {"top": 15, "bottom": 15, "left": 15, "right": 15};
+
 type state = {scale: float};
 type action =
   | Grow
@@ -33,7 +38,7 @@ type action =
 
 let component = ReasonReact.reducerComponent("StepperButton");
 
-let make = (~side, ~onPress, children) => {
+let make = (~side, ~onPress, ~disabled, children) => {
   let directional =
     switch (side) {
     | "left" => Styles.left
@@ -59,11 +64,14 @@ let make = (~side, ~onPress, children) => {
       open BsReactNative;
 
       let scale = makeScale(self.state.scale);
+      let onOff = disabled ? Styles.disabled : Styles.enabled;
 
       let style =
-        StyleSheet.flatten([scale, directional, Styles.container]);
+        StyleSheet.flatten([scale, onOff, directional, Styles.container]);
 
       <TouchableWithoutFeedback
+        disabled
+        hitSlop
         onPress
         onPressIn=(self.handle(grow))
         onPressOut=(self.handle(shrink))>
