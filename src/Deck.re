@@ -128,24 +128,24 @@ let make = (~deck, renderChild) => {
     switch (card) {
     | Card.Character(_) =>
       let characterCount = countCharacters(deck);
-      CustomList.Header({j|Characters ($characterCount)|j});
+      List.Header({j|Characters ($characterCount)|j});
     | Card.Event(_) =>
       let eventCount = countEvents(deck);
-      CustomList.Header({j|Events ($eventCount)|j});
+      List.Header({j|Events ($eventCount)|j});
     | Card.Battle(_) =>
       let battleCount = countBattles(deck);
-      CustomList.Header({j|Battle Cards ($battleCount)|j});
+      List.Header({j|Battle Cards ($battleCount)|j});
     };
 
   let init = ((card, count)) => [|
     toHeader(card),
-    CustomList.Item(card, count),
+    List.Item(card, count),
   |];
 
   let mapper = ((prevCard, _), (nextCard, count)) =>
     Card.sameType(prevCard, nextCard) ?
-      [|CustomList.Item(nextCard, count)|] :
-      [|toHeader(nextCard), CustomList.Item(nextCard, count)|];
+      [|List.Item(nextCard, count)|] :
+      [|toHeader(nextCard), List.Item(nextCard, count)|];
 
   let cards = flatMap2(deck, init, mapper);
 
@@ -162,7 +162,7 @@ let make = (~deck, renderChild) => {
     render: _self =>
       BsReactNative.(
         <View style=Styles.container>
-          <CustomList data=cards renderItem renderHeader />
+          <List data=cards renderItem renderHeader />
         </View>
       ),
   };

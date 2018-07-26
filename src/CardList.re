@@ -41,10 +41,10 @@ module Styles = {
     ]);
 };
 
-let make = (~cards, renderChild) => {
-  let component = ReasonReact.statelessComponent("CardList");
+let component = ReasonReact.statelessComponent("CardList");
 
-  let data = Belt.Array.map(cards, CustomList.toItem);
+let make = (~cards, renderChild) => {
+  let data = Belt.Array.map(cards, List.toItem);
   let renderItem = (card, count) => renderChild(card, count);
 
   {
@@ -58,7 +58,7 @@ let make = (~cards, renderChild) => {
             <ActivityIndicator size=`large color=Colors.ourBlue />
           </View>;
         } else {
-          <CustomList data renderItem />;
+          <List data renderItem />;
         };
 
       <View style=Styles.container> children </View>;
