@@ -8,18 +8,30 @@ let decoder = json => {
   small: json |> Json.Decode.field("small", Json.Decode.string),
 };
 
-let component = ReasonReact.statelessComponent("CardImage");
-
 module Styles = {
   open BsReactNative.Style;
 
   let default = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
 };
 
+type retainedProps = {
+  image: t,
+  style: BsReactNative.Style.t,
+};
+
+let component =
+  ReasonReact.statelessComponentWithRetainedProps("CardImage");
+
 /* TODO: this should do "size" things */
 let make = (~image, ~style=Styles.default, _children) => {
   ...component,
-  shouldUpdate: _ => false,
+  retainedProps: {
+    image,
+    style,
+  },
+  shouldUpdate: ({oldSelf, newSelf}) =>
+    oldSelf.retainedProps.image != newSelf.retainedProps.image
+    || oldSelf.retainedProps.style != newSelf.retainedProps.style,
   render: _self =>
     BsReactNative.(
       <View>
