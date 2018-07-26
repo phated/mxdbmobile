@@ -7,6 +7,14 @@ let character = character => Character(character);
 let event = event => Event(event);
 let battle = battle => Battle(battle);
 
+let sameType = (c1, c2) =>
+  switch (c1, c2) {
+  | (Character(_), Character(_))
+  | (Event(_), Event(_))
+  | (Battle(_), Battle(_)) => true
+  | _ => false
+  };
+
 let getUid = card =>
   switch (card) {
   | Character(character) => character.uid

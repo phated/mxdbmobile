@@ -40,6 +40,29 @@ let empty: t = Belt.Map.make(~id=(module Comparator));
 
 let toArray = deck => Belt.Map.toArray(deck);
 
+let flatMap2 = (deck, init, mapper) => {
+  let result =
+    Belt.Map.reduce(deck, None, (wrapper, key, value) =>
+      switch (wrapper) {
+      | None =>
+        let first = (key, value);
+        let initResults = init(first);
+        let flattened = Belt.Array.concat([||], initResults);
+        Some((flattened, first));
+      | Some((results, prev)) =>
+        let next = (key, value);
+        let nextResults = mapper(prev, next);
+        let flattened = Belt.Array.concat(results, nextResults);
+        Some((flattened, next));
+      }
+    );
+
+  switch (result) {
+  | Some((result, _last)) => result
+  | None => [||]
+  };
+};
+
 let maybeInc = maybeCount =>
   switch (maybeCount) {
   | Some(count) when count < 3 => Some(count + 1)
@@ -56,9 +79,30 @@ let maybeDec = maybeCount =>
 /* let get = (deck, card) => Belt.Map.getWithDefault(deck, card, 0); */
 
 let count = (deck, card) => Belt.Map.getWithDefault(deck, card, 0);
+let countCharacters = deck =>
+  Belt.Map.reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Character(_) => count + total
+    | _ => total
+    }
+  );
+let countEvents = deck =>
+  Belt.Map.reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Event(_) => count + total
+    | _ => total
+    }
+  );
+let countBattles = deck =>
+  Belt.Map.reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Battle(_) => count + total
+    | _ => total
+    }
+  );
 
 let total = deck =>
-  Belt.Map.reduce(deck, 0, (total, _key, count) => count + total);
+  Belt.Map.reduce(deck, 0, (total, _card, count) => count + total);
 
 let increment = (deck, card) => Belt.Map.update(deck, card, maybeInc);
 let decrement = (deck, card) => Belt.Map.update(deck, card, maybeDec);
@@ -66,6 +110,20 @@ let decrement = (deck, card) => Belt.Map.update(deck, card, maybeDec);
 module Styles = {
   open BsReactNative.Style;
   let container = style([flex(1.)]);
+
+  let header =
+    style([
+      height(40.0 |. Pt),
+      backgroundColor(Colors.Css.primary),
+      alignItems(Center),
+      justifyContent(Center),
+    ]);
+  let headerText =
+    style([
+      color(Colors.Css.white),
+      fontSize(20.0 |. Float),
+      fontWeight(`_800),
+    ]);
 
   let loadingContainer =
     style([flex(1.), alignItems(Center), justifyContent(Center)]);
@@ -79,49 +137,47 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("Deck");
 
-let getItemLayout = (_data, idx) => {
-  "length": 183,
-  "offset": 183 * idx,
-  "index": idx,
-};
-
 let make = (~deck, renderChild) => {
-  let itemSeparatorComponent =
-    BsReactNative.FlatList.separatorComponent(_ =>
-      BsReactNative.(<View style=Styles.separator />)
+  let toHeader = card =>
+    switch (card) {
+    | Card.Character(_) =>
+      let characterCount = countCharacters(deck);
+      CustomList.Header({j|Characters ($characterCount)|j});
+    | Card.Event(_) =>
+      let eventCount = countEvents(deck);
+      CustomList.Header({j|Events ($eventCount)|j});
+    | Card.Battle(_) =>
+      let battleCount = countBattles(deck);
+      CustomList.Header({j|Battle Cards ($battleCount)|j});
+    };
+
+  let init = ((card, count)) => [|
+    toHeader(card),
+    CustomList.Item(card, count),
+  |];
+
+  let mapper = ((prevCard, _), (nextCard, count)) =>
+    Card.sameType(prevCard, nextCard) ?
+      [|CustomList.Item(nextCard, count)|] :
+      [|toHeader(nextCard), CustomList.Item(nextCard, count)|];
+
+  let cards = flatMap2(deck, init, mapper);
+
+  let renderHeader = title =>
+    BsReactNative.(
+      <View style=Styles.header>
+        <Text style=Styles.headerText> (ReasonReact.string(title)) </Text>
+      </View>
     );
+  let renderItem = (card, count) => renderChild(card, count);
 
   {
     ...component,
-    render: _self => {
-      open BsReactNative;
-
-      let _ = ();
-
-      let cards = toArray(deck);
-      let renderItem =
-        FlatList.renderItem(
-          ({item}) => {
-            let (card, count) = item;
-            renderChild(card, count);
-          },
-        );
-
-      <View style=Styles.container>
-        <FlatList
-          data=cards
-          getItemLayout
-          initialNumToRender=4
-          keyExtractor=(
-            (item, _idx) => {
-              let (card, _count) = item;
-              Card.getUid(card);
-            }
-          )
-          renderItem
-          itemSeparatorComponent
-        />
-      </View>;
-    },
+    render: _self =>
+      BsReactNative.(
+        <View style=Styles.container>
+          <CustomList data=cards renderItem renderHeader />
+        </View>
+      ),
   };
 };
