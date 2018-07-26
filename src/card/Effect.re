@@ -10,6 +10,12 @@ let decoder = json => {
     |> Json.Decode.optional(Json.Decode.field("text", Json.Decode.string)),
 };
 
+let getText = effect =>
+  switch (effect.text) {
+  | Some(text) => text
+  | None => ""
+  };
+
 module Styles = {
   open BsReactNative.Style;
 

@@ -17,9 +17,16 @@ let sameType = (c1, c2) =>
 
 let getUid = card =>
   switch (card) {
-  | Character(character) => character.uid
-  | Event(event) => event.uid
-  | Battle(battle) => battle.uid
+  | Character({uid}) => uid
+  | Event({uid}) => uid
+  | Battle({uid}) => uid
+  };
+
+let getTitle = card =>
+  switch (card) {
+  | Character({title}) => title
+  | Event({title}) => title
+  | Battle({title}) => title
   };
 
 let getType = card =>
@@ -27,6 +34,13 @@ let getType = card =>
   | Character(_) => CardType.Character
   | Event(_) => CardType.Event
   | Battle(_) => CardType.Battle
+  };
+
+let getEffect = card =>
+  switch (card) {
+  | Character({effect}) => effect
+  | Event({effect}) => effect
+  | Battle({effect}) => effect
   };
 
 let getImage = card =>

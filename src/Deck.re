@@ -2,22 +2,14 @@ module Comparator =
   Belt.Id.MakeComparable({
     type t = Card.t;
 
-    let cmp = (first, second) => {
-      let cardType1 = Card.getType(first);
-      let cardType2 = Card.getType(second);
-
-      if (cardType1 == cardType2) {
-        let uid1 = Card.getUid(first);
-        let uid2 = Card.getUid(second);
-        compare(uid1, uid2);
-      } else {
-        /* Compare works on Variants in ocaml so no need for toInt??? */
-        compare(
-          cardType1,
-          cardType2,
-        );
-      };
-    };
+    let cmp =
+      Compare.concat([
+        Compare.by(card => Card.getType(card) |. CardType.toInt),
+        /* TODO: card stats order */
+        Compare.by(card => Card.getTitle(card)),
+        Compare.by(card => Card.getEffect(card) |. Effect.getText),
+        Compare.by(card => Card.getUid(card)),
+      ]);
   });
 
 type t = Belt.Map.t(Comparator.t, int, Comparator.identity);
