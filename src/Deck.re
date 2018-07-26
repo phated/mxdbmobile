@@ -2,27 +2,13 @@ module Comparator =
   Belt.Id.MakeComparable({
     type t = Card.t;
 
-    let getType = card =>
-      switch (card) {
-      | Card.Character(_) => CardType.Character
-      | Card.Event(_) => CardType.Event
-      | Card.Battle(_) => CardType.Battle
-      };
-
-    let getUid = card =>
-      switch (card) {
-      | Card.Character({uid}) => uid
-      | Card.Event({uid}) => uid
-      | Card.Battle({uid}) => uid
-      };
-
     let cmp = (first, second) => {
-      let cardType1 = getType(first);
-      let cardType2 = getType(second);
+      let cardType1 = Card.getType(first);
+      let cardType2 = Card.getType(second);
 
       if (cardType1 == cardType2) {
-        let uid1 = getUid(first);
-        let uid2 = getUid(second);
+        let uid1 = Card.getUid(first);
+        let uid2 = Card.getUid(second);
         compare(uid1, uid2);
       } else {
         /* Compare works on Variants in ocaml so no need for toInt??? */

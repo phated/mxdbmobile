@@ -22,6 +22,13 @@ let getUid = card =>
   | Battle(battle) => battle.uid
   };
 
+let getType = card =>
+  switch (card) {
+  | Character(_) => CardType.Character
+  | Event(_) => CardType.Event
+  | Battle(_) => CardType.Battle
+  };
+
 let getImage = card =>
   switch (card) {
   | Character({image}) => image
