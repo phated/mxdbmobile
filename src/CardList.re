@@ -40,25 +40,16 @@ module Styles = {
       /* marginLeft(16.0 |. Pt), */
     ]);
 };
-let getItemLayout = (_data, idx) => {
-  "length": 183,
-  "offset": 183 * idx,
-  "index": idx,
-};
-
-let component = ReasonReact.statelessComponent("CardList");
 
 let make = (~cards, renderChild) => {
-  let itemSeparatorComponent =
-    BsReactNative.FlatList.separatorComponent(_ =>
-      BsReactNative.(<View style=Styles.separator />)
-    );
+  let component = ReasonReact.statelessComponent("CardList");
+
+  let data = Belt.Array.map(cards, CustomList.toItem);
+  let renderItem = (card, count) => renderChild(card, count);
 
   {
     ...component,
     render: _self => {
-      /* Js.log("rendering card list"); */
-
       open BsReactNative;
 
       let children =
@@ -67,26 +58,7 @@ let make = (~cards, renderChild) => {
             <ActivityIndicator size=`large color=Colors.ourBlue />
           </View>;
         } else {
-          let renderItem =
-            FlatList.renderItem(
-              ({item}) => {
-                let (card, count) = item;
-                renderChild(card, count);
-              },
-            );
-          <FlatList
-            data=cards
-            getItemLayout
-            initialNumToRender=4
-            keyExtractor=(
-              (item, _idx) => {
-                let (card, _count) = item;
-                Card.getUid(card);
-              }
-            )
-            renderItem
-            itemSeparatorComponent
-          />;
+          <CustomList data renderItem />;
         };
 
       <View style=Styles.container> children </View>;

@@ -1,4 +1,4 @@
-type t('a) =
+type t =
   | Header(string)
   | Item(Card.t, int);
 
