@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@glennsl/bs-json": "^2.0.0",
+    "@reasonableconsulting/compare": "0.0.0",
     "bs-fetch": "^0.3.0",
     "bs-history": "^1.0.0",
     "bs-platform": "^3.1.5",

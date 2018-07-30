@@ -11,7 +11,8 @@
     "bs-fetch",
     "@glennsl/bs-json",
     "bs-history",
-    "reason-tea"
+    "reason-tea",
+    "@reasonableconsulting/compare"
   ],
   "namespace": true,
   "reason": {
