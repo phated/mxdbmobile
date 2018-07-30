@@ -65,6 +65,7 @@ let make = (~data, ~renderHeader=noop, ~renderItem, _children) => {
         initialNumToRender=4
         keyExtractor
         renderItem
+        removeClippedSubviews=true
         itemSeparatorComponent
       />;
     },
