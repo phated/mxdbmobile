@@ -160,6 +160,7 @@ let create = () => {
         };
 
       <SafeAreaView style=Styles.container>
+        <StatusBar backgroundColor=Colors.ourBlue barStyle=`lightContent />
         <Toolbar> ...toolbarRender </Toolbar>
         <CardList cards=cardsWithCount shown=(state.page == Cards)>
           ...renderCard

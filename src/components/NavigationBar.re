@@ -6,7 +6,7 @@ module Styles = {
       justifyContent(Center),
       alignContent(Center),
       flexDirection(Row),
-      backgroundColor(Colors.Css.primary),
+      backgroundColor(Colors.Css.ourBlue),
     ]);
 };
 let component = ReasonReact.statelessComponent("NavigationBar");

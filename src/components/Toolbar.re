@@ -6,7 +6,7 @@ module Styles = {
       flexDirection(Row),
       padding(8.0 |. Pt),
       height(60.0 |. Pt),
-      backgroundColor(Colors.Css.primary),
+      backgroundColor(Colors.Css.ourBlue),
     ]);
 };
 
@@ -20,7 +20,8 @@ type action =
 let component = ReasonReact.reducerComponent("Toolbar");
 
 let make = renderChildren => {
-  let enable = (_event, self) => self.ReasonReact.send(ChangeMode(Enabled));
+  let enable = (_event, self) =>
+    self.ReasonReact.send(ChangeMode(Enabled));
   let disable = (_event, self) =>
     self.ReasonReact.send(ChangeMode(Disabled));
 

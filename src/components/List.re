@@ -126,7 +126,7 @@ let make = (~data, ~renderHeader=noop, ~renderItem, ~activeState, _children) => 
           data
           getItemLayout
           initialNumToRender=4
-          maxToRenderPerBatch=4
+          maxToRenderPerBatch=1
           keyExtractor
           renderItem
           removeClippedSubviews=true
