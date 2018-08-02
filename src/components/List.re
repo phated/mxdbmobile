@@ -34,7 +34,7 @@ type state = {
   listRef: ref(option(ReasonReact.reactRef)),
 };
 type action =
-  | ScrollTo(float);
+  | Noop;
 type retainedProps = {activeState};
 
 let component = ReasonReact.reducerComponentWithRetainedProps("List");
@@ -65,13 +65,10 @@ let getItemLayout = (maybeData, idx) =>
 let onScroll = (evt, {ReasonReact.state}) => {
   let pt = BsReactNative.RNEvent.NativeScrollEvent.contentOffset(evt);
   state.position := pt.y;
-  ();
-  /* self.ReasonReact.send(ScrollTo(pt.y)); */
 };
 
-[@bs.val] external setTimeout : (unit => unit, int) => unit = "setTimeout";
 let scrollToOffset = (~position, listRef) =>
-  setTimeout(
+  Utils.setTimeout(
     _ =>
       BsReactNative.FlatList.scrollToOffset(
         ~offset=position,
@@ -102,10 +99,9 @@ let make = (~data, ~renderHeader=noop, ~renderItem, ~activeState, _children) => 
       activeState: activeState,
     },
     initialState: () => {position: ref(0.0), listRef: ref(None)},
-    reducer: (action, state) =>
+    reducer: (action, _state) =>
       switch (action) {
-      | ScrollTo(position) =>
-        ReasonReact.Update({...state, position: ref(position)})
+      | Noop => ReasonReact.NoUpdate
       },
     didUpdate: ({oldSelf, newSelf}) =>
       if (oldSelf.retainedProps.activeState == Inactive
@@ -130,6 +126,7 @@ let make = (~data, ~renderHeader=noop, ~renderItem, ~activeState, _children) => 
           data
           getItemLayout
           initialNumToRender=4
+          maxToRenderPerBatch=4
           keyExtractor
           renderItem
           removeClippedSubviews=true

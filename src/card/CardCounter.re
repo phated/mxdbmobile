@@ -1,6 +1,8 @@
 module Styles = {
   open BsReactNative.Style;
 
+  let container = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
+
   let stepperIcon = style([color(Colors.Css.primary)]);
 
   let counter =
@@ -38,7 +40,7 @@ let make = (~onIncrement, ~onDecrement, ~value, children) => {
     let opac = value == 0 ? Styles.isZero : Styles.notZero;
     let counterStyle = StyleSheet.flatten([opac, Styles.counter]);
 
-    <View>
+    <View style=Styles.container>
       image
       <StepperButton side="left" onPress=onDecrement disabled=(value == 0)>
         <Icon style=Styles.stepperIcon name="remove" />
