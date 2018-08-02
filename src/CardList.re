@@ -29,39 +29,26 @@ let decode = json => {
 module Styles = {
   open BsReactNative.Style;
   let container = style([flex(1.)]);
-
-  let loadingContainer =
-    style([flex(1.), alignItems(Center), justifyContent(Center)]);
-  let separator =
-    style([
-      flex(1.0),
-      height(1.0 |. Pt),
-      backgroundColor(Colors.Css.gray),
-      /* marginLeft(16.0 |. Pt), */
-    ]);
 };
 
 let component = ReasonReact.statelessComponent("CardList");
 
-let make = (~cards, renderChild) => {
+let make = (~cards, ~shown, renderChild) => {
   let data = Belt.Array.map(cards, List.toItem);
   let renderItem = (card, count) => renderChild(card, count);
 
   {
     ...component,
     render: _self => {
-      open BsReactNative;
-
-      let children =
-        if (Belt.Array.length(cards) == 0) {
-          <View style=Styles.loadingContainer>
-            <ActivityIndicator size=`large color=Colors.ourBlue />
-          </View>;
-        } else {
-          <List data renderItem />;
+      let loading = Belt.Array.length(data) == 0;
+      let activeState =
+        switch (shown, loading) {
+        | (true, true) => List.Loading
+        | (true, false) => List.Active
+        | (false, _) => List.Inactive
         };
 
-      <View style=Styles.container> children </View>;
+      <List data renderItem activeState />;
     },
   };
 };

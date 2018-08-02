@@ -6,15 +6,17 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("InfoPage");
 
-let make = _children => {
+/* TODO: retained props */
+let make = (~shown, _children) => {
   ...component,
-  shouldUpdate: _ => false,
   render: _self => {
     open BsReactNative;
     let _ = ();
 
-    <View style=Styles.container>
-      <Text> (ReasonReact.string("Hello info!!!")) </Text>
-    </View>;
+    shown ?
+      <View style=Styles.container>
+        <Text> (ReasonReact.string("Hello info!!!")) </Text>
+      </View> :
+      ReasonReact.null;
   },
 };

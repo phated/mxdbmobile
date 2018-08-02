@@ -115,7 +115,7 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("Deck");
 
-let make = (~deck, renderChild) => {
+let make = (~deck, ~shown, renderChild) => {
   let toHeader = card =>
     switch (card) {
     | Card.Character(_) =>
@@ -151,11 +151,10 @@ let make = (~deck, renderChild) => {
 
   {
     ...component,
-    render: _self =>
-      BsReactNative.(
-        <View style=Styles.container>
-          <List data=cards renderItem renderHeader />
-        </View>
-      ),
+    render: _self => {
+      let activeState = shown ? List.Active : List.Inactive;
+
+      <List data=cards renderItem renderHeader activeState />;
+    },
   };
 };

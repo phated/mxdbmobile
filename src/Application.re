@@ -159,16 +159,13 @@ let create = () => {
           |]
         };
 
-      let body =
-        switch (state.page) {
-        | Cards => <CardList cards=cardsWithCount> ...renderCard </CardList>
-        | Deck => <Deck deck> ...renderCard </Deck>
-        | Info => <Info />
-        };
-
       <SafeAreaView style=Styles.container>
         <Toolbar> ...toolbarRender </Toolbar>
-        body
+        <CardList cards=cardsWithCount shown=(state.page == Cards)>
+          ...renderCard
+        </CardList>
+        <Deck deck shown=(state.page == Deck)> ...renderCard </Deck>
+        <Info shown=(state.page == Info) />
         <NavigationBar>
           <NavigationButton
             icon="cards"
