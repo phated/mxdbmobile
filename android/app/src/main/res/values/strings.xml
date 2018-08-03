@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">mxdbmobile</string>
+    <string name="app_name">MetaX DB</string>
+    <string name="app_long_name">MetaX Deck Builder</string>
 </resources>
