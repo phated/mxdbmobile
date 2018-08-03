@@ -36,6 +36,8 @@ type action =
   | Grow
   | Shrink;
 
+let vibrationPattern = [|10, 10|];
+
 let component = ReasonReact.reducerComponent("StepperButton");
 
 let make = (~side, ~onPress, ~disabled, children) => {
@@ -46,6 +48,13 @@ let make = (~side, ~onPress, ~disabled, children) => {
     };
   let grow = (_, self) => self.ReasonReact.send(Grow);
   let shrink = (_, self) => self.ReasonReact.send(Shrink);
+  let press = _ => {
+    BsReactNative.Vibration.vibrate(
+      ~pattern=vibrationPattern,
+      ~repeat=false,
+    );
+    onPress();
+  };
 
   let makeScale = scale =>
     BsReactNative.Style.(
@@ -72,7 +81,7 @@ let make = (~side, ~onPress, ~disabled, children) => {
       <TouchableWithoutFeedback
         disabled
         hitSlop
-        onPress
+        onPress=press
         onPressIn=(self.handle(grow))
         onPressOut=(self.handle(shrink))>
         <View style> ...children </View>
