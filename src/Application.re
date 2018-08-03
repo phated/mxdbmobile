@@ -1,7 +1,8 @@
 module Styles = {
   open BsReactNative.Style;
 
-  let container = style([flex(1.)]);
+  /* backgroundColor is set to avoid showing the splash logo during app use */
+  let container = style([flex(1.), backgroundColor(Colors.Css.white)]);
 
   let title =
     style([
@@ -160,7 +161,10 @@ let create = () => {
         };
 
       <SafeAreaView style=Styles.container>
-        <StatusBar backgroundColor=Colors.ourBlue barStyle=`lightContent />
+        <StatusBar
+          backgroundColor=Colors.ourBlueDark
+          barStyle=`lightContent
+        />
         <Toolbar> ...toolbarRender </Toolbar>
         <CardList cards=cardsWithCount shown=(state.page == Cards)>
           ...renderCard
