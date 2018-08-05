@@ -92,7 +92,7 @@ module Styles = {
   let header =
     style([
       height(40.0 |. Pt),
-      backgroundColor(Colors.Css.primary),
+      backgroundColor(Colors.Css.ourBlueDark),
       alignItems(Center),
       justifyContent(Center),
     ]);
@@ -102,20 +102,11 @@ module Styles = {
       fontSize(20.0 |. Float),
       fontWeight(`_800),
     ]);
-
-  let loadingContainer =
-    style([flex(1.), alignItems(Center), justifyContent(Center)]);
-  let separator =
-    style([
-      flex(1.0),
-      height(1.0 |. Pt),
-      backgroundColor(Colors.Css.gray),
-    ]);
 };
 
 let component = ReasonReact.statelessComponent("Deck");
 
-let make = (~deck, ~shown, renderChild) => {
+let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   let toHeader = card =>
     switch (card) {
     | Card.Character(_) =>
@@ -151,10 +142,7 @@ let make = (~deck, ~shown, renderChild) => {
 
   {
     ...component,
-    render: _self => {
-      let activeState = shown ? List.Active : List.Inactive;
-
-      <List data=cards renderItem renderHeader activeState />;
-    },
+    render: _self =>
+      <List data=cards renderItem renderHeader position onPersistPosition />,
   };
 };

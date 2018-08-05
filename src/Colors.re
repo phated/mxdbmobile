@@ -21,6 +21,7 @@ module Css = {
   let gray = String(gray);
 
   let ourBlue = String(ourBlue);
+  let ourBlueDark = String(ourBlueDark);
 
   let transparentWhite = String("rgba(255, 255, 255, 0.9)");
 

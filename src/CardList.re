@@ -26,14 +26,9 @@ let decode = json => {
     json |> Json.Decode.field("battles", Json.Decode.array(Battle.decoder)),
 };
 
-module Styles = {
-  open BsReactNative.Style;
-  let container = style([flex(1.)]);
-};
-
 let component = ReasonReact.statelessComponent("CardList");
 
-let make = (~cards, ~shown, renderChild) => {
+let make = (~cards, ~position, ~onPersistPosition, renderChild) => {
   let data = Belt.Array.map(cards, List.toItem);
   let renderItem = (card, count) => renderChild(card, count);
 
@@ -41,14 +36,12 @@ let make = (~cards, ~shown, renderChild) => {
     ...component,
     render: _self => {
       let loading = Belt.Array.length(data) == 0;
-      let activeState =
-        switch (shown, loading) {
-        | (true, true) => List.Loading
-        | (true, false) => List.Active
-        | (false, _) => List.Inactive
-        };
 
-      <List data renderItem activeState />;
+      if (loading) {
+        <Loading />;
+      } else {
+        <List data renderItem position onPersistPosition />;
+      };
     },
   };
 };

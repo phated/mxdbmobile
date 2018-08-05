@@ -13,9 +13,6 @@ let isHeader = value =>
 module Styles = {
   open BsReactNative.Style;
 
-  let loadingContainer =
-    style([flex(1.), alignItems(Center), justifyContent(Center)]);
-
   let separator =
     style([
       flex(1.0),
@@ -24,20 +21,12 @@ module Styles = {
     ]);
 };
 
-type activeState =
-  | Active
-  | Inactive
-  | Loading;
-
 type state = {
   position: ref(float),
   listRef: ref(option(ReasonReact.reactRef)),
 };
-type action =
-  | Noop;
-type retainedProps = {activeState};
 
-let component = ReasonReact.reducerComponentWithRetainedProps("List");
+let component = ReasonReact.reducerComponent("List");
 
 let keyExtractor = (item, _idx) =>
   switch (item) {
@@ -68,21 +57,27 @@ let onScroll = (evt, {ReasonReact.state}) => {
 };
 
 let scrollToOffset = (~position, listRef) =>
-  Utils.setTimeout(
-    _ =>
-      BsReactNative.FlatList.scrollToOffset(
-        ~offset=position,
-        ~animated=false,
-        listRef,
-        (),
-      ),
-    0,
+  Utils.nextTick(_ =>
+    BsReactNative.FlatList.scrollToOffset(
+      ~offset=position,
+      ~animated=false,
+      listRef,
+      (),
+    )
   );
 
 let setRef = (listRef, {ReasonReact.state}) =>
   state.listRef := Js.Nullable.toOption(listRef);
 
-let make = (~data, ~renderHeader=noop, ~renderItem, ~activeState, _children) => {
+let make =
+    (
+      ~data,
+      ~renderHeader=noop,
+      ~renderItem,
+      ~position=0.0,
+      ~onPersistPosition,
+      _children,
+    ) => {
   open BsReactNative;
 
   let renderItem =
@@ -95,46 +90,31 @@ let make = (~data, ~renderHeader=noop, ~renderItem, ~activeState, _children) => 
 
   {
     ...component,
-    retainedProps: {
-      activeState: activeState,
-    },
     initialState: () => {position: ref(0.0), listRef: ref(None)},
-    reducer: (action, _state) =>
-      switch (action) {
-      | Noop => ReasonReact.NoUpdate
+    reducer: ((), _state) => ReasonReact.NoUpdate,
+    didMount: ({state, onUnmount}) =>
+      switch (state.listRef^) {
+      | Some(listRef) =>
+        let tickId = scrollToOffset(~position, listRef);
+        onUnmount(() => Utils.clearTick(tickId));
+      | None => ()
       },
-    didUpdate: ({oldSelf, newSelf}) =>
-      if (oldSelf.retainedProps.activeState == Inactive
-          && newSelf.retainedProps.activeState == Active) {
-        switch (newSelf.state.listRef^) {
-        | Some(listRef) =>
-          scrollToOffset(~position=newSelf.state.position^, listRef)
-        | None => ()
-        };
-      },
+    willUnmount: self => onPersistPosition(self.state.position^),
     render: self => {
       let _ = ();
 
-      switch (activeState) {
-      | Inactive => ReasonReact.null
-      | Loading =>
-        <View style=Styles.loadingContainer>
-          <ActivityIndicator size=`large color=Colors.ourBlue />
-        </View>
-      | Active =>
-        <FlatList
-          data
-          getItemLayout
-          initialNumToRender=4
-          maxToRenderPerBatch=1
-          keyExtractor
-          renderItem
-          removeClippedSubviews=true
-          itemSeparatorComponent
-          ref=(self.handle(setRef))
-          onScroll=(self.handle(onScroll))
-        />
-      };
+      <FlatList
+        data
+        getItemLayout
+        initialNumToRender=4
+        maxToRenderPerBatch=1
+        keyExtractor
+        renderItem
+        removeClippedSubviews=true
+        itemSeparatorComponent
+        ref=(self.handle(setRef))
+        onScroll=(self.handle(onScroll))
+      />;
     },
   };
 };

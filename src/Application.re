@@ -160,17 +160,24 @@ let create = () => {
           |]
         };
 
+      let renderPage = (~position, ~onPersistPosition, current) =>
+        switch (current) {
+        | Page.Cards =>
+          <CardList cards=cardsWithCount position onPersistPosition>
+            ...renderCard
+          </CardList>
+        | Page.Deck =>
+          <Deck deck position onPersistPosition> ...renderCard </Deck>
+        | Page.Info => <Info />
+        };
+
       <SafeAreaView style=Styles.container>
         <StatusBar
           backgroundColor=Colors.ourBlueDark
           barStyle=`lightContent
         />
         <Toolbar> ...toolbarRender </Toolbar>
-        <CardList cards=cardsWithCount shown=(state.page == Cards)>
-          ...renderCard
-        </CardList>
-        <Deck deck shown=(state.page == Deck)> ...renderCard </Deck>
-        <Info shown=(state.page == Info) />
+        <Page current=state.page> ...renderPage </Page>
         <NavigationBar>
           <NavigationButton
             icon="cards"
