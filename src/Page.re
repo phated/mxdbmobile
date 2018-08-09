@@ -1,13 +1,15 @@
 type t =
   | Cards
   | Deck
-  | Info;
+  | Settings
+  | Stats;
 
 let fromPath = path =>
   switch (path) {
   | [""] => Cards
   | ["deck"] => Deck
-  | ["info"] => Info
+  | ["settings"] => Settings
+  | ["stats"] => Stats
   | _ => failwith("Invalid route")
   };
 
@@ -15,7 +17,8 @@ let toPath = page =>
   switch (page) {
   | Cards => [""]
   | Deck => ["deck"]
-  | Info => ["info"]
+  | Settings => ["stats"]
+  | Stats => ["settings"]
   };
 
 type state = {
@@ -60,7 +63,8 @@ let make = (~current, renderPage) => {
           ~onPersistPosition=self.handle(persistDeckPosition),
           current,
         )
-      | Info => renderPage(~position=0.0, ~onPersistPosition=noop, current)
+      | Settings
+      | Stats => renderPage(~position=0.0, ~onPersistPosition=noop, current)
       },
   };
 };

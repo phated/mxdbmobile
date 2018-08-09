@@ -1,10 +1,11 @@
 module Styles = {
   open BsReactNative.Style;
 
-  let container = style([flex(1.0)]);
+  let container =
+    style([flex(1.0), alignItems(Center), justifyContent(Center)]);
 };
 
-let component = ReasonReact.statelessComponent("InfoPage");
+let component = ReasonReact.statelessComponent("SettingsPage");
 
 /* TODO: retained props */
 let make = _children => {
@@ -14,7 +15,7 @@ let make = _children => {
     let _ = ();
 
     <View style=Styles.container>
-      <Text> (ReasonReact.string("Hello info!!!")) </Text>
+      <Text> (ReasonReact.string("Settings page")) </Text>
     </View>;
   },
 };

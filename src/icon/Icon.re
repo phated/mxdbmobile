@@ -1,5 +1,6 @@
 [@bs.module "react-native-vector-icons"]
-external createIconSetFromFontello : Js.Json.t => ReasonReact.reactClass = "";
+external createIconSetFromFontello : Js.Json.t => ReasonReact.reactClass =
+  "";
 
 [@bs.module "react-native-vector-icons/dist/MaterialIcons"]
 external materialIcon : ReasonReact.reactClass = "default";
@@ -40,6 +41,7 @@ let isCustom = name =>
 
 let isCommunity = name =>
   switch (name) {
+  | "chart-bar"
   | "plus-circle"
   | "plus-circle-outline"
   | "minus-circle"

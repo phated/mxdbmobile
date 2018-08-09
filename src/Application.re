@@ -13,6 +13,8 @@ module Styles = {
       flex(1.0),
     ]);
 
+  let iconWrapper = style([height(40.0 |. Pt), width(40.0 |. Pt)]);
+
   let icon =
     style([
       color(Colors.Css.white),
@@ -20,6 +22,8 @@ module Styles = {
       textAlignVertical(Center),
     ]);
 };
+
+let iconHitSlop = {"top": 10, "bottom": 10, "left": 10, "right": 10};
 
 type action =
   | NavigateTo(Page.t)
@@ -47,7 +51,10 @@ let create = () => {
   let toCards = (_, self) =>
     self.ReasonTea.Program.send(NavigateTo(Cards));
   let toDeck = (_, self) => self.ReasonTea.Program.send(NavigateTo(Deck));
-  let toInfo = (_, self) => self.ReasonTea.Program.send(NavigateTo(Info));
+  let toSettings = (_, self) =>
+    self.ReasonTea.Program.send(NavigateTo(Settings));
+  let toStats = (_, self) =>
+    self.ReasonTea.Program.send(NavigateTo(Stats));
 
   {
     ...program,
@@ -142,10 +149,14 @@ let create = () => {
           onDecrement=(handle(decrement))
         />;
 
-      let toolbarRender = (~enable, ~disable, mode) =>
+      let cardListToolbarRender = (~enable, ~disable, mode) =>
         switch (mode) {
         | Toolbar.Enabled => [|
-            <Icon name="arrow-back" style=Styles.icon onPress=disable />,
+            <TouchableOpacity hitSlop=iconHitSlop onPress=disable>
+              <View style=Styles.iconWrapper>
+                <Icon name="arrow-back" style=Styles.icon />
+              </View>
+            </TouchableOpacity>,
             <SearchInput
               previous=(Filter.toString(filter))
               onBlur=disable
@@ -156,8 +167,48 @@ let create = () => {
             <Text style=Styles.title>
               (ReasonReact.string("MetaX Deck Builder"))
             </Text>,
-            <Icon name="search" style=Styles.icon onPress=enable />,
+            <TouchableOpacity hitSlop=iconHitSlop>
+              <View style=Styles.iconWrapper>
+                <Icon name="view-module" style=Styles.icon />
+              </View>
+            </TouchableOpacity>,
+            <TouchableOpacity hitSlop=iconHitSlop onPress=enable>
+              <View style=Styles.iconWrapper>
+                <Icon name="search" style=Styles.icon />
+              </View>
+            </TouchableOpacity>,
           |]
+        };
+      let deckListToolbarRender = (~enable, ~disable, mode) =>
+        switch (mode) {
+        | Toolbar.Enabled => [||]
+        | Toolbar.Disabled => [|
+            <Text style=Styles.title>
+              (ReasonReact.string("MetaX Deck Builder"))
+            </Text>,
+            <TouchableOpacity hitSlop=iconHitSlop>
+              <View style=Styles.iconWrapper>
+                <Icon name="view-module" style=Styles.icon />
+              </View>
+            </TouchableOpacity>,
+            <TouchableOpacity hitSlop=iconHitSlop>
+              <View style=Styles.iconWrapper>
+                <Icon name="save" style=Styles.icon />
+              </View>
+            </TouchableOpacity>,
+            <TouchableOpacity hitSlop=iconHitSlop>
+              <View style=Styles.iconWrapper>
+                <Icon name="delete" style=Styles.icon />
+              </View>
+            </TouchableOpacity>,
+          |]
+        };
+
+      let toolbarRender =
+        switch (state.page) {
+        | Page.Cards => cardListToolbarRender
+        | Page.Deck => deckListToolbarRender
+        | _ => cardListToolbarRender
         };
 
       let renderPage = (~position, ~onPersistPosition, current) =>
@@ -168,7 +219,8 @@ let create = () => {
           </CardList>
         | Page.Deck =>
           <Deck deck position onPersistPosition> ...renderCard </Deck>
-        | Page.Info => <Info />
+        | Page.Stats => <Stats />
+        | Page.Settings => <Settings />
         };
 
       <SafeAreaView style=Styles.container>
@@ -182,17 +234,26 @@ let create = () => {
           <NavigationButton
             icon="cards"
             label="Cards"
+            active=(state.page === Cards)
             onPress=(handle(toCards))
           />
           <NavigationButton
             icon="deck"
             label={j|Deck ($deckSize)|j}
+            active=(state.page === Deck)
             onPress=(handle(toDeck))
           />
           <NavigationButton
-            icon="info"
-            label="Info"
-            onPress=(handle(toInfo))
+            icon="chart-bar"
+            label="Stats"
+            active=(state.page === Stats)
+            onPress=(handle(toStats))
+          />
+          <NavigationButton
+            icon="settings"
+            label="Settings"
+            active=(state.page === Settings)
+            onPress=(handle(toSettings))
           />
         </NavigationBar>
       </SafeAreaView>;
