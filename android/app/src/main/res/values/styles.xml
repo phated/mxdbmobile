@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- https://www.bignerdranch.com/blog/polishing-your-Android-overview-screen-entry/ -->
-        <item name="colorPrimary">#004a7d</item>
+        <item name="colorPrimary">#0064a7</item>
     </style>
 
     <style name="SplashTheme" parent="AppTheme">
