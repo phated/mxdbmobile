@@ -94,7 +94,7 @@ let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
         <View style=Styles.container>
           <CardCounter
             onIncrement=increment onDecrement=decrement value=count>
-            <CardImage image />
+            <CardImage image size=Thumbnail />
           </CardCounter>
           details
         </View>
