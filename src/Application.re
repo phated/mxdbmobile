@@ -12,18 +12,7 @@ module Styles = {
       fontWeight(`Bold),
       flex(1.0),
     ]);
-
-  let iconWrapper = style([height(40.0 |. Pt), width(40.0 |. Pt)]);
-
-  let icon =
-    style([
-      color(Colors.Css.white),
-      margin(8.0 |. Pt),
-      textAlignVertical(Center),
-    ]);
 };
-
-let iconHitSlop = {"top": 10, "bottom": 10, "left": 10, "right": 10};
 
 type action =
   | NavigateTo(Page.t)
@@ -31,7 +20,6 @@ type action =
   | Increment(Card.t)
   | Decrement(Card.t)
   | StoreCards(CardList.t);
-
 type state = {
   page: Page.t,
   filter: Filter.t,
@@ -130,7 +118,7 @@ let create = () => {
     view: ({state, handle}) => {
       open BsReactNative;
 
-      let {cards, deck, filter, deckSize} = state;
+      let {cards, deck, filter, deckSize, page} = state;
 
       let cardsWithCount =
         CardList.map(
@@ -152,11 +140,7 @@ let create = () => {
       let cardListToolbarRender = (~enable, ~disable, mode) =>
         switch (mode) {
         | Toolbar.Enabled => [|
-            <TouchableOpacity hitSlop=iconHitSlop onPress=disable>
-              <View style=Styles.iconWrapper>
-                <Icon name="arrow-back" style=Styles.icon />
-              </View>
-            </TouchableOpacity>,
+            <IconButton icon="arrow-back" onPress=disable />,
             <SearchInput
               previous=(Filter.toString(filter))
               onBlur=disable
@@ -167,48 +151,30 @@ let create = () => {
             <Text style=Styles.title>
               (ReasonReact.string("MetaX Deck Builder"))
             </Text>,
-            <TouchableOpacity hitSlop=iconHitSlop>
-              <View style=Styles.iconWrapper>
-                <Icon name="view-module" style=Styles.icon />
-              </View>
-            </TouchableOpacity>,
-            <TouchableOpacity hitSlop=iconHitSlop onPress=enable>
-              <View style=Styles.iconWrapper>
-                <Icon name="search" style=Styles.icon />
-              </View>
-            </TouchableOpacity>,
+            <IconButton icon="view-module" />,
+            <IconButton icon="search" onPress=enable />,
           |]
         };
-      let deckListToolbarRender = (~enable, ~disable, mode) =>
-        switch (mode) {
-        | Toolbar.Enabled => [||]
-        | Toolbar.Disabled => [|
-            <Text style=Styles.title>
-              (ReasonReact.string("MetaX Deck Builder"))
-            </Text>,
-            <TouchableOpacity hitSlop=iconHitSlop>
-              <View style=Styles.iconWrapper>
-                <Icon name="view-module" style=Styles.icon />
-              </View>
-            </TouchableOpacity>,
-            <TouchableOpacity hitSlop=iconHitSlop>
-              <View style=Styles.iconWrapper>
-                <Icon name="save" style=Styles.icon />
-              </View>
-            </TouchableOpacity>,
-            <TouchableOpacity hitSlop=iconHitSlop>
-              <View style=Styles.iconWrapper>
-                <Icon name="delete" style=Styles.icon />
-              </View>
-            </TouchableOpacity>,
-          |]
-        };
+      let deckListToolbarRender = (~enable, ~disable, _mode) => [|
+        <Text style=Styles.title>
+          (ReasonReact.string("MetaX Deck Builder"))
+        </Text>,
+        <IconButton icon="view-module" />,
+        <IconButton icon="save" />,
+        <IconButton icon="delete" />,
+      |];
+
+      let emptyToolbarRender = (~enable, ~disable, _mode) => [|
+        <Text style=Styles.title>
+          (ReasonReact.string("MetaX Deck Builder"))
+        </Text>,
+      |];
 
       let toolbarRender =
-        switch (state.page) {
-        | Page.Cards => cardListToolbarRender
-        | Page.Deck => deckListToolbarRender
-        | _ => cardListToolbarRender
+        switch (page) {
+        | Cards => cardListToolbarRender
+        | Deck => deckListToolbarRender
+        | _ => emptyToolbarRender
         };
 
       let renderPage = (~position, ~onPersistPosition, current) =>
