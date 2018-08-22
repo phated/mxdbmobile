@@ -190,10 +190,7 @@ let create = () => {
         };
 
       <SafeAreaView style=Styles.container>
-        <StatusBar
-          backgroundColor=Colors.ourBlueDark
-          barStyle=`lightContent
-        />
+        <StatusBar backgroundColor=Colors.ourBlueDark />
         <Toolbar> ...toolbarRender </Toolbar>
         <Page current=state.page> ...renderPage </Page>
         <NavigationBar>
