@@ -151,7 +151,7 @@ let create = () => {
             <Text style=Styles.title>
               (ReasonReact.string("MetaX Deck Builder"))
             </Text>,
-            <IconButton icon="view-module" />,
+            /* <IconButton icon="view-module" />, */
             <IconButton icon="search" onPress=enable />,
           |]
         };
@@ -159,7 +159,7 @@ let create = () => {
         <Text style=Styles.title>
           (ReasonReact.string("MetaX Deck Builder"))
         </Text>,
-        <IconButton icon="view-module" />,
+        /* <IconButton icon="view-module" />, */
         <IconButton icon="save" />,
         <IconButton icon="delete" />,
       |];
