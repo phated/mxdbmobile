@@ -4,11 +4,11 @@ module Comparator =
 
     let cmp =
       Compare.concat([
-        Compare.by(card => Card.getType(card) |. CardType.toInt),
+        Compare.by(card => Card.typeGet(card) |. CardType.toInt),
         /* TODO: card stats order */
-        Compare.by(card => Card.getTitle(card)),
-        Compare.by(card => Card.getEffect(card) |. Effect.getText),
-        Compare.by(card => Card.getUid(card)),
+        Compare.by(card => Card.titleGet(card)),
+        Compare.by(card => Card.effectGet(card) |. Effect.getText),
+        Compare.by(card => Card.uidGet(card)),
       ]);
   });
 

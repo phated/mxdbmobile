@@ -15,7 +15,7 @@ let sameType = (c1, c2) =>
   | _ => false
   };
 
-let getUid = card =>
+let uidGet = card =>
   switch (card) {
   | Character({uid}) => uid
   | Event({uid}) => uid
@@ -43,28 +43,28 @@ let expansionGet = card =>
   | Battle({expansion}) => expansion
   };
 
-let getTitle = card =>
+let titleGet = card =>
   switch (card) {
   | Character({title}) => title
   | Event({title}) => title
   | Battle({title}) => title
   };
 
-let getType = card =>
+let typeGet = card =>
   switch (card) {
   | Character(_) => CardType.Character
   | Event(_) => CardType.Event
   | Battle(_) => CardType.Battle
   };
 
-let getEffect = card =>
+let effectGet = card =>
   switch (card) {
   | Character({effect}) => effect
   | Event({effect}) => effect
   | Battle({effect}) => effect
   };
 
-let getImage = card =>
+let imageGet = card =>
   switch (card) {
   | Character({image}) => image
   | Event({image}) => image
@@ -92,7 +92,7 @@ let component = ReasonReact.statelessComponentWithRetainedProps("Card");
 let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
   let increment = _ => onIncrement(card);
   let decrement = _ => onDecrement(card);
-  let image = getImage(card);
+  let image = imageGet(card);
 
   let details =
     switch (card) {

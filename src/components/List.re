@@ -31,7 +31,7 @@ let component = ReasonReact.reducerComponent("List");
 let keyExtractor = (item, _idx) =>
   switch (item) {
   | Header(title) => title
-  | Item(card, _count) => Card.getUid(card)
+  | Item(card, _count) => Card.uidGet(card)
   };
 let noop = _ => ReasonReact.null;
 
