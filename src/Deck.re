@@ -18,6 +18,8 @@ let empty: t = Belt.Map.make(~id=(module Comparator));
 
 let toArray = deck => Belt.Map.toArray(deck);
 
+let reduce = Belt.Map.reduce;
+
 let flatMap2 = (deck, init, mapper) => {
   let result =
     Belt.Map.reduce(deck, None, (wrapper, key, value) =>
@@ -144,5 +146,28 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
     ...component,
     render: _self =>
       <List data=cards renderItem renderHeader position onPersistPosition />,
+  };
+};
+
+let hash = deck => {
+  let version = 0;
+
+  let encodedVersion = Hash.toBase64(version);
+
+  let result = Hash.emptyResult(encodedVersion);
+
+  let encodeResult = reduce(deck, result, Hash.encodeCard);
+
+  let encodedDeck =
+    encodedVersion ++ String.concat("", encodeResult.cardHashes);
+
+  let base64Checksum = Hash.toBase64(encodeResult.checksum mod 64);
+
+  let encoded = encodedDeck ++ base64Checksum;
+  /* AiAASAhA */
+  if (Belt.List.size(encodeResult.cardHashes) > 0) {
+    Some(encoded);
+  } else {
+    None;
   };
 };
