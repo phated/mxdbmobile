@@ -1,5 +1,8 @@
 type t = {
   uid: string,
+  rarity: Rarity.t,
+  number: int,
+  expansion: Expansion.t,
   title: string,
   mp: MP.t,
   stat: BattleStat.t,
@@ -10,6 +13,9 @@ type t = {
 let decoder: Js.Json.t => t =
   json => {
     uid: json |> Json.Decode.field("uid", Json.Decode.string),
+    rarity: json |> Json.Decode.field("rarity", Rarity.decoder),
+    number: json |> Json.Decode.field("number", Json.Decode.int),
+    expansion: json |> Json.Decode.field("set", Expansion.decoder),
     title: json |> Json.Decode.field("title", Json.Decode.string),
     mp: json |> Json.Decode.field("mp", MP.decoder),
     stat: json |> Json.Decode.field("stats", BattleStat.decoder),

@@ -22,6 +22,27 @@ let getUid = card =>
   | Battle({uid}) => uid
   };
 
+let rarityGet = card =>
+  switch (card) {
+  | Character({rarity}) => rarity
+  | Event({rarity}) => rarity
+  | Battle({rarity}) => rarity
+  };
+
+let numberGet = card =>
+  switch (card) {
+  | Character({number}) => number
+  | Event({number}) => number
+  | Battle({number}) => number
+  };
+
+let expansionGet = card =>
+  switch (card) {
+  | Character({expansion}) => expansion
+  | Event({expansion}) => expansion
+  | Battle({expansion}) => expansion
+  };
+
 let getTitle = card =>
   switch (card) {
   | Character({title}) => title
