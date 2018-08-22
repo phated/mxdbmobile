@@ -35,10 +35,18 @@ let keyExtractor = (item, _idx) =>
   };
 let noop = _ => ReasonReact.null;
 
-let itemSeparatorComponent =
-  BsReactNative.(
-    FlatList.separatorComponent(_ => <View style=Styles.separator />)
+let itemSeparatorComponent = {
+  open BsReactNative;
+
+  let _ = ();
+
+  FlatList.separatorComponent(({leadingItem}) =>
+      switch (leadingItem) {
+      | Some(Item(_card, _count)) => <View style=Styles.separator />
+      | _ => ReasonReact.null
+      }
   );
+};
 
 let getItemLayout = (maybeData, idx) =>
   switch (maybeData) {
