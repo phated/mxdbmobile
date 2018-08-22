@@ -1,9 +1,9 @@
 type t =
   | MP(int);
 
-let fromString = value => MP(value);
+let fromInt = value => MP(value);
 
-let decoder = json => json |> Json.Decode.map(fromString, Json.Decode.int);
+let decoder = json => json |> Json.Decode.map(fromInt, Json.Decode.int);
 
 module Styles = {
   open BsReactNative.Style;
