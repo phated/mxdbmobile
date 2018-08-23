@@ -16,10 +16,7 @@ let map = ({characters, events, battles}, mapper) =>
 let decode = json => {
   characters:
     json
-    |> Json.Decode.field(
-         "characters",
-         Json.Decode.array(Character.decoder),
-       ),
+    |> Json.Decode.field("characters", Json.Decode.array(Character.decoder)),
   events:
     json |> Json.Decode.field("events", Json.Decode.array(Event.decoder)),
   battles:
