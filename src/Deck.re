@@ -113,24 +113,24 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
     switch (card) {
     | Card.Character(_) =>
       let characterCount = countCharacters(deck);
-      List.Header({j|Characters ($characterCount)|j});
+      PositionedList.Header({j|Characters ($characterCount)|j});
     | Card.Event(_) =>
       let eventCount = countEvents(deck);
-      List.Header({j|Events ($eventCount)|j});
+      PositionedList.Header({j|Events ($eventCount)|j});
     | Card.Battle(_) =>
       let battleCount = countBattles(deck);
-      List.Header({j|Battle Cards ($battleCount)|j});
+      PositionedList.Header({j|Battle Cards ($battleCount)|j});
     };
 
   let init = ((card, count)) => [|
     toHeader(card),
-    List.Item(card, count),
+    PositionedList.Item(card, count),
   |];
 
   let mapper = ((prevCard, _), (nextCard, count)) =>
     Card.sameType(prevCard, nextCard) ?
-      [|List.Item(nextCard, count)|] :
-      [|toHeader(nextCard), List.Item(nextCard, count)|];
+      [|PositionedList.Item(nextCard, count)|] :
+      [|toHeader(nextCard), PositionedList.Item(nextCard, count)|];
 
   let cards = flatMap2(deck, init, mapper);
 
@@ -145,7 +145,13 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   {
     ...component,
     render: _self =>
-      <List data=cards renderItem renderHeader position onPersistPosition />,
+      <PositionedList
+        data=cards
+        renderItem
+        renderHeader
+        position
+        onPersistPosition
+      />,
   };
 };
 

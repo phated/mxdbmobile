@@ -29,7 +29,7 @@ let decode = json => {
 let component = ReasonReact.statelessComponent("CardList");
 
 let make = (~cards, ~position, ~onPersistPosition, renderChild) => {
-  let data = Belt.Array.map(cards, List.toItem);
+  let data = Belt.Array.map(cards, PositionedList.toItem);
   let renderItem = (card, count) => renderChild(card, count);
 
   {
@@ -40,7 +40,7 @@ let make = (~cards, ~position, ~onPersistPosition, renderChild) => {
       if (loading) {
         <Loading />;
       } else {
-        <List data renderItem position onPersistPosition />;
+        <PositionedList data renderItem position onPersistPosition />;
       };
     },
   };
