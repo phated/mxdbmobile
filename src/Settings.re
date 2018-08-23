@@ -1,8 +1,15 @@
 module Styles = {
   open BsReactNative.Style;
 
-  let container =
-    style([flex(1.0), alignItems(Center), justifyContent(Center)]);
+  let listItem =
+    style([
+      flex(1.0),
+      flexDirection(Row),
+      justifyContent(SpaceBetween),
+      alignItems(Center),
+      height(54.0 |. Pt),
+      paddingHorizontal(16.0 |. Pt),
+    ]);
 };
 
 let component = ReasonReact.statelessComponent("SettingsPage");
@@ -14,8 +21,18 @@ let make = _children => {
     open BsReactNative;
     let _ = ();
 
-    <View style=Styles.container>
-      <Text> (ReasonReact.string("Settings page")) </Text>
-    </View>;
+    let data = [|"Patreon Supporters", "Software"|];
+
+    let renderItem = item => {
+      let _ = ();
+      <TouchableOpacity>
+        <View style=Styles.listItem>
+          <Text> (ReasonReact.string(item)) </Text>
+          <Icon name="chevron-right" />
+        </View>
+      </TouchableOpacity>;
+    };
+
+    <List data renderItem />;
   },
 };

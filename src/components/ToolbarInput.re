@@ -1,7 +1,7 @@
 module Styles = {
   open BsReactNative.Style;
 
-  let search =
+  let input =
     style([
       flex(1.0),
       color(Colors.Css.white),
@@ -15,27 +15,27 @@ type action =
   | UpdateText(string)
   | Submit;
 
-let component = ReasonReact.reducerComponent("SearchInput");
+let component = ReasonReact.reducerComponent("ToolbarInput");
 
 let noop = _ => ();
-let make = (~onSearch=noop, ~onBlur=noop, ~previous="", _children) => {
+let make = (~onSubmit=noop, ~placeholder, ~onBlur=noop, ~previous="", _children) => {
   ...component,
   initialState: () => previous,
   reducer: (action, state) =>
     switch (action) {
     | UpdateText(text) => ReasonReact.Update(text)
-    | Submit => ReasonReact.SideEffects((self => onSearch(self.state)))
+    | Submit => ReasonReact.SideEffects((self => onSubmit(self.state)))
     },
   render: self =>
     BsReactNative.(
       <TextInput
-        style=Styles.search
+        style=Styles.input
         autoFocus=true
         autoCorrect=false
         spellCheck=false
         autoCapitalize=`none
         underlineColorAndroid="transparent"
-        placeholder="Search"
+        placeholder
         placeholderTextColor=Colors.gray
         onBlur
         blurOnSubmit=true

@@ -17,6 +17,7 @@ module Styles = {
 type action =
   | NavigateTo(Page.t)
   | Search(string)
+  | RenameDeck(string)
   | Increment(Card.t)
   | Decrement(Card.t)
   | StoreCards(CardList.t);
@@ -26,50 +27,54 @@ type state = {
   cards: CardList.t,
   deck: Deck.t,
   deckSize: int,
+  deckName: string,
 };
 
 let create = () => {
   let program = ReasonTea.Program.routerProgram("Main App");
 
   let search = (text, self) => self.ReasonTea.Program.send(Search(text));
+  let renameDeck = (text, self) =>
+    self.ReasonTea.Program.send(RenameDeck(text));
   let increment = (card, self) =>
     self.ReasonTea.Program.send(Increment(card));
   let decrement = (card, self) =>
     self.ReasonTea.Program.send(Decrement(card));
-  let toCards = (_, self) =>
-    self.ReasonTea.Program.send(NavigateTo(Cards));
+  let toCards = (_, self) => self.ReasonTea.Program.send(NavigateTo(Cards));
   let toDeck = (_, self) => self.ReasonTea.Program.send(NavigateTo(Deck));
   let toSettings = (_, self) =>
     self.ReasonTea.Program.send(NavigateTo(Settings));
-  let toStats = (_, self) =>
-    self.ReasonTea.Program.send(NavigateTo(Stats));
+  let toStats = (_, self) => self.ReasonTea.Program.send(NavigateTo(Stats));
 
   {
     ...program,
     fromRoute: (action, route) =>
       switch (action) {
       | Init =>
+        let now = Js.Date.make();
+        let todayDate = Js.Date.toLocaleDateString(now);
+        let todayTime = Js.Date.toLocaleTimeString(now);
         ReasonTea.Program.UpdateWithSideEffects(
           {
-            page: Page.fromPath(route.path),
+            /* page: Page.fromPath(route.path), */
+            page: Page.Settings,
             filter: Filter.Empty,
             cards: CardList.empty,
             deck: Deck.empty,
             deckSize: 0,
+            deckName: {j|Untitled - $todayDate $todayTime|j},
           },
           (
             self =>
               Query.send(CardList.query, self.state.filter)
               /* |> Js.Promise.then_(Utils.tapLog) */
-              |> Js.Promise.then_(
-                   cards => {
-                     self.send(StoreCards(cards));
-                     Js.Promise.resolve(cards);
-                   },
-                 )
+              |> Js.Promise.then_(cards => {
+                   self.send(StoreCards(cards));
+                   Js.Promise.resolve(cards);
+                 })
               |> ignore
           ),
-        )
+        );
       | Push => ReasonTea.Program.NoUpdate
       | _ => ReasonTea.Program.NoUpdate
       },
@@ -98,6 +103,8 @@ let create = () => {
         let deck = Deck.decrement(state.deck, card);
         let deckSize = Deck.total(deck);
         ReasonTea.Program.Update({...state, deck, deckSize});
+      | RenameDeck(deckName) =>
+        ReasonTea.Program.Update({...state, deckName})
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
           {...state, cards: CardList.empty, filter: FreeText(filter)},
@@ -105,12 +112,10 @@ let create = () => {
             self =>
               Query.send(CardList.query, self.state.filter)
               /* |> Js.Promise.then_(Utils.tapLog) */
-              |> Js.Promise.then_(
-                   cards => {
-                     self.send(StoreCards(cards));
-                     Js.Promise.resolve(cards);
-                   },
-                 )
+              |> Js.Promise.then_(cards => {
+                   self.send(StoreCards(cards));
+                   Js.Promise.resolve(cards);
+                 })
               |> ignore
           ),
         )
@@ -118,7 +123,7 @@ let create = () => {
     view: ({state, handle}) => {
       open BsReactNative;
 
-      let {cards, deck, filter, deckSize, page} = state;
+      let {cards, deck, filter, deckSize, page, deckName} = state;
 
       let cardsWithCount =
         CardList.map(
@@ -141,10 +146,11 @@ let create = () => {
         switch (mode) {
         | Toolbar.Enabled => [|
             <IconButton icon="arrow-back" onPress=disable />,
-            <SearchInput
+            <ToolbarInput
+              placeholder="Search"
               previous=(Filter.toString(filter))
               onBlur=disable
-              onSearch=(handle(search))
+              onSubmit=(handle(search))
             />,
           |]
         | Toolbar.Disabled => [|
@@ -155,13 +161,33 @@ let create = () => {
             <IconButton icon="search" onPress=enable />,
           |]
         };
-      let deckListToolbarRender = (~enable, ~disable, _mode) => [|
-        <Text style=Styles.title>
-          (ReasonReact.string("MetaX Deck Builder"))
-        </Text>,
-        /* <IconButton icon="view-module" />, */
-        <IconButton icon="save" />,
-        <IconButton icon="delete" />,
+      let deckListToolbarRender = (~enable, ~disable, mode) =>
+        switch (mode) {
+        | Toolbar.Enabled => [|
+            <IconButton icon="arrow-back" onPress=disable />,
+            <ToolbarInput
+              placeholder="Deck Name"
+              previous=deckName
+              onBlur=disable
+              onSubmit=(handle(renameDeck))
+            />,
+          |]
+        | Toolbar.Disabled => [|
+            <Text
+              ellipsizeMode=`tail
+              numberOfLines=1
+              style=Styles.title
+              onPress=enable>
+              <Icon name="edit" size=16 />
+              (ReasonReact.string(deckName))
+            </Text>,
+            /* <IconButton icon="view-module" />, */
+            <IconButton icon="clear-all" />,
+          |]
+        };
+
+      let settingsToolbarRender = (~enable, ~disable, _mode) => [|
+        <Text style=Styles.title> (ReasonReact.string("Settings")) </Text>,
       |];
 
       let emptyToolbarRender = (~enable, ~disable, _mode) => [|
@@ -174,6 +200,7 @@ let create = () => {
         switch (page) {
         | Cards => cardListToolbarRender
         | Deck => deckListToolbarRender
+        | Settings => settingsToolbarRender
         | _ => emptyToolbarRender
         };
 
