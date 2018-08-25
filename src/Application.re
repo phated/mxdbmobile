@@ -20,6 +20,8 @@ type action =
   | RenameDeck(string)
   | Increment(Card.t)
   | Decrement(Card.t)
+  | PersistCardListPosition(float)
+  | PersistDeckPosition(float)
   | StoreCards(CardList.t);
 type state = {
   page: Page.t,
@@ -28,6 +30,8 @@ type state = {
   deck: Deck.t,
   deckSize: int,
   deckName: string,
+  cardListPosition: float,
+  deckPosition: float,
 };
 
 let create = () => {
@@ -45,6 +49,10 @@ let create = () => {
   let toSettings = (_, self) =>
     self.ReasonTea.Program.send(NavigateTo(Settings));
   let toStats = (_, self) => self.ReasonTea.Program.send(NavigateTo(Stats));
+  let persistCardListPosition = (position, self) =>
+    self.ReasonTea.Program.send(PersistCardListPosition(position));
+  let persistDeckPosition = (position, self) =>
+    self.ReasonTea.Program.send(PersistDeckPosition(position));
 
   {
     ...program,
@@ -63,6 +71,8 @@ let create = () => {
             deck: Deck.empty,
             deckSize: 0,
             deckName: {j|Untitled - $todayDate $todayTime|j},
+            cardListPosition: 0.0,
+            deckPosition: 0.0,
           },
           (
             self =>
@@ -94,7 +104,8 @@ let create = () => {
     update: (action, state) =>
       switch (action) {
       | NavigateTo(page) => ReasonTea.Program.Update({...state, page})
-      | StoreCards(cards) => ReasonTea.Program.Update({...state, cards})
+      | StoreCards(cards) =>
+        ReasonTea.Program.Update({...state, cards, cardListPosition: 0.0})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
         let deckSize = Deck.total(deck);
@@ -105,6 +116,10 @@ let create = () => {
         ReasonTea.Program.Update({...state, deck, deckSize});
       | RenameDeck(deckName) =>
         ReasonTea.Program.Update({...state, deckName})
+      | PersistCardListPosition(position) =>
+        ReasonTea.Program.Update({...state, cardListPosition: position})
+      | PersistDeckPosition(position) =>
+        ReasonTea.Program.Update({...state, deckPosition: position})
       | Search(filter) =>
         ReasonTea.Program.UpdateWithSideEffects(
           {...state, cards: CardList.empty, filter: FreeText(filter)},
@@ -204,14 +219,18 @@ let create = () => {
         | _ => emptyToolbarRender
         };
 
-      let renderPage = (~position, ~onPersistPosition, current) =>
-        switch (current) {
+      let page =
+        switch (state.page) {
         | Page.Cards =>
+          let position = state.cardListPosition;
+          let onPersistPosition = handle(persistCardListPosition);
           <CardList cards=cardsWithCount position onPersistPosition>
             ...renderCard
-          </CardList>
+          </CardList>;
         | Page.Deck =>
-          <Deck deck position onPersistPosition> ...renderCard </Deck>
+          let position = state.deckPosition;
+          let onPersistPosition = handle(persistDeckPosition);
+          <Deck deck position onPersistPosition> ...renderCard </Deck>;
         | Page.Stats => <Stats />
         | Page.Settings => <Settings />
         };
@@ -219,7 +238,7 @@ let create = () => {
       <SafeAreaView style=Styles.container>
         <StatusBar backgroundColor=Colors.ourBlueDark />
         <Toolbar> ...toolbarRender </Toolbar>
-        <Page current=state.page> ...renderPage </Page>
+        page
         <NavigationBar>
           <NavigationButton
             icon="cards"
