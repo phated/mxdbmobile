@@ -21,7 +21,7 @@ let make = _children => {
     open BsReactNative;
     let _ = ();
 
-    let data = [|"Patreon Supporters", "Software"|];
+    let data = [|"Patreon Supporters", "Legal"|];
 
     let renderItem = item => {
       let _ = ();
