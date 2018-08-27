@@ -24,8 +24,7 @@ type retainedProps = {
   size,
 };
 
-let component =
-  ReasonReact.statelessComponentWithRetainedProps("CardImage");
+let component = ReasonReact.statelessComponentWithRetainedProps("CardImage");
 
 let make = (~image, ~size, _children) => {
   ...component,

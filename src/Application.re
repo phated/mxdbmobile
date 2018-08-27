@@ -49,6 +49,9 @@ let create = () => {
   let toSettings = (_, self) =>
     self.ReasonTea.Program.send(NavigateTo(Settings));
   let toStats = (_, self) => self.ReasonTea.Program.send(NavigateTo(Stats));
+  let toPatreon = (_, self) =>
+    self.ReasonTea.Program.send(NavigateTo(Patreon));
+  let toLegal = (_, self) => self.ReasonTea.Program.send(NavigateTo(Legal));
   let persistCardListPosition = (position, self) =>
     self.ReasonTea.Program.send(PersistCardListPosition(position));
   let persistDeckPosition = (position, self) =>
@@ -232,7 +235,14 @@ let create = () => {
           let onPersistPosition = handle(persistDeckPosition);
           <Deck deck position onPersistPosition> ...renderCard </Deck>;
         | Page.Stats => <Stats />
-        | Page.Settings => <Settings />
+        | Page.Settings =>
+          let data = [|
+            Settings.{title: "Patreon", onPress: handle(toPatreon)},
+            Settings.{title: "Legal", onPress: handle(toLegal)},
+          |];
+          <Settings data />;
+        | Page.Patreon => <Patreon />
+        | Page.Legal => <Legal />
         };
 
       <SafeAreaView style=Styles.container>

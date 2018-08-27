@@ -12,27 +12,25 @@ module Styles = {
     ]);
 };
 
+type t = {
+  title: string,
+  onPress: unit => unit,
+};
+
 let component = ReasonReact.statelessComponent("SettingsPage");
 
+let renderItem = ({title, onPress}) =>
+  BsReactNative.(
+    <TouchableOpacity onPress>
+      <View style=Styles.listItem>
+        <Text> <S> title </S> </Text>
+        <Icon name="chevron-right" />
+      </View>
+    </TouchableOpacity>
+  );
+
 /* TODO: retained props */
-let make = _children => {
+let make = (~data, _children) => {
   ...component,
-  render: _self => {
-    open BsReactNative;
-    let _ = ();
-
-    let data = [|"Patreon Supporters", "Legal"|];
-
-    let renderItem = item => {
-      let _ = ();
-      <TouchableOpacity>
-        <View style=Styles.listItem>
-          <Text> (ReasonReact.string(item)) </Text>
-          <Icon name="chevron-right" />
-        </View>
-      </TouchableOpacity>;
-    };
-
-    <List data renderItem />;
-  },
+  render: _self => <List data renderItem />,
 };
