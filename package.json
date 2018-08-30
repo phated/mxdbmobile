@@ -4,6 +4,7 @@
   "private": true,
   "license": "MPL-2.0",
   "scripts": {
+    "prestart": "rm -rf ./android/app/build/intermediates/assets/debug/index.android.bundle ./android/app/build/intermediates/assets/debug/index.android.bundle.meta",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "build": "bsb -make-world",
@@ -12,7 +13,9 @@
     "ios": "react-native run-ios",
     "android": "react-native run-android",
     "link": "react-native link",
-    "bundle-level": "browserify --standalone level --exclude react-native level.js | derequire > level.dist.js"
+    "bundle-level": "browserify --standalone level --exclude react-native level.js | derequire > level.dist.js",
+    "preapk": "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug",
+    "apk": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
     "@aantron/repromise": "^0.6.0",
