@@ -148,7 +148,7 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   let renderHeader = title =>
     BsReactNative.(
       <View style=Styles.header>
-        <Text style=Styles.headerText> {ReasonReact.string(title)} </Text>
+        <Text style=Styles.headerText> <S> title </S> </Text>
       </View>
     );
   let renderItem = (card, count) => renderChild(card, count);

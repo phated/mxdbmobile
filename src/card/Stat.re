@@ -31,17 +31,17 @@ module Styles = {
   let container =
     style([
       flexDirection(Row),
-      marginTop(8.0 |. Pt),
+      marginTop(8.0->Pt),
       justifyContent(FlexEnd),
       alignItems(Center),
-      width(45.0 |. Pt),
+      width(45.0->Pt),
     ]);
 
   let rank =
     style([
-      marginLeft(4.0 |. Pt),
-      width(10.0 |. Pt),
-      fontSize(14.0 |. Float),
+      marginLeft(4.0->Pt),
+      width(10.0->Pt),
+      fontSize(14.0->Float),
       /* textAlignVertical(Center), */
     ]);
 
@@ -60,23 +60,17 @@ let make = (~value, _children) => {
       | Strength(rank) =>
         <View style=Styles.container>
           <Icon name="strength" style=Styles.strength />
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | Intelligence(rank) =>
         <View style=Styles.container>
           <Icon name="intelligence" style=Styles.intelligence />
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | Special(rank) =>
         <View style=Styles.container>
           <Icon name="special" style=Styles.special />
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       }
     ),

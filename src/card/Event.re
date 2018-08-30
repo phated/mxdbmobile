@@ -27,22 +27,14 @@ module Styles = {
   let container = style([flex(1.0), flexDirection(Row)]);
 
   let details =
-    style([
-      flex(1.0),
-      flexDirection(Column),
-      paddingHorizontal(8.0 |. Pt),
-    ]);
+    style([flex(1.0), flexDirection(Column), paddingHorizontal(8.0->Pt)]);
 
   let title = style([fontWeight(`Bold)]);
 
   let cardListItem =
-    style([
-      height(182.0 |. Pt),
-      flexDirection(Row),
-      padding(16.0 |. Pt),
-    ]);
+    style([height(182.0->Pt), flexDirection(Row), padding(16.0->Pt)]);
 
-  let image = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
+  let image = style([height(150.0->Pt), width(108.0->Pt)]);
 };
 
 let component = ReasonReact.statelessComponent("Event");
@@ -56,7 +48,7 @@ let make = (~card, _children) => {
 
     let cardDetails =
       <View style=Styles.details>
-        <Text style=Styles.title> (ReasonReact.string(title)) </Text>
+        <Text style=Styles.title> <S> title </S> </Text>
         <Effect effect />
       </View>;
     let cardStats = <View> <MP value=mp /> </View>;

@@ -34,7 +34,7 @@ module Styles = {
       flexDirection(Row),
       justifyContent(FlexEnd),
       alignItems(Center),
-      width(45.0 |. Pt),
+      width(45.0->Pt),
     ]);
 
   let doubleIconContainer =
@@ -42,7 +42,7 @@ module Styles = {
       flexDirection(Row),
       justifyContent(FlexEnd),
       alignItems(Center),
-      width(52.5 |. Pt),
+      width(52.5->Pt),
     ]);
 
   let tripleIconContainer =
@@ -50,46 +50,46 @@ module Styles = {
       flexDirection(Row),
       justifyContent(FlexEnd),
       alignItems(Center),
-      width(68.0 |. Pt),
+      width(68.0->Pt),
     ]);
 
   let doubleIcon =
-    style([position(Relative), width(38.5 |. Pt), height(30.0 |. Pt)]);
+    style([position(Relative), width(38.5->Pt), height(30.0->Pt)]);
   let firstDouble =
     style([
       position(Absolute),
-      top(5.0 |. Pt),
-      left(0.0 |. Pt),
+      top(5.0->Pt),
+      left(0.0->Pt),
       borderRadius(12.0),
       backgroundColor(Colors.Css.white),
     ]);
-  let secondDouble = style([position(Absolute), right(0.0 |. Pt)]);
+  let secondDouble = style([position(Absolute), right(0.0->Pt)]);
 
   let tripleIcon =
-    style([position(Relative), width(54.0 |. Pt), height(30.0 |. Pt)]);
+    style([position(Relative), width(54.0->Pt), height(30.0->Pt)]);
   let firstTriple =
-    style([position(Absolute), top(5.0 |. Pt), left(0.0 |. Pt)]);
+    style([position(Absolute), top(5.0->Pt), left(0.0->Pt)]);
   let secondTriple =
     style([
       position(Absolute),
-      left(15.0 |. Pt),
+      left(15.0->Pt),
       borderRadius(12.0),
       backgroundColor(Colors.Css.white),
     ]);
   let thirdTriple =
     style([
       position(Absolute),
-      top(5.0 |. Pt),
-      right(0.0 |. Pt),
+      top(5.0->Pt),
+      right(0.0->Pt),
       borderRadius(12.0),
       backgroundColor(Colors.Css.white),
     ]);
 
   let rank =
     style([
-      marginLeft(4.0 |. Pt),
-      width(10.0 |. Pt),
-      fontSize(14.0 |. Float),
+      marginLeft(4.0->Pt),
+      width(10.0->Pt),
+      fontSize(14.0->Float),
       /* textAlignVertical(Center), */
     ]);
 
@@ -110,23 +110,17 @@ let make = (~stat, _children) => {
       | Strength(rank) =>
         <View style=Styles.singleIconContainer>
           <Icon name="strength" style=Styles.strength />
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | Intelligence(rank) =>
         <View style=Styles.singleIconContainer>
           <Icon name="intelligence" style=Styles.intelligence />
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | Special(rank) =>
         <View style=Styles.singleIconContainer>
           <Icon name="special" style=Styles.special />
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | StrengthIntelligence(rank) =>
         <View style=Styles.doubleIconContainer>
@@ -138,9 +132,7 @@ let make = (~stat, _children) => {
               <Icon name="strength" style=Styles.strength />
             </View>
           </View>
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | IntelligenceSpecial(rank) =>
         <View style=Styles.doubleIconContainer>
@@ -152,9 +144,7 @@ let make = (~stat, _children) => {
               <Icon name="intelligence" style=Styles.intelligence />
             </View>
           </View>
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | StrengthSpecial(rank) =>
         <View style=Styles.doubleIconContainer>
@@ -166,9 +156,7 @@ let make = (~stat, _children) => {
               <Icon name="strength" style=Styles.strength />
             </View>
           </View>
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       | StrengthIntelligenceSpecial(rank) =>
         <View style=Styles.tripleIconContainer>
@@ -183,9 +171,7 @@ let make = (~stat, _children) => {
               <Icon name="special" style=Styles.special />
             </View>
           </View>
-          <Text style=Styles.rank>
-            (ReasonReact.string(string_of_int(rank)))
-          </Text>
+          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
         </View>
       };
 

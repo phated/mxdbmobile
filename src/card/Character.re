@@ -38,15 +38,11 @@ module Styles = {
   let container = style([flex(1.0), flexDirection(Row)]);
 
   let details =
-    style([
-      flex(1.0),
-      flexDirection(Column),
-      paddingHorizontal(8.0 |. Pt),
-    ]);
+    style([flex(1.0), flexDirection(Column), paddingHorizontal(8.0->Pt)]);
 
   let title = style([fontWeight(`Bold)]);
 
-  let stats = style([width(45.0 |. Pt), alignItems(FlexEnd)]);
+  let stats = style([width(45.0->Pt), alignItems(FlexEnd)]);
 };
 
 let component = ReasonReact.statelessComponent("Character");
@@ -61,11 +57,11 @@ let make = (~card, _children) => {
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title>
-          (ReasonReact.string(title))
-          (ReasonReact.string(" - "))
-          (ReasonReact.string(subtitle))
+          <S> title </S>
+          <S> " - " </S>
+          <S> subtitle </S>
         </Text>
-        <Text> (ReasonReact.string(trait)) </Text>
+        <Text> <S> trait </S> </Text>
         <Effect effect />
       </View>;
     let cardStats =

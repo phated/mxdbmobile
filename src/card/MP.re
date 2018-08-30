@@ -8,9 +8,9 @@ let decoder = json => json |> Json.Decode.map(fromInt, Json.Decode.int);
 module Styles = {
   open BsReactNative.Style;
 
-  let container = style([width(45.0 |. Pt), fontSize(14.0 |. Float)]);
+  let container = style([width(45.0->Pt), fontSize(14.0->Float)]);
 
-  let sign = style([fontSize(11.0 |. Float)]);
+  let sign = style([fontSize(11.0->Float)]);
 };
 
 let component = ReasonReact.statelessComponent("MP");
@@ -23,15 +23,15 @@ let make = (~value, _children) => {
 
     let sign =
       if (intValue >= 0) {
-        <Text style=Styles.sign> (ReasonReact.string("+")) </Text>;
+        <Text style=Styles.sign> <S> "+" </S> </Text>;
       } else {
-        <Text style=Styles.sign> (ReasonReact.string("-")) </Text>;
+        <Text style=Styles.sign> <S> "-" </S> </Text>;
       };
 
     <Text style=Styles.container>
-      (ReasonReact.string("MP: "))
+      <S> "MP: " </S>
       sign
-      (ReasonReact.string(string_of_int(abs(intValue))))
+      <S> {string_of_int(abs(intValue))} </S>
     </Text>;
   },
 };

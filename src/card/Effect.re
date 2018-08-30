@@ -32,14 +32,14 @@ module Styles = {
   let effectWithSymbol =
     style([
       flex(1.),
-      paddingLeft(4.0 |. Pt),
-      marginLeft(4.0 |. Pt),
+      paddingLeft(4.0->Pt),
+      marginLeft(4.0->Pt),
       borderLeftWidth(2.0),
       borderLeftColor(Colors.Css.gray),
       borderStyle(Solid),
     ]);
 
-  let effectText = style([fontSize(11.0 |. Float)]);
+  let effectText = style([fontSize(11.0->Float)]);
 
   let attack = style([color(Colors.Css.attack)]);
   let defend = style([color(Colors.Css.defend)]);
@@ -77,9 +77,7 @@ let make = (~effect, _children) => {
           <View style=Styles.effectContainer>
             symbolImage
             <View style=effectStyle>
-              <Text style=Styles.effectText>
-                (ReasonReact.string(effectText))
-              </Text>
+              <Text style=Styles.effectText> <S> effectText </S> </Text>
             </View>
           </View>
         </View>

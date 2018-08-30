@@ -14,8 +14,6 @@ let make = _children => {
     open BsReactNative;
     let _ = ();
 
-    <View style=Styles.container>
-      <Text> (ReasonReact.string("Stats page")) </Text>
-    </View>;
+    <View style=Styles.container> <Text> <S> "Stats page" </S> </Text> </View>;
   },
 };
