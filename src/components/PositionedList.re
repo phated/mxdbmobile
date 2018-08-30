@@ -1,24 +1,20 @@
-type t =
-  | Header(string)
-  | Item(Card.t, int);
-
-let toItem = ((card, count)) => Item(card, count);
-
-let isHeader = value =>
-  switch (value) {
-  | Item(_, _) => false
-  | Header(_) => true
+module Item = {
+  type t('a, 'b) = {
+    key: 'a,
+    value: 'b,
+    size: int,
   };
+};
+
+type t('key, 'value) =
+  | Header(string)
+  | Item(Item.t('key, 'value));
 
 module Styles = {
   open BsReactNative.Style;
 
   let separator =
-    style([
-      flex(1.0),
-      height(1.0 |. Pt),
-      backgroundColor(Colors.Css.gray),
-    ]);
+    style([flex(1.0), height(1.0->Pt), backgroundColor(Colors.Css.gray)]);
 };
 
 type state = {
@@ -28,36 +24,24 @@ type state = {
 
 let component = ReasonReact.reducerComponent("PositionedList");
 
-let keyExtractor = (item, _idx) =>
-  switch (item) {
-  | Header(title) => title
-  | Item(card, _count) => Card.uidGet(card)
-  };
-let noop = _ => ReasonReact.null;
+let noop = _ => failwith("No renderHeader method provided");
 
-let itemSeparatorComponent = {
-  open BsReactNative;
-
-  let _ = ();
-
-  FlatList.separatorComponent(({leadingItem}) =>
-    switch (leadingItem) {
-    | Some(Item(_card, _count)) => <View style=Styles.separator />
-    | _ => ReasonReact.null
-    }
-  );
-};
-
-let getItemLayout = (maybeData, idx) =>
-  switch (maybeData) {
-  | Some(data) when isHeader(data[idx]) => {
-      "length": 40,
-      "offset": 40 * idx,
+let getItemLayout = (maybeData, idx) => {
+  let maybeItem =
+    switch (maybeData) {
+    | Some(data) => Some(data[idx])
+    | None => None
+    };
+  switch (maybeItem) {
+  | Some(Header(_)) => {"length": 40, "offset": 40 * idx, "index": idx}
+  | Some(Item({size})) => {
+      "length": size,
+      "offset": size * idx,
       "index": idx,
     }
-  | Some(_data) => {"length": 183, "offset": 183 * idx, "index": idx}
   | None => {"length": 0, "offset": 0, "index": idx}
   };
+};
 
 let onScroll = (evt, {ReasonReact.state}) => {
   let pt = BsReactNative.RNEvent.NativeScrollEvent.contentOffset(evt);
@@ -84,6 +68,8 @@ let make =
       ~renderItem,
       ~position=0.0,
       ~onPersistPosition,
+      ~keyExtractor,
+      ~initialNumToRender=4,
       _children,
     ) => {
   open BsReactNative;
@@ -92,7 +78,15 @@ let make =
     FlatList.renderItem(({item}) =>
       switch (item) {
       | Header(title) => renderHeader(title)
-      | Item(card, count) => renderItem(card, count)
+      | Item({key, value}) => renderItem(key, value)
+      }
+    );
+  /* TODO: List Footer Component for 1 item list? */
+  let itemSeparatorComponent =
+    FlatList.separatorComponent(({leadingItem}) =>
+      switch (leadingItem) {
+      | Some(Item(_)) => <View style=Styles.separator />
+      | _ => ReasonReact.null
       }
     );
 
@@ -112,14 +106,14 @@ let make =
       <FlatList
         data
         getItemLayout
-        initialNumToRender=4
+        initialNumToRender
         maxToRenderPerBatch=1
         keyExtractor
         renderItem
         removeClippedSubviews=true
         itemSeparatorComponent
-        ref=(self.handle(setRef))
-        onScroll=(self.handle(onScroll))
+        ref={self.handle(setRef)}
+        onScroll={self.handle(onScroll)}
       />,
   };
 };

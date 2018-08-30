@@ -26,8 +26,16 @@ let decode = json => {
 let component = ReasonReact.statelessComponent("CardList");
 
 let make = (~cards, ~position, ~onPersistPosition, renderChild) => {
-  let data = Belt.Array.map(cards, PositionedList.toItem);
+  let data =
+    Belt.Array.map(cards, item =>
+      PositionedList.Item({key: fst(item), value: snd(item), size: 183})
+    );
   let renderItem = (card, count) => renderChild(card, count);
+  let keyExtractor = (item, _idx) =>
+    switch (item) {
+    | PositionedList.Header(title) => title
+    | PositionedList.Item({key}) => Card.uidGet(key)
+    };
 
   {
     ...component,
@@ -37,7 +45,13 @@ let make = (~cards, ~position, ~onPersistPosition, renderChild) => {
       if (loading) {
         <Loading />;
       } else {
-        <PositionedList data renderItem position onPersistPosition />;
+        <PositionedList
+          data
+          renderItem
+          position
+          onPersistPosition
+          keyExtractor
+        />;
       };
     },
   };

@@ -19,9 +19,8 @@ type action =
 
 let component = ReasonReact.reducerComponent("Toolbar");
 
-let make = renderChildren => {
-  let enable = (_event, self) =>
-    self.ReasonReact.send(ChangeMode(Enabled));
+let make = renderChild => {
+  let enable = (_event, self) => self.ReasonReact.send(ChangeMode(Enabled));
   let disable = (_event, self) =>
     self.ReasonReact.send(ChangeMode(Disabled));
 
@@ -33,13 +32,13 @@ let make = renderChildren => {
       | ChangeMode(mode) => ReasonReact.Update(mode)
       },
     render: self => {
-      let children =
-        renderChildren(
+      let child =
+        renderChild(
           ~enable=self.handle(enable),
           ~disable=self.handle(disable),
           self.state,
         );
-      BsReactNative.(<View style=Styles.container> ...children </View>);
+      BsReactNative.(<View style=Styles.container> child </View>);
     },
   };
 };

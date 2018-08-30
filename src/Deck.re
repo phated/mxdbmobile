@@ -4,10 +4,10 @@ module Comparator =
 
     let cmp =
       Compare.concat([
-        Compare.by(card => Card.typeGet(card) |. CardType.toInt),
+        Compare.by(card => Card.typeGet(card)->CardType.toInt),
         /* TODO: card stats order */
         Compare.by(card => Card.titleGet(card)),
-        Compare.by(card => Card.effectGet(card) |. Effect.getText),
+        Compare.by(card => Card.effectGet(card)->Effect.getText),
         Compare.by(card => Card.uidGet(card)),
       ]);
   });
@@ -15,6 +15,8 @@ module Comparator =
 type t = Belt.Map.t(Comparator.t, int, Comparator.identity);
 
 let empty: t = Belt.Map.make(~id=(module Comparator));
+
+let isEmpty = deck => Belt.Map.isEmpty(deck);
 
 let toArray = deck => Belt.Map.toArray(deck);
 
@@ -93,7 +95,7 @@ module Styles = {
 
   let header =
     style([
-      height(40.0 |. Pt),
+      height(40.0->Pt),
       backgroundColor(Colors.Css.ourBlueDark),
       alignItems(Center),
       justifyContent(Center),
@@ -101,7 +103,7 @@ module Styles = {
   let headerText =
     style([
       color(Colors.Css.white),
-      fontSize(20.0 |. Float),
+      fontSize(20.0->Float),
       fontWeight(`_800),
     ]);
 };
@@ -122,22 +124,31 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
       PositionedList.Header({j|Battle Cards ($battleCount)|j});
     };
 
+  let keyExtractor = (item, _idx) =>
+    switch (item) {
+    | PositionedList.Header(title) => title
+    | PositionedList.Item({key}) => Card.uidGet(key)
+    };
+
   let init = ((card, count)) => [|
     toHeader(card),
-    PositionedList.Item(card, count),
+    PositionedList.Item({key: card, value: count, size: 183}),
   |];
 
   let mapper = ((prevCard, _), (nextCard, count)) =>
     Card.sameType(prevCard, nextCard) ?
-      [|PositionedList.Item(nextCard, count)|] :
-      [|toHeader(nextCard), PositionedList.Item(nextCard, count)|];
+      [|PositionedList.Item({key: nextCard, value: count, size: 183})|] :
+      [|
+        toHeader(nextCard),
+        PositionedList.Item({key: nextCard, value: count, size: 183}),
+      |];
 
   let cards = flatMap2(deck, init, mapper);
 
   let renderHeader = title =>
     BsReactNative.(
       <View style=Styles.header>
-        <Text style=Styles.headerText> (ReasonReact.string(title)) </Text>
+        <Text style=Styles.headerText> {ReasonReact.string(title)} </Text>
       </View>
     );
   let renderItem = (card, count) => renderChild(card, count);
@@ -151,6 +162,7 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
         renderHeader
         position
         onPersistPosition
+        keyExtractor
       />,
   };
 };
@@ -176,4 +188,132 @@ let hash = deck => {
   } else {
     None;
   };
+};
+
+let query = {|
+query CardList($uids: [String!]!) {
+  characters: allCards(filter: {
+    AND: [
+      { type: Character },
+      { uid_in: $uids }
+    ]
+  }, orderBy: title_ASC) {
+    uid
+    rarity
+    number
+    set
+    title
+    subtitle
+    trait {
+      name
+    }
+    mp
+    stats {
+      type
+      rank
+    }
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+      small
+    }
+  }
+  events: allCards(filter: {
+    AND: [
+      { type: Event },
+      { uid_in: $uids }
+    ]
+  }, orderBy: title_ASC) {
+    uid
+    rarity
+    number
+    set
+    title
+    mp
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+      small
+    }
+  }
+  battles: allCards(filter: {
+    AND: [
+      { type: Battle },
+      { uid_in: $uids }
+    ]
+  }, orderBy: title_ASC) {
+    uid
+    rarity
+    number
+    set
+    title
+    mp
+    stats(orderBy: type_ASC) {
+      type
+      rank
+    }
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+      small
+    }
+  }
+}
+|};
+
+let decode = json => json |> Json.Decode.dict(Json.Decode.int);
+
+let loadFromHash = hash => {
+  let (result, resolve) = Repromise.make();
+
+  MyFetch.fetch(
+    "https://metax.toyboat.net/decodeDeck.php?output=metaxdb&hash=" ++ hash,
+  )
+  |> Repromise.map(result =>
+       switch (result) {
+       | Belt.Result.Ok(data) => decode(data)->Belt.Result.Ok
+       | Belt.Result.Error(msg) => Belt.Result.Error(msg)
+       }
+     )
+  |> Repromise.wait(result =>
+       switch (result) {
+       | Belt.Result.Ok(dict) =>
+         let uids =
+           Js.Dict.keys(dict) |> Json.Encode.array(Json.Encode.string);
+         Js.log(uids);
+         let vars = Json.Encode.object_([("uids", uids)]);
+         Query.send(query, vars)
+         |> Js.Promise.then_(cards => {
+              Js.log(cards);
+              let deckArray =
+                CardList.map(
+                  cards,
+                  card => {
+                    let uid = Card.uidGet(card);
+                    let count = Js.Dict.unsafeGet(dict, uid);
+                    (card, count);
+                  },
+                );
+              Belt.Map.mergeMany(empty, deckArray)->Belt.Result.Ok->resolve;
+              Js.Promise.resolve(cards);
+            })
+         |> Js.Promise.catch(err => {
+              Js.log(err);
+              Js.Promise.reject(Failure("wat"));
+            })
+         |> ignore;
+       | Belt.Result.Error(msg) => Belt.Result.Error(msg)->resolve
+       }
+     );
+
+  result;
 };

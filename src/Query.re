@@ -9,7 +9,7 @@ let send = (q, v) =>
         ~body=
           Js.Dict.fromList([
             ("query", Js.Json.string(q)),
-            ("variables", Filter.encode(v)),
+            ("variables", v),
           ])
           |> Js.Json.object_
           |> Js.Json.stringify
@@ -22,24 +22,23 @@ let send = (q, v) =>
     |> Js.Promise.then_(resp =>
          if (Response.ok(resp)) {
            Response.json(resp)
-           |> Js.Promise.then_(data =>
+           |> Js.Promise.then_(data
                 /* Js.log(data); */
-                switch (Js.Json.decodeObject(data)) {
-                | Some(obj) =>
-                  Js.Dict.unsafeGet(obj, "data")
-                  |> CardList.decode
-                  |> Js.Promise.resolve
-                | None =>
-                  Js.Promise.reject(
-                    Graphql_error("Response is not an object"),
-                  )
-                }
-              );
+                =>
+                  switch (Js.Json.decodeObject(data)) {
+                  | Some(obj) =>
+                    Js.Dict.unsafeGet(obj, "data")
+                    |> CardList.decode
+                    |> Js.Promise.resolve
+                  | None =>
+                    Js.Promise.reject(
+                      Graphql_error("Response is not an object"),
+                    )
+                  }
+                );
          } else {
            Js.Promise.reject(
-             Graphql_error(
-               "Request failed: " ++ Response.statusText(resp),
-             ),
+             Graphql_error("Request failed: " ++ Response.statusText(resp)),
            );
          }
        )

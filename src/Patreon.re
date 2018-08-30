@@ -11,9 +11,9 @@ module Styles = {
   let blockContainer =
     style([flex(1.0), justifyContent(Center), alignItems(Center)]);
 
-  let patreonButton = style([marginTop(32.0 |. Pt)]);
+  let patreonButton = style([marginTop(32.0->Pt)]);
 
-  let patreonName = style([marginTop(10.0 |. Pt), fontWeight(`Bold)]);
+  let patreonName = style([marginTop(10.0->Pt), fontWeight(`Bold)]);
 
   let special = style([color(Colors.Css.special)]);
 };
@@ -38,7 +38,7 @@ let make = _children => {
         <Text> <S> "subscribe to us on Patreon!" </S> </Text>
         <LinkOut
           style=Styles.patreonButton url="https://www.patreon.com/metaxdb">
-          <Image source=(Image.Required(patreonLogo)) />
+          <Image source={Image.Required(patreonLogo)} />
         </LinkOut>
       </View>
       <View style=Styles.blockContainer>
