@@ -12,7 +12,8 @@
     "@glennsl/bs-json",
     "bs-history",
     "reason-tea",
-    "@reasonableconsulting/compare"
+    "@reasonableconsulting/compare",
+    "@aantron/repromise"
   ],
   "namespace": true,
   "reason": {
