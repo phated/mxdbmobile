@@ -1,1 +1,1 @@
-let run = _ => <ReasonTea.ReactProgram program=Application.create />;
+let run = _ => <Oolong.ReactProgram program=Application.create />;

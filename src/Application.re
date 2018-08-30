@@ -49,47 +49,42 @@ type state = {
 };
 
 let create = () => {
-  let program = ReasonTea.Program.routerProgram("Main App");
+  let program = Oolong.routerProgram("Main App");
 
-  let search = (text, self) => self.ReasonTea.Program.send(Search(text));
-  let renameDeck = (text, self) =>
-    self.ReasonTea.Program.send(RenameDeck(text));
+  let search = (text, self) => self.Oolong.send(Search(text));
+  let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
   let loadDeck = (deckName, hash, _, self) => {
     let _ = ();
 
-    self.ReasonTea.Program.send(NavigateTo(Loading));
+    self.Oolong.send(NavigateTo(Loading));
 
     Deck.loadFromHash(hash)
     |> Repromise.wait(result =>
          switch (result) {
          | Belt.Result.Ok(deck) =>
-           self.ReasonTea.Program.send(ReplaceDeck(deckName, deck))
+           self.Oolong.send(ReplaceDeck(deckName, deck))
          | Belt.Result.Error(msg) => Js.log(msg)
          }
        );
   };
-  let clearDeck = (_text, self) => self.ReasonTea.Program.send(ClearDeck);
-  let increment = (card, self) =>
-    self.ReasonTea.Program.send(Increment(card));
-  let decrement = (card, self) =>
-    self.ReasonTea.Program.send(Decrement(card));
-  let toCards = (_, self) => self.ReasonTea.Program.send(NavigateTo(Cards));
+  let clearDeck = (_text, self) => self.Oolong.send(ClearDeck);
+  let increment = (card, self) => self.Oolong.send(Increment(card));
+  let decrement = (card, self) => self.Oolong.send(Decrement(card));
+  let toCards = (_, self) => self.Oolong.send(NavigateTo(Cards));
   let toDeck = (_, self) =>
-    if (Deck.isEmpty(self.ReasonTea.Program.state.deck)) {
-      self.ReasonTea.Program.send(NavigateTo(SavedDecks));
+    if (Deck.isEmpty(self.Oolong.state.deck)) {
+      self.Oolong.send(NavigateTo(SavedDecks));
     } else {
-      self.ReasonTea.Program.send(NavigateTo(Deck));
+      self.Oolong.send(NavigateTo(Deck));
     };
-  let toSettings = (_, self) =>
-    self.ReasonTea.Program.send(NavigateTo(Settings));
-  let toStats = (_, self) => self.ReasonTea.Program.send(NavigateTo(Stats));
-  let toPatreon = (_, self) =>
-    self.ReasonTea.Program.send(NavigateTo(Patreon));
-  let toLegal = (_, self) => self.ReasonTea.Program.send(NavigateTo(Legal));
+  let toSettings = (_, self) => self.Oolong.send(NavigateTo(Settings));
+  let toStats = (_, self) => self.Oolong.send(NavigateTo(Stats));
+  let toPatreon = (_, self) => self.Oolong.send(NavigateTo(Patreon));
+  let toLegal = (_, self) => self.Oolong.send(NavigateTo(Legal));
   let persistCardListPosition = (position, self) =>
-    self.ReasonTea.Program.send(PersistCardListPosition(position));
+    self.Oolong.send(PersistCardListPosition(position));
   let persistDeckPosition = (position, self) =>
-    self.ReasonTea.Program.send(PersistDeckPosition(position));
+    self.Oolong.send(PersistDeckPosition(position));
 
   {
     ...program,
@@ -99,7 +94,7 @@ let create = () => {
         let now = Js.Date.make();
         let _todayDate = Js.Date.toLocaleDateString(now);
         let _todayTime = Js.Date.toLocaleTimeString(now);
-        ReasonTea.Program.UpdateWithSideEffects(
+        Oolong.UpdateWithSideEffects(
           {
             page: Page.fromPath(route.path),
             /* page: Page.SavedDecks, */
@@ -136,49 +131,35 @@ let create = () => {
             }
           ),
         );
-      | Push => ReasonTea.Program.NoUpdate
-      | _ => ReasonTea.Program.NoUpdate
+      | Push => Oolong.NoUpdate
+      | _ => Oolong.NoUpdate
       },
     toRoute: ({previous, next}) =>
       if (previous == next) {
-        ReasonTea.Program.NoTransition;
+        Oolong.NoTransition;
       } else {
         let search = Filter.toString(next.filter);
-        ReasonTea.Program.Push(
-          ReasonTea.Route.make(
-            ~path=Page.toPath(next.page),
-            ~search,
-            ~hash="",
-          ),
+        /* Js.log(Deck.hash(next.deck)); */
+        Oolong.Push(
+          Oolong.Route.make(~path=Page.toPath(next.page), ~search, ~hash=""),
         );
       },
     update: (action, state) =>
       switch (action) {
-      | NavigateTo(page) => ReasonTea.Program.Update({...state, page})
+      | NavigateTo(page) => Oolong.Update({...state, page})
       | StoreCards(cards) =>
-        ReasonTea.Program.Update({...state, cards, cardListPosition: 0.0})
-      | StoreDecks(publicDecks) =>
-        ReasonTea.Program.Update({...state, publicDecks})
+        Oolong.Update({...state, cards, cardListPosition: 0.0})
+      | StoreDecks(publicDecks) => Oolong.Update({...state, publicDecks})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
         let deckSize = Deck.total(deck);
-        ReasonTea.Program.Update({
-          ...state,
-          deck,
-          deckSize,
-          deckPosition: 0.0,
-        });
+        Oolong.Update({...state, deck, deckSize, deckPosition: 0.0});
       | Decrement(card) =>
         let deck = Deck.decrement(state.deck, card);
         let deckSize = Deck.total(deck);
-        ReasonTea.Program.Update({
-          ...state,
-          deck,
-          deckSize,
-          deckPosition: 0.0,
-        });
+        Oolong.Update({...state, deck, deckSize, deckPosition: 0.0});
       | ReplaceDeck(deckName, deck) =>
-        ReasonTea.Program.Update({
+        Oolong.Update({
           ...state,
           deckName: Some(deckName),
           deck,
@@ -187,9 +168,9 @@ let create = () => {
           deckPosition: 0.0,
         })
       | RenameDeck(deckName) =>
-        ReasonTea.Program.Update({...state, deckName: Some(deckName)})
+        Oolong.Update({...state, deckName: Some(deckName)})
       | ClearDeck =>
-        ReasonTea.Program.Update({
+        Oolong.Update({
           ...state,
           deckName: None,
           deck: Deck.empty,
@@ -198,11 +179,11 @@ let create = () => {
           deckPosition: 0.0,
         })
       | PersistCardListPosition(position) =>
-        ReasonTea.Program.Update({...state, cardListPosition: position})
+        Oolong.Update({...state, cardListPosition: position})
       | PersistDeckPosition(position) =>
-        ReasonTea.Program.Update({...state, deckPosition: position})
+        Oolong.Update({...state, deckPosition: position})
       | Search(filter) =>
-        ReasonTea.Program.UpdateWithSideEffects(
+        Oolong.UpdateWithSideEffects(
           {...state, cards: CardList.empty, filter: FreeText(filter)},
           (
             self =>

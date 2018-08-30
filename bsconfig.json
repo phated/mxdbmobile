@@ -11,7 +11,7 @@
     "bs-fetch",
     "@glennsl/bs-json",
     "bs-history",
-    "reason-tea",
+    "@reasonableconsulting/oolong",
     "@reasonableconsulting/compare",
     "@aantron/repromise"
   ],
