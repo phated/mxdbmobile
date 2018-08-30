@@ -289,11 +289,9 @@ let loadFromHash = hash => {
        | Belt.Result.Ok(dict) =>
          let uids =
            Js.Dict.keys(dict) |> Json.Encode.array(Json.Encode.string);
-         Js.log(uids);
          let vars = Json.Encode.object_([("uids", uids)]);
          Query.send(query, vars)
          |> Js.Promise.then_(cards => {
-              Js.log(cards);
               let deckArray =
                 CardList.map(
                   cards,

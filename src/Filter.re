@@ -35,7 +35,6 @@ let encode = filter => {
     switch (filter) {
     | Empty => Json.Encode.null
     | FreeText(text) when isSymbol(text) =>
-      /* Js.log("is symbol"); */
       Json.Encode.object_([("symbol", Json.Encode.string(text))])
     | FreeText(text) =>
       Json.Encode.object_([
@@ -46,6 +45,5 @@ let encode = filter => {
         ("effect", Json.Encode.string(text)),
       ])
     };
-  /* Js.log(query); */
   query;
 };

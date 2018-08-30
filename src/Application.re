@@ -101,8 +101,8 @@ let create = () => {
         let _todayTime = Js.Date.toLocaleTimeString(now);
         ReasonTea.Program.UpdateWithSideEffects(
           {
-            /* page: Page.fromPath(route.path), */
-            page: Page.SavedDecks,
+            page: Page.fromPath(route.path),
+            /* page: Page.SavedDecks, */
             filter: Filter.Empty,
             cards: CardList.empty,
             deck: Deck.empty,

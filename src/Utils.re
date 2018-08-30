@@ -3,8 +3,5 @@ let tapLog = res => {
   Js.Promise.resolve(res);
 };
 
-[@bs.val] external setTimeout : (unit => unit, int) => int = "setTimeout";
-[@bs.val] external clearTimeout : int => unit = "clearTimeout";
-
-let nextTick = cb => setTimeout(cb, 0);
-let clearTick = id => clearTimeout(id);
+let nextTick = cb => Js.Global.setTimeout(cb, 0);
+let clearTick = id => Js.Global.clearTimeout(id);

@@ -5,8 +5,8 @@ module Styles = {
     style([
       flex(1.0),
       color(Colors.Css.white),
-      fontSize(20.0 |. Float),
-      paddingVertical(8.0 |. Pt),
+      fontSize(20.0->Float),
+      paddingVertical(8.0->Pt),
     ]);
 };
 
@@ -18,10 +18,11 @@ type action =
 let component = ReasonReact.reducerComponent("ToolbarInput");
 
 let noop = _ => ();
-let make = (~onSubmit=noop, ~placeholder, ~onBlur=noop, ~previous="", _children) => {
+let make =
+    (~onSubmit=noop, ~placeholder, ~onBlur=noop, ~previous="", _children) => {
   ...component,
   initialState: () => previous,
-  reducer: (action, state) =>
+  reducer: (action, _state) =>
     switch (action) {
     | UpdateText(text) => ReasonReact.Update(text)
     | Submit => ReasonReact.SideEffects((self => onSubmit(self.state)))
@@ -39,9 +40,9 @@ let make = (~onSubmit=noop, ~placeholder, ~onBlur=noop, ~previous="", _children)
         placeholderTextColor=Colors.gray
         onBlur
         blurOnSubmit=true
-        value=self.state
-        onChangeText=(text => self.send(UpdateText(text)))
-        onSubmitEditing=(_ => self.send(Submit))
+        value={self.state}
+        onChangeText={text => self.send(UpdateText(text))}
+        onSubmitEditing={_ => self.send(Submit)}
       />
     ),
 };
