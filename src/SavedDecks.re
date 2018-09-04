@@ -1,16 +1,57 @@
 type t = {
-  author: string,
+  author: option(string),
   name: string,
   /* date: string, */
   hash: string,
   /* source: string, */
 };
 
+let namespace = "@mxdbmobile/decks/";
+
 let decode = json => {
-  author: json |> Json.Decode.field("author", Json.Decode.string),
+  author:
+    json
+    |> Json.Decode.field("author", Json.Decode.optional(Json.Decode.string)),
   name: json |> Json.Decode.field("name", Json.Decode.string),
   hash: json |> Json.Decode.field("hash", Json.Decode.string),
 };
+
+let fetch = () =>
+  AsyncStorage.getAllKeys()
+  |> Repromise.map(maybeKeys =>
+       switch (maybeKeys) {
+       | None => Belt.Result.Error("Unable to get decks")
+       | Some(keys) =>
+         let deckKeys =
+           Belt.Array.keep(keys, key => Js.String.startsWith(namespace, key));
+         Belt.Result.Ok(deckKeys);
+       }
+     )
+  |> Repromise.andThen(result =>
+       switch (result) {
+       | Belt.Result.Error(msg) => Repromise.resolved(Belt.Result.Error(msg))
+       | Belt.Result.Ok(deckKeys) =>
+         let deckHashes =
+           Belt.Array.map(deckKeys, key =>
+             AsyncStorage.getItem(key)
+             |> Repromise.map(maybeHash =>
+                  switch (maybeHash) {
+                  | None => None
+                  | Some(hash) =>
+                    let name = Js.String.replace(namespace, "", key);
+                    Some({hash, name, author: None});
+                  }
+                )
+           )
+           |> Belt.List.fromArray;
+         Repromise.all(deckHashes)
+         |> Repromise.map(decks => {
+              let decks =
+                Belt.List.keepMap(decks, a => a) |> Belt.List.toArray;
+              Belt.Result.Ok(decks);
+            });
+       }
+     );
 
 let component = ReasonReact.statelessComponent("SavedDecks");
 
@@ -47,12 +88,18 @@ let make =
     | PositionedList.Item({key}) => key
     };
 
-  /* let savedHeader = [|PositionedList.Header("Saved Decks")|]; */
-  let savedHeader = [||];
+  /* TODO: Don't show header when no decks */
+  let savedHeader = [|PositionedList.Header("Saved Decks")|];
   let publicHeader = [|PositionedList.Header("Public Decks")|];
 
-  let toItem = ({name, hash, author}) =>
-    PositionedList.Item({key: {j|$name by $author|j}, value: hash, size: 41});
+  let toItem = ({name, hash, author}) => {
+    let key =
+      switch (author) {
+      | Some(author) => name ++ " by " ++ author
+      | None => name
+      };
+    PositionedList.Item({key, value: hash, size: 41});
+  };
 
   let saved = Belt.Array.map(savedDecks, toItem);
   let public = Belt.Array.map(publicDecks, toItem);

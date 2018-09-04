@@ -26,14 +26,14 @@ module Styles = {
 type action =
   | NavigateTo(Page.t)
   | Search(string)
-  | ReplaceDeck(string, Deck.t)
+  | ReplaceDeck(Deck.t)
   | RenameDeck(string)
   | ClearDeck
   | Increment(Card.t)
   | Decrement(Card.t)
   | PersistCardListPosition(float)
   | PersistDeckPosition(float)
-  | StoreDecks(array(SavedDecks.t))
+  | StoreDecks(array(SavedDecks.t), array(SavedDecks.t))
   | StoreCards(CardList.t);
 type state = {
   page: Page.t,
@@ -41,7 +41,6 @@ type state = {
   cards: CardList.t,
   deck: Deck.t,
   deckSize: int,
-  deckName: option(string),
   cardListPosition: float,
   deckPosition: float,
   savedDecks: array(SavedDecks.t),
@@ -51,6 +50,22 @@ type state = {
 let create = () => {
   let program = Oolong.routerProgram("Main App");
 
+  let getDecks = self => {
+    let localDecks = SavedDecks.fetch();
+    let netdeckerDecks = Netdecker.fetch();
+
+    Repromise.all([localDecks, netdeckerDecks])
+    |> Repromise.wait(decks =>
+         switch (decks) {
+         | [local, netdecker] =>
+           let localDecks = Belt.Result.getWithDefault(local, [||]);
+           let netdeckerDecks = Belt.Result.getWithDefault(netdecker, [||]);
+           self.Oolong.send(StoreDecks(localDecks, netdeckerDecks));
+         | _ => ()
+         }
+       );
+  };
+
   let search = (text, self) => self.Oolong.send(Search(text));
   let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
   let loadDeck = (deckName, hash, _, self) => {
@@ -58,11 +73,10 @@ let create = () => {
 
     self.Oolong.send(NavigateTo(Loading));
 
-    Deck.loadFromHash(hash)
+    Deck.loadFromHash(~name=deckName, hash)
     |> Repromise.wait(result =>
          switch (result) {
-         | Belt.Result.Ok(deck) =>
-           self.Oolong.send(ReplaceDeck(deckName, deck))
+         | Belt.Result.Ok(deck) => self.Oolong.send(ReplaceDeck(deck))
          | Belt.Result.Error(msg) => Js.log(msg)
          }
        );
@@ -86,14 +100,20 @@ let create = () => {
   let persistDeckPosition = (position, self) =>
     self.Oolong.send(PersistDeckPosition(position));
 
+  let saveDeck = self =>
+    /* TODO: Indicator for saving deck (if this takes long/can fail) */
+    switch (Deck.nameGet(self.Oolong.state.deck)) {
+    | None => ()
+    | Some(deckName) =>
+      Deck.persist(deckName, self.Oolong.state.deck)
+      |> Repromise.wait(Js.log)
+    };
+
   {
     ...program,
     fromRoute: (action, route) =>
       switch (action) {
       | Init =>
-        let now = Js.Date.make();
-        let _todayDate = Js.Date.toLocaleDateString(now);
-        let _todayTime = Js.Date.toLocaleTimeString(now);
         Oolong.UpdateWithSideEffects(
           {
             page: Page.fromPath(route.path),
@@ -102,8 +122,6 @@ let create = () => {
             cards: CardList.empty,
             deck: Deck.empty,
             deckSize: 0,
-            /* deckName: Some({j|Untitled - $todayDate $todayTime|j}), */
-            deckName: None,
             cardListPosition: 0.0,
             deckPosition: 0.0,
             savedDecks: [||],
@@ -119,18 +137,12 @@ let create = () => {
                      Js.Promise.resolve(cards);
                    })
                 |> ignore;
-              let _ =
-                Netdecker.fetch()
-                |> Repromise.wait(result =>
-                     switch (result) {
-                     | Belt.Result.Ok(decks) => self.send(StoreDecks(decks))
-                     | Belt.Result.Error(msg) => Js.log(msg)
-                     }
-                   );
+
+              let _ = getDecks(self);
               ();
             }
           ),
-        );
+        )
       | Push => Oolong.NoUpdate
       | _ => Oolong.NoUpdate
       },
@@ -149,35 +161,54 @@ let create = () => {
       | NavigateTo(page) => Oolong.Update({...state, page})
       | StoreCards(cards) =>
         Oolong.Update({...state, cards, cardListPosition: 0.0})
-      | StoreDecks(publicDecks) => Oolong.Update({...state, publicDecks})
+      | StoreDecks(savedDecks, publicDecks) =>
+        Oolong.Update({...state, savedDecks, publicDecks})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
         let deckSize = Deck.total(deck);
-        Oolong.Update({...state, deck, deckSize, deckPosition: 0.0});
+        Oolong.UpdateWithSideEffects(
+          {...state, deck, deckSize, deckPosition: 0.0},
+          saveDeck,
+        );
       | Decrement(card) =>
         let deck = Deck.decrement(state.deck, card);
         let deckSize = Deck.total(deck);
-        Oolong.Update({...state, deck, deckSize, deckPosition: 0.0});
-      | ReplaceDeck(deckName, deck) =>
+        Oolong.UpdateWithSideEffects(
+          {...state, deck, deckSize, deckPosition: 0.0},
+          (
+            self =>
+              /* TODO: Indicator for saving deck (if this takes long/can fail) */
+              switch (Deck.nameGet(self.state.deck)) {
+              | None => ()
+              | Some(deckName) =>
+                Deck.persist(deckName, self.state.deck)
+                |> Repromise.wait(Js.log)
+              }
+          ),
+        );
+      | ReplaceDeck(deck) =>
         Oolong.Update({
           ...state,
-          deckName: Some(deckName),
           deck,
           deckSize: Deck.total(deck),
           page: Deck,
           deckPosition: 0.0,
         })
       | RenameDeck(deckName) =>
-        Oolong.Update({...state, deckName: Some(deckName)})
+        Oolong.Update({...state, deck: Deck.nameSet(state.deck, deckName)})
       | ClearDeck =>
-        Oolong.Update({
-          ...state,
-          deckName: None,
-          deck: Deck.empty,
-          deckSize: 0,
-          page: SavedDecks,
-          deckPosition: 0.0,
-        })
+        Oolong.UpdateWithSideEffects(
+          {
+            ...state,
+            deck: Deck.empty,
+            deckSize: 0,
+            page: SavedDecks,
+            deckPosition: 0.0,
+            publicDecks: [||],
+            savedDecks: [||],
+          },
+          getDecks,
+        )
       | PersistCardListPosition(position) =>
         Oolong.Update({...state, cardListPosition: position})
       | PersistDeckPosition(position) =>
@@ -200,16 +231,7 @@ let create = () => {
     view: ({state, handle}) => {
       open BsReactNative;
 
-      let {
-        cards,
-        deck,
-        filter,
-        deckSize,
-        page,
-        deckName,
-        savedDecks,
-        publicDecks,
-      } = state;
+      let {cards, deck, filter, deckSize, page, savedDecks, publicDecks} = state;
 
       let cardsWithCount =
         CardList.map(
@@ -254,7 +276,7 @@ let create = () => {
             <IconButton icon="arrow-back" onPress=disable />
             <ToolbarInput
               placeholder="Deck Name"
-              previous={Belt.Option.getWithDefault(deckName, "")}
+              previous={Belt.Option.getWithDefault(Deck.nameGet(deck), "")}
               onBlur=disable
               onSubmit={handle(renameDeck)}
             />
@@ -267,7 +289,7 @@ let create = () => {
               style=Styles.title
               onPress=enable>
               <Icon name="edit" size=16 />
-              <S> {Belt.Option.getWithDefault(deckName, "")} </S>
+              <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
             </Text>
             /* <IconButton icon="view-module" />, */
             <IconButton icon="clear-all" onPress={handle(clearDeck)} />

@@ -12,32 +12,85 @@ module Comparator =
       ]);
   });
 
-type t = Belt.Map.t(Comparator.t, int, Comparator.identity);
+type decklist = Belt.Map.t(Comparator.t, int, Comparator.identity);
+let emptyDecklist = Belt.Map.make(~id=(module Comparator));
 
-let empty: t = Belt.Map.make(~id=(module Comparator));
+type t =
+  | Empty
+  | Named(string, decklist);
 
-let isEmpty = deck => Belt.Map.isEmpty(deck);
+let nameGet = deck =>
+  switch (deck) {
+  | Empty => None
+  | Named(name, _deck) => Some(name)
+  };
 
-let toArray = deck => Belt.Map.toArray(deck);
+let nameSet = (deck, name) =>
+  switch (deck) {
+  | Named(_name, deck) => Named(name, deck)
+  | Empty => Named(name, emptyDecklist)
+  };
 
-let reduce = Belt.Map.reduce;
+let empty = Empty;
+
+let unbox = deck =>
+  switch (deck) {
+  | Empty => emptyDecklist
+  | Named(_name, deck) => deck
+  };
+
+let mergeMany = (deck, deckArray) =>
+  unbox(deck)->Belt.Map.mergeMany(deckArray);
+
+let make = (~name=?, decklist) => {
+  /* let deck = mergeMany(empty, deckArray); */
+
+  let deckName =
+    switch (name) {
+    | Some(name) => name
+    | None =>
+      let now = Js.Date.make();
+      let todayDate = Js.Date.toLocaleDateString(now);
+      let todayTime = Js.Date.toLocaleTimeString(now);
+      Printf.sprintf("Untitled - %s %s", todayDate, todayTime);
+    };
+
+  Named(deckName, decklist);
+};
+
+let fromArray = (~name=?, deckArray) => {
+  let deck = mergeMany(Empty, deckArray);
+  make(~name?, deck);
+};
+
+let isEmpty = deck =>
+  switch (deck) {
+  /* TODO: not sure if I should check this */
+  /* | Some({deck}) => Belt.Map.isEmpty(deck) */
+  | Empty => true
+  | Named(_) => false
+  };
+
+let toArray = deck => unbox(deck)->Belt.Map.toArray;
+
+let reduce = (deck, init, fn) => unbox(deck)->Belt.Map.reduce(init, fn);
 
 let flatMap2 = (deck, init, mapper) => {
-  let result =
-    Belt.Map.reduce(deck, None, (wrapper, key, value) =>
-      switch (wrapper) {
-      | None =>
-        let first = (key, value);
-        let initResults = init(first);
-        let flattened = Belt.Array.concat([||], initResults);
-        Some((flattened, first));
-      | Some((results, prev)) =>
-        let next = (key, value);
-        let nextResults = mapper(prev, next);
-        let flattened = Belt.Array.concat(results, nextResults);
-        Some((flattened, next));
-      }
-    );
+  let fn = (wrapper, key, value) =>
+    switch (wrapper) {
+    | None =>
+      let first = (key, value);
+      let initResults = init(first);
+      let flattened = Belt.Array.concat([||], initResults);
+      Some((flattened, first));
+    | Some((results, prev)) =>
+      let next = (key, value);
+      let nextResults = mapper(prev, next);
+      let flattened = Belt.Array.concat(results, nextResults);
+      Some((flattened, next));
+    };
+
+  let result = unbox(deck)->Belt.Map.reduce(None, fn);
 
   switch (result) {
   | Some((result, _last)) => result
@@ -58,36 +111,49 @@ let maybeDec = maybeCount =>
   | None => None
   };
 
-/* let get = (deck, card) => Belt.Map.getWithDefault(deck, card, 0); */
-
-let count = (deck, card) => Belt.Map.getWithDefault(deck, card, 0);
+let count = (deck, card) => unbox(deck)->Belt.Map.getWithDefault(card, 0);
 let countCharacters = deck =>
-  Belt.Map.reduce(deck, 0, (total, card, count) =>
+  reduce(deck, 0, (total, card, count) =>
     switch (card) {
     | Card.Character(_) => count + total
     | _ => total
     }
   );
 let countEvents = deck =>
-  Belt.Map.reduce(deck, 0, (total, card, count) =>
+  reduce(deck, 0, (total, card, count) =>
     switch (card) {
     | Card.Event(_) => count + total
     | _ => total
     }
   );
 let countBattles = deck =>
-  Belt.Map.reduce(deck, 0, (total, card, count) =>
+  reduce(deck, 0, (total, card, count) =>
     switch (card) {
     | Card.Battle(_) => count + total
     | _ => total
     }
   );
 
-let total = deck =>
-  Belt.Map.reduce(deck, 0, (total, _card, count) => count + total);
+let total = deck => reduce(deck, 0, (total, _card, count) => count + total);
 
-let increment = (deck, card) => Belt.Map.update(deck, card, maybeInc);
-let decrement = (deck, card) => Belt.Map.update(deck, card, maybeDec);
+let update = (deck, key, fn) =>
+  switch (deck) {
+  | Empty =>
+    let newDeck = Belt.Map.update(emptyDecklist, key, fn);
+    if (Belt.Map.isEmpty(newDeck)) {
+      Empty;
+    } else {
+      make(newDeck);
+    };
+  | Named(name, deck) =>
+    /* TODO: What happens if you "empty" a named deck? */
+    let newDeck = Belt.Map.update(deck, key, fn);
+    Named(name, newDeck);
+  };
+
+let increment = (deck, card) => update(deck, card, maybeInc);
+
+let decrement = (deck, card) => update(deck, card, maybeDec);
 
 module Styles = {
   open BsReactNative.Style;
@@ -190,6 +256,17 @@ let hash = deck => {
   };
 };
 
+let persist = (deckName, deck) => {
+  let key = "@mxdbmobile/decks/" ++ deckName;
+  let maybeHash = hash(deck);
+
+  /* TODO: What should happen if the hash is empty? This is basically when a user removes the last card from a deck */
+  switch (maybeHash) {
+  | Some(hash) => AsyncStorage.setItem(key, hash)
+  | None => Repromise.resolved(Belt.Result.Error("Unable to Hash"))
+  };
+};
+
 let query = {|
 query CardList($uids: [String!]!) {
   characters: allCards(filter: {
@@ -272,7 +349,7 @@ query CardList($uids: [String!]!) {
 
 let decode = json => json |> Json.Decode.dict(Json.Decode.int);
 
-let loadFromHash = hash => {
+let loadFromHash = (~name=?, hash) => {
   let (result, resolve) = Repromise.make();
 
   MyFetch.fetch(
@@ -301,7 +378,8 @@ let loadFromHash = hash => {
                     (card, count);
                   },
                 );
-              Belt.Map.mergeMany(empty, deckArray)->Belt.Result.Ok->resolve;
+
+              fromArray(~name?, deckArray)->Belt.Result.Ok->resolve;
               Js.Promise.resolve(cards);
             })
          |> Js.Promise.catch(err => {
