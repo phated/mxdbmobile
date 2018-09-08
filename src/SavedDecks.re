@@ -1,57 +1,67 @@
-type t = {
-  author: option(string),
+type publicDeck = {
+  author: string,
   name: string,
   /* date: string, */
   hash: string,
   /* source: string, */
 };
 
-let namespace = "@mxdbmobile/decks/";
-
-let decode = json => {
-  author:
-    json
-    |> Json.Decode.field("author", Json.Decode.optional(Json.Decode.string)),
-  name: json |> Json.Decode.field("name", Json.Decode.string),
-  hash: json |> Json.Decode.field("hash", Json.Decode.string),
+type privateDeck = {
+  key: string,
+  name: string,
+  hash: string,
 };
 
-let fetch = () =>
-  AsyncStorage.getAllKeys()
-  |> Repromise.map(maybeKeys =>
-       switch (maybeKeys) {
-       | None => Belt.Result.Error("Unable to get decks")
-       | Some(keys) =>
-         let deckKeys =
-           Belt.Array.keep(keys, key => Js.String.startsWith(namespace, key));
-         Belt.Result.Ok(deckKeys);
-       }
-     )
-  |> Repromise.andThen(result =>
-       switch (result) {
-       | Belt.Result.Error(msg) => Repromise.resolved(Belt.Result.Error(msg))
-       | Belt.Result.Ok(deckKeys) =>
-         let deckHashes =
-           Belt.Array.map(deckKeys, key =>
-             AsyncStorage.getItem(key)
-             |> Repromise.map(maybeHash =>
-                  switch (maybeHash) {
-                  | None => None
-                  | Some(hash) =>
-                    let name = Js.String.replace(namespace, "", key);
-                    Some({hash, name, author: None});
-                  }
-                )
-           )
-           |> Belt.List.fromArray;
-         Repromise.all(deckHashes)
-         |> Repromise.map(decks => {
-              let decks =
-                Belt.List.keepMap(decks, a => a) |> Belt.List.toArray;
-              Belt.Result.Ok(decks);
-            });
-       }
-     );
+type t =
+  | Public(publicDeck)
+  | Private(privateDeck);
+
+let isPrivate = savedDeck =>
+  switch (savedDeck) {
+  | Public(_) => false
+  | Private(_) => true
+  };
+
+let isPublic = savedDeck =>
+  switch (savedDeck) {
+  | Public(_) => true
+  | Private(_) => false
+  };
+
+let decode = json =>
+  Public({
+    author: json |> Json.Decode.field("author", Json.Decode.string),
+    name: json |> Json.Decode.field("name", Json.Decode.string),
+    hash: json |> Json.Decode.field("hash", Json.Decode.string),
+  });
+
+let fetch = () => {
+  let toSavedDeck = record =>
+    Private({
+      key: Database.Decks.keyGet(record),
+      name: Database.Decks.nameGet(record),
+      hash: Database.Decks.hashGet(record),
+    });
+
+  Database.Decks.getAll()
+  |> Repromise.map(records => Belt.Array.map(records, toSavedDeck))
+  |> Repromise.map(decks => Belt.Result.Ok(decks));
+};
+
+let persist = deck => {
+  let maybeKey = Deck.keyGet(deck);
+  let maybeName = Deck.nameGet(deck);
+  let maybeHash = Deck.hash(deck);
+
+  /* TODO: What should happen if the hash is empty? This is basically when a user removes the last card from a deck */
+  switch (maybeKey, maybeName, maybeHash) {
+  | (_, _, None) => Repromise.resolved(Belt.Result.Error("Unable to Hash"))
+  | (None, Some(name), Some(hash)) => Database.Decks.insert(~name, ~hash)
+  | (Some(key), Some(name), Some(hash)) =>
+    Database.Decks.update(~key, ~name, ~hash)
+  | _ => Repromise.resolved(Belt.Result.Error("Invalid configuration"))
+  };
+};
 
 let component = ReasonReact.statelessComponent("SavedDecks");
 
@@ -73,8 +83,21 @@ module Styles = {
     ]);
 };
 
-let make =
-    (~savedDecks, ~publicDecks, ~position, ~onPersistPosition, renderChild) => {
+let toItem = savedDeck =>
+  switch (savedDeck) {
+  | Public({name, author}) =>
+    let key = name ++ " by " ++ author;
+    PositionedList.Item({key, value: savedDeck, size: 41});
+  | Private({key}) => PositionedList.Item({key, value: savedDeck, size: 41})
+  };
+
+let keyExtractor = (item, _idx) =>
+  switch (item) {
+  | PositionedList.Header(title) => title
+  | PositionedList.Item({key}) => key
+  };
+
+let make = (~decks, ~position, ~onPersistPosition, renderChild) => {
   let renderItem = (deck, hash) => renderChild(deck, hash);
   let renderHeader = title =>
     BsReactNative.(
@@ -82,42 +105,34 @@ let make =
         <Text style=Styles.headerText> <S> title </S> </Text>
       </View>
     );
-  let keyExtractor = (item, _idx) =>
-    switch (item) {
-    | PositionedList.Header(title) => title
-    | PositionedList.Item({key}) => key
-    };
 
-  /* TODO: Don't show header when no decks */
-  let savedHeader = [|PositionedList.Header("Saved Decks")|];
-  let publicHeader = [|PositionedList.Header("Public Decks")|];
+  let data = Belt.MutableQueue.make();
 
-  let toItem = ({name, hash, author}) => {
-    let key =
-      switch (author) {
-      | Some(author) => name ++ " by " ++ author
-      | None => name
-      };
-    PositionedList.Item({key, value: hash, size: 41});
+  let (private, public) = Belt.Array.partition(decks, isPrivate);
+  if (Belt.Array.length(private) > 0) {
+    Belt.MutableQueue.add(data, PositionedList.Header("Saved Decks"));
+    Belt.Array.forEach(private, deck =>
+      Belt.MutableQueue.add(data, toItem(deck))
+    );
   };
 
-  let saved = Belt.Array.map(savedDecks, toItem);
-  let public = Belt.Array.map(publicDecks, toItem);
-
-  let data =
-    Belt.Array.concatMany([|savedHeader, saved, publicHeader, public|]);
+  if (Belt.Array.length(public) > 0) {
+    Belt.MutableQueue.add(data, PositionedList.Header("Public Decks"));
+    Belt.Array.forEach(public, deck =>
+      Belt.MutableQueue.add(data, toItem(deck))
+    );
+  };
 
   {
     ...component,
     render: _self => {
-      let loading =
-        Belt.Array.length(saved) === 0 && Belt.Array.length(public) === 0;
+      let loading = Belt.MutableQueue.size(data) === 0;
 
       if (loading) {
         <Loading />;
       } else {
         <PositionedList
-          data
+          data={Belt.MutableQueue.toArray(data)}
           renderHeader
           renderItem
           position

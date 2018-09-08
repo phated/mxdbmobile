@@ -33,47 +33,52 @@ type action =
   | Decrement(Card.t)
   | PersistCardListPosition(float)
   | PersistDeckPosition(float)
-  | StoreDecks(array(SavedDecks.t), array(SavedDecks.t))
-  | StoreCards(CardList.t);
+  | Error
+  | StoreDeckKey(string)
+  | StoreDecks(array(SavedDecks.t));
 type state = {
   page: Page.t,
   filter: Filter.t,
-  cards: CardList.t,
   deck: Deck.t,
   deckSize: int,
   cardListPosition: float,
   deckPosition: float,
   savedDecks: array(SavedDecks.t),
-  publicDecks: array(SavedDecks.t),
 };
 
 let create = () => {
   let program = Oolong.routerProgram("Main App");
 
   let getDecks = self => {
-    let localDecks = SavedDecks.fetch();
-    let netdeckerDecks = Netdecker.fetch();
+    let privateFetch = SavedDecks.fetch();
+    let publicFetch = Netdecker.fetch();
 
-    Repromise.all([localDecks, netdeckerDecks])
-    |> Repromise.wait(decks =>
-         switch (decks) {
-         | [local, netdecker] =>
-           let localDecks = Belt.Result.getWithDefault(local, [||]);
-           let netdeckerDecks = Belt.Result.getWithDefault(netdecker, [||]);
-           self.Oolong.send(StoreDecks(localDecks, netdeckerDecks));
-         | _ => ()
+    let combineDecks = results =>
+      switch (results) {
+      | [privateResults, publicResults] =>
+        let private = Belt.Result.getWithDefault(privateResults, [||]);
+        let public = Belt.Result.getWithDefault(publicResults, [||]);
+        let decks = Belt.Array.concat(private, public);
+        Belt.Result.Ok(decks);
+      | _ => Belt.Result.Error("Incorrect results")
+      };
+
+    Repromise.all([privateFetch, publicFetch])
+    |> Repromise.map(combineDecks)
+    |> Repromise.wait(result =>
+         switch (result) {
+         | Belt.Result.Ok(decks) => self.Oolong.send(StoreDecks(decks))
+         | Belt.Result.Error(_) => self.Oolong.send(Error)
          }
        );
   };
 
   let search = (text, self) => self.Oolong.send(Search(text));
   let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
-  let loadDeck = (deckName, hash, _, self) => {
-    let _ = ();
-
+  let loadDeck = (~key=?, deckName, hash, _, self) => {
     self.Oolong.send(NavigateTo(Loading));
 
-    Deck.loadFromHash(~name=deckName, hash)
+    Deck.loadFromHash(~key?, ~name=deckName, hash)
     |> Repromise.wait(result =>
          switch (result) {
          | Belt.Result.Ok(deck) => self.Oolong.send(ReplaceDeck(deck))
@@ -102,12 +107,13 @@ let create = () => {
 
   let saveDeck = self =>
     /* TODO: Indicator for saving deck (if this takes long/can fail) */
-    switch (Deck.nameGet(self.Oolong.state.deck)) {
-    | None => ()
-    | Some(deckName) =>
-      Deck.persist(deckName, self.Oolong.state.deck)
-      |> Repromise.wait(Js.log)
-    };
+    SavedDecks.persist(self.Oolong.state.deck)
+    |> Repromise.wait(result =>
+         switch (result) {
+         | Belt.Result.Ok(key) => self.Oolong.send(StoreDeckKey(key))
+         | Belt.Result.Error(_) => self.Oolong.send(Error)
+         }
+       );
 
   {
     ...program,
@@ -119,29 +125,13 @@ let create = () => {
             page: Page.fromPath(route.path),
             /* page: Page.SavedDecks, */
             filter: Filter.Empty,
-            cards: CardList.empty,
             deck: Deck.empty,
             deckSize: 0,
             cardListPosition: 0.0,
             deckPosition: 0.0,
             savedDecks: [||],
-            publicDecks: [||],
           },
-          (
-            self => {
-              let _ =
-                Query.send(CardList.query, Filter.encode(self.state.filter))
-                /* |> Js.Promise.then_(Utils.tapLog) */
-                |> Js.Promise.then_(cards => {
-                     self.send(StoreCards(cards));
-                     Js.Promise.resolve(cards);
-                   })
-                |> ignore;
-
-              let _ = getDecks(self);
-              ();
-            }
-          ),
+          getDecks,
         )
       | Push => Oolong.NoUpdate
       | _ => Oolong.NoUpdate
@@ -158,11 +148,13 @@ let create = () => {
       },
     update: (action, state) =>
       switch (action) {
+      | Error =>
+        Js.log("something went terribly wrong");
+        Oolong.NoUpdate;
+      | StoreDeckKey(key) =>
+        Oolong.Update({...state, deck: Deck.keySet(state.deck, key)})
       | NavigateTo(page) => Oolong.Update({...state, page})
-      | StoreCards(cards) =>
-        Oolong.Update({...state, cards, cardListPosition: 0.0})
-      | StoreDecks(savedDecks, publicDecks) =>
-        Oolong.Update({...state, savedDecks, publicDecks})
+      | StoreDecks(savedDecks) => Oolong.Update({...state, savedDecks})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
         let deckSize = Deck.total(deck);
@@ -175,16 +167,7 @@ let create = () => {
         let deckSize = Deck.total(deck);
         Oolong.UpdateWithSideEffects(
           {...state, deck, deckSize, deckPosition: 0.0},
-          (
-            self =>
-              /* TODO: Indicator for saving deck (if this takes long/can fail) */
-              switch (Deck.nameGet(self.state.deck)) {
-              | None => ()
-              | Some(deckName) =>
-                Deck.persist(deckName, self.state.deck)
-                |> Repromise.wait(Js.log)
-              }
-          ),
+          saveDeck,
         );
       | ReplaceDeck(deck) =>
         Oolong.Update({
@@ -195,7 +178,10 @@ let create = () => {
           deckPosition: 0.0,
         })
       | RenameDeck(deckName) =>
-        Oolong.Update({...state, deck: Deck.nameSet(state.deck, deckName)})
+        Oolong.UpdateWithSideEffects(
+          {...state, deck: Deck.nameSet(state.deck, deckName)},
+          saveDeck,
+        )
       | ClearDeck =>
         Oolong.UpdateWithSideEffects(
           {
@@ -204,43 +190,26 @@ let create = () => {
             deckSize: 0,
             page: SavedDecks,
             deckPosition: 0.0,
-            publicDecks: [||],
             savedDecks: [||],
           },
           getDecks,
         )
+
       | PersistCardListPosition(position) =>
         Oolong.Update({...state, cardListPosition: position})
       | PersistDeckPosition(position) =>
         Oolong.Update({...state, deckPosition: position})
       | Search(filter) =>
-        Oolong.UpdateWithSideEffects(
-          {...state, cards: CardList.empty, filter: FreeText(filter)},
-          (
-            self =>
-              Query.send(CardList.query, Filter.encode(self.state.filter))
-              /* |> Js.Promise.then_(Utils.tapLog) */
-              |> Js.Promise.then_(cards => {
-                   self.send(StoreCards(cards));
-                   Js.Promise.resolve(cards);
-                 })
-              |> ignore
-          ),
-        )
+        Oolong.Update({
+          ...state,
+          cardListPosition: 0.0,
+          filter: FreeText(filter),
+        })
       },
     view: ({state, handle}) => {
       open BsReactNative;
 
-      let {cards, deck, filter, deckSize, page, savedDecks, publicDecks} = state;
-
-      let cardsWithCount =
-        CardList.map(
-          cards,
-          card => {
-            let count = Deck.count(deck, card);
-            (card, count);
-          },
-        );
+      let {deck, filter, deckSize, page, savedDecks} = state;
 
       let renderCard = (card, count) =>
         <Card
@@ -325,14 +294,26 @@ let create = () => {
         | _ => emptyToolbarRender
         };
 
-      let renderDeck = (deckName, hash) =>
-        <TouchableOpacity onPress={handle(loadDeck(deckName, hash))}>
-          <View style=Styles.deck>
-            <Text style=Styles.deckName numberOfLines=1>
-              <S> deckName </S>
-            </Text>
-          </View>
-        </TouchableOpacity>;
+      let renderDeck = (_key, savedDeck) =>
+        switch (savedDeck) {
+        | SavedDecks.Public({name, author, hash}) =>
+          let deckName = name ++ " by " ++ author;
+          <TouchableOpacity onPress={handle(loadDeck(deckName, hash))}>
+            <View style=Styles.deck>
+              <Text style=Styles.deckName numberOfLines=1>
+                <S> deckName </S>
+              </Text>
+            </View>
+          </TouchableOpacity>;
+        | SavedDecks.Private({key, name, hash}) =>
+          <TouchableOpacity onPress={handle(loadDeck(~key, name, hash))}>
+            <View style=Styles.deck>
+              <Text style=Styles.deckName numberOfLines=1>
+                <S> name </S>
+              </Text>
+            </View>
+          </TouchableOpacity>
+        };
 
       let page =
         switch (state.page) {
@@ -350,7 +331,7 @@ let create = () => {
         | Page.SavedDecks =>
           let position = 0.0;
           let onPersistPosition = handle((_, _) => ());
-          <SavedDecks savedDecks publicDecks position onPersistPosition>
+          <SavedDecks decks=savedDecks position onPersistPosition>
             ...renderDeck
           </SavedDecks>;
         | Page.Stats => <Page.Stats />

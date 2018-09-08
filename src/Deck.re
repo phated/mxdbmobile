@@ -15,18 +15,38 @@ module Comparator =
 type decklist = Belt.Map.t(Comparator.t, int, Comparator.identity);
 let emptyDecklist = Belt.Map.make(~id=(module Comparator));
 
+type saveKey = string;
+type name = string;
+
 type t =
   | Empty
-  | Named(string, decklist);
+  | Named(name, decklist)
+  | Saved(saveKey, name, decklist);
+
+let keyGet = deck =>
+  switch (deck) {
+  | Empty => None
+  | Named(_) => None
+  | Saved(saveKey, _name, _deck) => Some(saveKey)
+  };
+
+let keySet = (deck, saveKey) =>
+  switch (deck) {
+  | Empty => Empty
+  | Named(name, deck) => Saved(saveKey, name, deck)
+  | Saved(_saveKey, name, deck) => Saved(saveKey, name, deck)
+  };
 
 let nameGet = deck =>
   switch (deck) {
   | Empty => None
   | Named(name, _deck) => Some(name)
+  | Saved(_saveKey, name, _deck) => Some(name)
   };
 
 let nameSet = (deck, name) =>
   switch (deck) {
+  | Saved(saveKey, _name, deck) => Saved(saveKey, name, deck)
   | Named(_name, deck) => Named(name, deck)
   | Empty => Named(name, emptyDecklist)
   };
@@ -37,12 +57,13 @@ let unbox = deck =>
   switch (deck) {
   | Empty => emptyDecklist
   | Named(_name, deck) => deck
+  | Saved(_saveKey, _name, deck) => deck
   };
 
 let mergeMany = (deck, deckArray) =>
   unbox(deck)->Belt.Map.mergeMany(deckArray);
 
-let make = (~name=?, decklist) => {
+let make = (~key=?, ~name=?, decklist) => {
   /* let deck = mergeMany(empty, deckArray); */
 
   let deckName =
@@ -55,12 +76,15 @@ let make = (~name=?, decklist) => {
       Printf.sprintf("Untitled - %s %s", todayDate, todayTime);
     };
 
-  Named(deckName, decklist);
+  switch (key) {
+  | None => Named(deckName, decklist)
+  | Some(saveKey) => Saved(saveKey, deckName, decklist)
+  };
 };
 
-let fromArray = (~name=?, deckArray) => {
+let fromArray = (~key=?, ~name=?, deckArray) => {
   let deck = mergeMany(Empty, deckArray);
-  make(~name?, deck);
+  make(~key?, ~name?, deck);
 };
 
 let isEmpty = deck =>
@@ -69,6 +93,7 @@ let isEmpty = deck =>
   /* | Some({deck}) => Belt.Map.isEmpty(deck) */
   | Empty => true
   | Named(_) => false
+  | Saved(_) => false
   };
 
 let toArray = deck => unbox(deck)->Belt.Map.toArray;
@@ -149,6 +174,10 @@ let update = (deck, key, fn) =>
     /* TODO: What happens if you "empty" a named deck? */
     let newDeck = Belt.Map.update(deck, key, fn);
     Named(name, newDeck);
+  | Saved(saveKey, name, deck) =>
+    /* TODO: What happens if you "empty" a saved deck? */
+    let newDeck = Belt.Map.update(deck, key, fn);
+    Saved(saveKey, name, newDeck);
   };
 
 let increment = (deck, card) => update(deck, card, maybeInc);
@@ -256,17 +285,6 @@ let hash = deck => {
   };
 };
 
-let persist = (deckName, deck) => {
-  let key = "@mxdbmobile/decks/" ++ deckName;
-  let maybeHash = hash(deck);
-
-  /* TODO: What should happen if the hash is empty? This is basically when a user removes the last card from a deck */
-  switch (maybeHash) {
-  | Some(hash) => AsyncStorage.setItem(key, hash)
-  | None => Repromise.resolved(Belt.Result.Error("Unable to Hash"))
-  };
-};
-
 let query = {|
 query CardList($uids: [String!]!) {
   characters: allCards(filter: {
@@ -349,7 +367,7 @@ query CardList($uids: [String!]!) {
 
 let decode = json => json |> Json.Decode.dict(Json.Decode.int);
 
-let loadFromHash = (~name=?, hash) => {
+let loadFromHash = (~key=?, ~name=?, hash) => {
   let (result, resolve) = Repromise.make();
 
   MyFetch.fetch(
@@ -379,7 +397,7 @@ let loadFromHash = (~name=?, hash) => {
                   },
                 );
 
-              fromArray(~name?, deckArray)->Belt.Result.Ok->resolve;
+              fromArray(~key?, ~name?, deckArray)->Belt.Result.Ok->resolve;
               Js.Promise.resolve(cards);
             })
          |> Js.Promise.catch(err => {
