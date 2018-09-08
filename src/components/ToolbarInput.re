@@ -35,6 +35,7 @@ let make =
         autoCorrect=false
         spellCheck=false
         autoCapitalize=`none
+        selectTextOnFocus=true
         underlineColorAndroid="transparent"
         placeholder
         placeholderTextColor=Colors.gray
