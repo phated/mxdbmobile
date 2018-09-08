@@ -14,7 +14,8 @@
     "android": "react-native run-android",
     "link": "react-native link",
     "bundle-level": "browserify --standalone level --exclude react-native level.js | derequire > level.dist.js",
-    "preapk": "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug",
+    "debug-bundle": "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug",
+    "preapk": "mkdir -p ./android/app/build/intermediates/assets/debug/ && npm run debug-bundle",
     "apk": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
