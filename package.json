@@ -11,12 +11,14 @@
     "clean": "bsb -clean-world",
     "ios": "react-native run-ios",
     "android": "react-native run-android",
-    "link": "react-native link"
+    "link": "react-native link",
+    "bundle-level": "browserify --standalone level --exclude react-native level.js | derequire > level.dist.js"
   },
   "dependencies": {
     "@aantron/repromise": "^0.6.0",
     "@glennsl/bs-json": "^3.0.0",
     "@reasonableconsulting/compare": "0.0.0",
+    "@reasonableconsulting/oolong": "file:../oolong",
     "bs-fetch": "^0.3.0",
     "bs-history": "^1.0.0",
     "bs-platform": "^4.0.0",
@@ -25,15 +27,19 @@
     "react": "^16.4.2",
     "react-native": "0.55.4",
     "react-native-vector-icons": "^4.6.0",
-    "reason-react": "^0.5.0",
-    "@reasonableconsulting/oolong": "file:../oolong"
+    "reason-react": "^0.5.0"
   },
   "devDependencies": {
+    "asyncstorage-down": "^4.0.1",
     "babel-jest": "23.0.1",
     "babel-preset-react-native": "4.0.0",
+    "browserify": "^16.2.2",
+    "derequire": "^2.0.6",
     "jest": "23.1.0",
+    "level-packager": "^4.0.1",
     "react-native-cli": "^2.0.1",
-    "react-test-renderer": "16.3.1"
+    "react-test-renderer": "16.3.1",
+    "subleveldown": "^3.0.1"
   },
   "jest": {
     "preset": "react-native"
