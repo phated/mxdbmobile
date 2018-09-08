@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-npm run build && npm run apk
+npm run build && npm run preapk
