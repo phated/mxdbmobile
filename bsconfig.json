@@ -30,7 +30,8 @@
       "subdirs": [
         "icon",
         "card",
-        "components"
+        "components",
+        "page"
       ]
     }
   ]
