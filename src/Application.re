@@ -250,6 +250,17 @@ let create = () => {
           onDecrement={handle(decrement)}
         />;
 
+      let cardListRender = card => {
+        let count = Deck.count(deck, card);
+
+        <Card
+          card
+          count
+          onIncrement={handle(increment)}
+          onDecrement={handle(decrement)}
+        />;
+      };
+
       let cardListToolbarRender = (~enable, ~disable, mode) =>
         switch (mode) {
         | Toolbar.Enabled =>
@@ -329,9 +340,9 @@ let create = () => {
         | Page.Cards =>
           let position = state.cardListPosition;
           let onPersistPosition = handle(persistCardListPosition);
-          <CardList cards=cardsWithCount position onPersistPosition>
-            ...renderCard
-          </CardList>;
+          <Page.CardList filter position onPersistPosition>
+            ...cardListRender
+          </Page.CardList>;
         | Page.Deck =>
           let position = state.deckPosition;
           let onPersistPosition = handle(persistDeckPosition);
@@ -342,15 +353,15 @@ let create = () => {
           <SavedDecks savedDecks publicDecks position onPersistPosition>
             ...renderDeck
           </SavedDecks>;
-        | Page.Stats => <Stats />
+        | Page.Stats => <Page.Stats />
         | Page.Settings =>
           let data = [|
-            Settings.{title: "Patreon", onPress: handle(toPatreon)},
-            Settings.{title: "Legal", onPress: handle(toLegal)},
+            Page.Settings.{title: "Patreon", onPress: handle(toPatreon)},
+            Page.Settings.{title: "Legal", onPress: handle(toLegal)},
           |];
-          <Settings data />;
-        | Page.Patreon => <Patreon />
-        | Page.Legal => <Legal />
+          <Page.Settings data />;
+        | Page.Patreon => <Page.Patreon />
+        | Page.Legal => <Page.Legal />
         };
 
       <SafeAreaView style=Styles.container>

@@ -23,40 +23,6 @@ let decode = json => {
     json |> Json.Decode.field("battles", Json.Decode.array(Battle.decoder)),
 };
 
-let component = ReasonReact.statelessComponent("CardList");
-
-let make = (~cards, ~position, ~onPersistPosition, renderChild) => {
-  let data =
-    Belt.Array.map(cards, item =>
-      PositionedList.Item({key: fst(item), value: snd(item), size: 183})
-    );
-  let renderItem = (card, count) => renderChild(card, count);
-  let keyExtractor = (item, _idx) =>
-    switch (item) {
-    | PositionedList.Header(title) => title
-    | PositionedList.Item({key}) => Card.uidGet(key)
-    };
-
-  {
-    ...component,
-    render: _self => {
-      let loading = Belt.Array.length(data) == 0;
-
-      if (loading) {
-        <Loading />;
-      } else {
-        <PositionedList
-          data
-          renderItem
-          position
-          onPersistPosition
-          keyExtractor
-        />;
-      };
-    },
-  };
-};
-
 let query = {|
 query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $effect: String, $symbol: CardSymbol) {
   characters: allCards(filter: {

@@ -18,7 +18,7 @@ module Styles = {
   let special = style([color(Colors.Css.special)]);
 };
 
-let component = ReasonReact.statelessComponent("StatsPage");
+let component = ReasonReact.statelessComponent("Page.Patreon");
 
 /* TODO: retained props */
 let make = _children => {
@@ -27,7 +27,7 @@ let make = _children => {
     open BsReactNative;
     let _ = ();
 
-    let patreonLogo = Packager.require("./assets/patron.png");
+    let patreonLogo = Packager.require("../assets/patron.png");
 
     <View style=Styles.container>
       <View style=Styles.blockContainer>

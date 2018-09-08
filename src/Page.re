@@ -8,6 +8,12 @@ type t =
   | Patreon
   | Stats;
 
+module Stats = Page_Stats;
+module Settings = Page_Settings;
+module Legal = Page_Legal;
+module Patreon = Page_Patreon;
+module CardList = Page_CardList;
+
 let fromPath = path =>
   switch (path) {
   | [""] => Cards

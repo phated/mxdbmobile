@@ -7,16 +7,15 @@ module Styles = {
     style([flex(1.0), alignItems(Center), justifyContent(Center)]);
 };
 
-let component = ReasonReact.statelessComponent("StatsPage");
+let component = ReasonReact.statelessComponent("Page.Legal");
 
 /* TODO: retained props */
 let make = _children => {
   ...component,
   render: _self => {
     open BsReactNative;
-    let _ = ();
 
-    let graphcoolLogo = Packager.require("./assets/graphcool.png");
+    let graphcoolLogo = Packager.require("../assets/graphcool.png");
 
     <View style=Styles.container>
       <View style=Styles.blockContainer>
@@ -30,7 +29,7 @@ let make = _children => {
       </View>
       <View style=Styles.blockContainer>
         <LinkOut url="https://www.graph.cool/cloud/">
-          <Image source=(Image.Required(graphcoolLogo)) />
+          <Image source={Image.Required(graphcoolLogo)} />
         </LinkOut>
       </View>
     </View>;

@@ -7,8 +7,8 @@ module Styles = {
       flexDirection(Row),
       justifyContent(SpaceBetween),
       alignItems(Center),
-      height(54.0 |. Pt),
-      paddingHorizontal(16.0 |. Pt),
+      height(54.0->Pt),
+      paddingHorizontal(16.0->Pt),
     ]);
 };
 
@@ -17,7 +17,7 @@ type t = {
   onPress: unit => unit,
 };
 
-let component = ReasonReact.statelessComponent("SettingsPage");
+let component = ReasonReact.statelessComponent("Page.Settings");
 
 let renderItem = ({title, onPress}) =>
   BsReactNative.(
