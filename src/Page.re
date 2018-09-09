@@ -13,6 +13,7 @@ module Settings = Page_Settings;
 module Legal = Page_Legal;
 module Patreon = Page_Patreon;
 module CardList = Page_CardList;
+module SavedDecks = Page_SavedDecks;
 
 let fromPath = path =>
   switch (path) {

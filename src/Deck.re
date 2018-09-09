@@ -64,8 +64,6 @@ let mergeMany = (deck, deckArray) =>
   unbox(deck)->Belt.Map.mergeMany(deckArray);
 
 let make = (~key=?, ~name=?, decklist) => {
-  /* let deck = mergeMany(empty, deckArray); */
-
   let deckName =
     switch (name) {
     | Some(name) => name
