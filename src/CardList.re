@@ -1,26 +1,41 @@
-type t = {
-  characters: array(Character.t),
-  events: array(Event.t),
-  battles: array(Battle.t),
-};
+type t = Belt.Set.t(Card.Compare.t, Card.Compare.identity);
 
-let empty = {characters: [||], events: [||], battles: [||]};
+let empty = Belt.Set.make(~id=(module Card.Compare));
 
-let map = ({characters, events, battles}, mapper) =>
-  Belt.Array.concatMany([|
-    Belt.Array.map(characters, card => mapper(Card.character(card))),
-    Belt.Array.map(events, card => mapper(Card.event(card))),
-    Belt.Array.map(battles, card => mapper(Card.battle(card))),
-  |]);
+let fromArray = cards => Belt.Set.fromArray(~id=(module Card.Compare), cards);
+
+let map = (cards, mapper) =>
+  Belt.Set.toArray(cards)->Belt.Array.map(mapper);
 
 let decode = json => {
-  characters:
-    json
-    |> Json.Decode.field("characters", Json.Decode.array(Character.decoder)),
-  events:
-    json |> Json.Decode.field("events", Json.Decode.array(Event.decoder)),
-  battles:
-    json |> Json.Decode.field("battles", Json.Decode.array(Battle.decoder)),
+  let toSet = cards => Belt.Array.concatMany(cards)->fromArray;
+
+  json
+  |> Json.Decode.map(toSet, json =>
+       [|
+         json
+         |> Json.Decode.field(
+              "characters",
+              Json.Decode.array(
+                Character.decoder |> Json.Decode.map(Card.character),
+              ),
+            ),
+         json
+         |> Json.Decode.field(
+              "events",
+              Json.Decode.array(
+                Event.decoder |> Json.Decode.map(Card.event),
+              ),
+            ),
+         json
+         |> Json.Decode.field(
+              "battles",
+              Json.Decode.array(
+                Battle.decoder |> Json.Decode.map(Card.battle),
+              ),
+            ),
+       |]
+     );
 };
 
 let query = {|
