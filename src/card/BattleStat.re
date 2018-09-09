@@ -7,6 +7,28 @@ type t =
   | StrengthSpecial(int)
   | StrengthIntelligenceSpecial(int);
 
+let rankGet = stat =>
+  switch (stat) {
+  | Strength(rank) => rank
+  | Intelligence(rank) => rank
+  | Special(rank) => rank
+  | StrengthIntelligence(rank) => rank
+  | IntelligenceSpecial(rank) => rank
+  | StrengthSpecial(rank) => rank
+  | StrengthIntelligenceSpecial(rank) => rank
+  };
+
+let toInt = stat =>
+  switch (stat) {
+  | Strength(_rank) => 0
+  | Intelligence(_rank) => 1
+  | Special(_rank) => 2
+  | StrengthIntelligence(_rank) => 3
+  | IntelligenceSpecial(_rank) => 4
+  | StrengthSpecial(_rank) => 5
+  | StrengthIntelligenceSpecial(_rank) => 6
+  };
+
 let fromStatList: array(Stat.t) => t =
   statList =>
     switch (statList) {
