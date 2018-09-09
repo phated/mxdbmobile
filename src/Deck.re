@@ -1,19 +1,5 @@
-module Comparator =
-  Belt.Id.MakeComparable({
-    type t = Card.t;
-
-    let cmp =
-      Compare.concat([
-        Compare.by(card => Card.typeGet(card)->CardType.toInt),
-        /* TODO: card stats order */
-        Compare.by(card => Card.titleGet(card)),
-        Compare.by(card => Card.effectGet(card)->Effect.getText),
-        Compare.by(card => Card.uidGet(card)),
-      ]);
-  });
-
-type decklist = Belt.Map.t(Comparator.t, int, Comparator.identity);
-let emptyDecklist = Belt.Map.make(~id=(module Comparator));
+type decklist = Belt.Map.t(Card.Compare.t, int, Card.Compare.identity);
+let emptyDecklist = Belt.Map.make(~id=(module Card.Compare));
 
 type saveKey = string;
 type name = string;

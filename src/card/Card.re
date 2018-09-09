@@ -75,11 +75,7 @@ module Styles = {
   open BsReactNative.Style;
 
   let container =
-    style([
-      height(182.0 |. Pt),
-      flexDirection(Row),
-      padding(16.0 |. Pt),
-    ]);
+    style([height(182.0->Pt), flexDirection(Row), padding(16.0->Pt)]);
 };
 
 type retainedProps = {
@@ -113,8 +109,7 @@ let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
     render: _self =>
       BsReactNative.(
         <View style=Styles.container>
-          <CardCounter
-            onIncrement=increment onDecrement=decrement value=count>
+          <CardCounter onIncrement=increment onDecrement=decrement value=count>
             <CardImage image size=Thumbnail />
           </CardCounter>
           details
@@ -122,3 +117,29 @@ let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
       ),
   };
 };
+
+type card = t;
+module Compare =
+  Belt.Id.MakeComparable({
+    type t = card;
+
+    let cmp =
+      Compare.concat([
+        Compare.by(card => typeGet(card)->CardType.toInt),
+        Compare.by(card =>
+          switch (card) {
+          | Battle(card) => BattleStat.rankGet(card.stat)
+          | _ => 0
+          }
+        ),
+        Compare.by(card =>
+          switch (card) {
+          | Battle(card) => BattleStat.toInt(card.stat)
+          | _ => 0
+          }
+        ),
+        Compare.by(card => titleGet(card)),
+        Compare.by(card => effectGet(card)->Effect.getText),
+        Compare.by(card => uidGet(card)),
+      ]);
+  });
