@@ -47,9 +47,12 @@ let make = (~card, _children) => {
 
     let {title, effect, mp, stat} = card;
 
+    let rank = string_of_int(BattleStat.rankGet(stat));
+
     let cardDetails =
       <View style=Styles.details>
         <Text style=Styles.title> <S> title </S> </Text>
+        <Text> <S> {"Rank " ++ rank} </S> </Text>
         <Effect effect />
       </View>;
     let cardStats =
