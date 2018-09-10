@@ -238,7 +238,7 @@ let create = () => {
               <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
             </Text>
             /* <IconButton icon="view-module" />, */
-            <IconButton icon="clear-all" onPress={handle(clearDeck)} />
+            <IconButton icon="playlist-remove" onPress={handle(clearDeck)} />
           </>
         };
 

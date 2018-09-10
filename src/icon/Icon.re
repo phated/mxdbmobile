@@ -1,17 +1,16 @@
 [@bs.module "react-native-vector-icons"]
-external createIconSetFromFontello : Js.Json.t => ReasonReact.reactClass =
-  "";
+external createIconSetFromFontello: Js.Json.t => ReasonReact.reactClass = "";
 
 [@bs.module "react-native-vector-icons/dist/MaterialIcons"]
-external materialIcon : ReasonReact.reactClass = "default";
+external materialIcon: ReasonReact.reactClass = "default";
 
 [@bs.module "react-native-vector-icons/dist/MaterialCommunityIcons"]
-external communityIcon : ReasonReact.reactClass = "default";
+external communityIcon: ReasonReact.reactClass = "default";
 
 [@bs.module "react-native-vector-icons/dist/FontAwesome"]
-external faIcon : ReasonReact.reactClass = "default";
+external faIcon: ReasonReact.reactClass = "default";
 
-[@bs.module] external config : Js.Json.t = "./config.json";
+[@bs.module] external config: Js.Json.t = "./config.json";
 
 [@bs.deriving abstract]
 type jsProps = {
@@ -41,6 +40,7 @@ let isCustom = name =>
 
 let isCommunity = name =>
   switch (name) {
+  | "playlist-remove"
   | "chart-bar"
   | "plus-circle"
   | "plus-circle-outline"
