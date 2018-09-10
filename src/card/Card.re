@@ -7,6 +7,16 @@ let character = character => Character(character);
 let event = event => Event(event);
 let battle = battle => Battle(battle);
 
+/* TODO: Character/Battle/Event need card type so we don't accidentally decode to the wrong type */
+let decoder = json =>
+  json
+  |> Json.Decode.oneOf([
+       Json.Decode.map(character, Character.decoder),
+       Json.Decode.map(battle, Battle.decoder),
+       Json.Decode.map(event, Event.decoder),
+     ]);
+
+/* TODO: Once we have card type, this can likely be simplified */
 let sameType = (c1, c2) =>
   switch (c1, c2) {
   | (Character(_), Character(_))

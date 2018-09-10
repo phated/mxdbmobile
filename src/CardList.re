@@ -14,26 +14,10 @@ let decode = json => {
   |> Json.Decode.map(toSet, json =>
        [|
          json
-         |> Json.Decode.field(
-              "characters",
-              Json.Decode.array(
-                Character.decoder |> Json.Decode.map(Card.character),
-              ),
-            ),
+         |> Json.Decode.field("characters", Json.Decode.array(Card.decoder)),
+         json |> Json.Decode.field("events", Json.Decode.array(Card.decoder)),
          json
-         |> Json.Decode.field(
-              "events",
-              Json.Decode.array(
-                Event.decoder |> Json.Decode.map(Card.event),
-              ),
-            ),
-         json
-         |> Json.Decode.field(
-              "battles",
-              Json.Decode.array(
-                Battle.decoder |> Json.Decode.map(Card.battle),
-              ),
-            ),
+         |> Json.Decode.field("battles", Json.Decode.array(Card.decoder)),
        |]
      );
 };

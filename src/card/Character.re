@@ -1,4 +1,5 @@
 type t = {
+  /* TODO: This should have card type */
   uid: string,
   rarity: Rarity.t,
   number: int,
