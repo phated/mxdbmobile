@@ -234,6 +234,7 @@ let create = () => {
               style=Styles.title
               onPress=enable>
               <Icon name="edit" size=16 />
+              <S> " " </S>
               <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
             </Text>
             /* <IconButton icon="view-module" />, */
