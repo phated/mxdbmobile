@@ -21,6 +21,19 @@ module Styles = {
       justifyContent(Center),
     ]);
   let deckName = style([fontSize(20.0->Float)]);
+
+  let deckErrorWrapper = style([width(16.0->Pt), position(Absolute)]);
+  let deckError =
+    style([
+      /* TODO: this should be "yellow" */
+      color(Colors.Css.constant),
+      position(Absolute),
+      top(4.0->Pt),
+      right((-20.0)->Pt),
+    ]);
+
+  let icon = style([color(Colors.Css.white)]);
+  let label = style([fontSize(12.0->Float), color(Colors.Css.white)]);
 };
 
 type action =
@@ -39,9 +52,38 @@ type state = {
   page: Page.t,
   filter: Filter.t,
   deck: Deck.t,
-  deckSize: int,
   cardListPosition: float,
   deckPosition: float,
+};
+
+let renderLabeledIcon = (~label, ~icon, ()) =>
+  <>
+    <Icon name=icon style=Styles.icon />
+    <BsReactNative.Text style=Styles.label>
+      <S> label </S>
+    </BsReactNative.Text>
+  </>;
+
+let renderDeckLabel = (deck, ()) => {
+  open BsReactNative;
+  let deckSize = Deck.total(deck);
+
+  let errorIcon =
+    if (Deck.isValid(deck)) {
+      <View style=Styles.deckErrorWrapper>
+        <Icon name="warning" size=16 style=Styles.deckError />
+      </View>;
+    } else {
+      ReasonReact.null;
+    };
+
+  <>
+    <Icon name="deck" style=Styles.icon />
+    errorIcon
+    <Text style=Styles.label>
+      <S> {Printf.sprintf("Deck (%d)", deckSize)} </S>
+    </Text>
+  </>;
 };
 
 let create = () => {
@@ -96,10 +138,8 @@ let create = () => {
       | Init =>
         Oolong.Update({
           page: Page.fromPath(route.path),
-          /* page: Page.SavedDecks, */
           filter: Filter.Empty,
           deck: Deck.empty,
-          deckSize: 0,
           cardListPosition: 0.0,
           deckPosition: 0.0,
         })
@@ -111,7 +151,6 @@ let create = () => {
         Oolong.NoTransition;
       } else {
         let search = Filter.toString(next.filter);
-        /* Js.log(Deck.hash(next.deck)); */
         Oolong.Push(
           Oolong.Route.make(~path=Page.toPath(next.page), ~search, ~hash=""),
         );
@@ -126,26 +165,18 @@ let create = () => {
       | NavigateTo(page) => Oolong.Update({...state, page})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
-        let deckSize = Deck.total(deck);
         Oolong.UpdateWithSideEffects(
-          {...state, deck, deckSize, deckPosition: 0.0},
+          {...state, deck, deckPosition: 0.0},
           saveDeck,
         );
       | Decrement(card) =>
         let deck = Deck.decrement(state.deck, card);
-        let deckSize = Deck.total(deck);
         Oolong.UpdateWithSideEffects(
-          {...state, deck, deckSize, deckPosition: 0.0},
+          {...state, deck, deckPosition: 0.0},
           saveDeck,
         );
       | ReplaceDeck(deck) =>
-        Oolong.Update({
-          ...state,
-          deck,
-          deckSize: Deck.total(deck),
-          page: Deck,
-          deckPosition: 0.0,
-        })
+        Oolong.Update({...state, deck, page: Deck, deckPosition: 0.0})
       | RenameDeck(deckName) =>
         Oolong.UpdateWithSideEffects(
           {...state, deck: Deck.nameSet(state.deck, deckName)},
@@ -155,15 +186,13 @@ let create = () => {
         Oolong.Update({
           ...state,
           deck: Deck.empty,
-          deckSize: 0,
           page: SavedDecks,
           deckPosition: 0.0,
         })
-
-      | PersistCardListPosition(position) =>
-        Oolong.Update({...state, cardListPosition: position})
-      | PersistDeckPosition(position) =>
-        Oolong.Update({...state, deckPosition: position})
+      | PersistCardListPosition(cardListPosition) =>
+        Oolong.Update({...state, cardListPosition})
+      | PersistDeckPosition(deckPosition) =>
+        Oolong.Update({...state, deckPosition})
       | Search(filter) =>
         Oolong.Update({
           ...state,
@@ -174,7 +203,7 @@ let create = () => {
     view: ({state, handle}) => {
       open BsReactNative;
 
-      let {deck, filter, deckSize, page} = state;
+      let {deck, filter, page} = state;
 
       let renderCard = (card, count) =>
         <Card
@@ -210,7 +239,6 @@ let create = () => {
         | Toolbar.Disabled =>
           <>
             <Text style=Styles.title> <S> "MetaX Deck Builder" </S> </Text>
-            /* <IconButton icon="view-module" />, */
             <IconButton icon="search" onPress=enable />
           </>
         };
@@ -237,7 +265,6 @@ let create = () => {
               <S> " " </S>
               <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
             </Text>
-            /* <IconButton icon="view-module" />, */
             <IconButton icon="playlist-remove" onPress={handle(clearDeck)} />
           </>
         };
@@ -263,7 +290,7 @@ let create = () => {
       let renderDeck = (_key, savedDeck) =>
         switch (savedDeck) {
         | Page.SavedDecks.Public({name, author, hash}) =>
-          let deckName = name ++ " by " ++ author;
+          let deckName = Printf.sprintf("%s by %s", name, author);
           <TouchableOpacity onPress={handle(loadDeck(deckName, hash))}>
             <View style=Styles.deck>
               <Text style=Styles.deckName numberOfLines=1>
@@ -317,29 +344,22 @@ let create = () => {
         page
         <NavigationBar>
           <NavigationButton
-            icon="cards"
-            label="Cards"
-            active={state.page === Cards}
-            onPress={handle(toCards)}
-          />
+            active={state.page === Cards} onPress={handle(toCards)}>
+            ...{renderLabeledIcon(~icon="cards", ~label="Cards")}
+          </NavigationButton>
           <NavigationButton
-            icon="deck"
-            label={j|Deck ($deckSize)|j}
             active={state.page === Deck || state.page === SavedDecks}
-            onPress={handle(toDeck)}
-          />
+            onPress={handle(toDeck)}>
+            ...{renderDeckLabel(deck)}
+          </NavigationButton>
           <NavigationButton
-            icon="chart-bar"
-            label="Stats"
-            active={state.page === Stats}
-            onPress={handle(toStats)}
-          />
+            active={state.page === Stats} onPress={handle(toStats)}>
+            ...{renderLabeledIcon(~icon="chart-bar", ~label="Stats")}
+          </NavigationButton>
           <NavigationButton
-            icon="settings"
-            label="Settings"
-            active={state.page === Settings}
-            onPress={handle(toSettings)}
-          />
+            active={state.page === Settings} onPress={handle(toSettings)}>
+            ...{renderLabeledIcon(~icon="settings", ~label="Settings")}
+          </NavigationButton>
         </NavigationBar>
       </SafeAreaView>;
     },

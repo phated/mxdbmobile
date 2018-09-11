@@ -80,6 +80,10 @@ let isEmpty = deck =>
   | Saved(_) => false
   };
 
+let size = deck => unbox(deck)->Belt.Map.size;
+
+let isValid = deck => isEmpty(deck) === false && size(deck) !== 40;
+
 let toArray = deck => unbox(deck)->Belt.Map.toArray;
 
 let reduce = (deck, init, fn) => unbox(deck)->Belt.Map.reduce(init, fn);
