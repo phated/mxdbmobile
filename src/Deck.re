@@ -196,13 +196,16 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
     switch (card) {
     | Card.Character(_) =>
       let characterCount = countCharacters(deck);
-      PositionedList.Header({j|Characters ($characterCount)|j});
+      let title = Printf.sprintf("Characters (%d)", characterCount);
+      PositionedList.Header(title);
     | Card.Event(_) =>
       let eventCount = countEvents(deck);
-      PositionedList.Header({j|Events ($eventCount)|j});
+      let title = Printf.sprintf("Events (%d)", eventCount);
+      PositionedList.Header(title);
     | Card.Battle(_) =>
       let battleCount = countBattles(deck);
-      PositionedList.Header({j|Battle Cards ($battleCount)|j});
+      let title = Printf.sprintf("Battle Cards (%d)", battleCount);
+      PositionedList.Header(title);
     };
 
   let keyExtractor = (item, _idx) =>
