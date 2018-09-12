@@ -33,6 +33,9 @@ let decoder: Js.Json.t => t =
     image: json |> Json.Decode.field("image", CardImage.decoder),
   };
 
+let toGroupIdentifier = ({title, subtitle}) =>
+  Printf.sprintf("%s_%s", title, subtitle);
+
 module Styles = {
   open BsReactNative.Style;
 

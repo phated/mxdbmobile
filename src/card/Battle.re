@@ -24,6 +24,8 @@ let decoder: Js.Json.t => t =
     image: json |> Json.Decode.field("image", CardImage.decoder),
   };
 
+let toGroupIdentifier = ({stat}) => BattleStat.toGroupIdentifier(stat);
+
 module Styles = {
   open BsReactNative.Style;
 

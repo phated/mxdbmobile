@@ -81,6 +81,13 @@ let imageGet = card =>
   | Battle({image}) => image
   };
 
+let toGroupIdentifier = card =>
+  switch (card) {
+  | Character(character) => Character.toGroupIdentifier(character)
+  | Event(event) => Event.toGroupIdentifier(event)
+  | Battle(battle) => Battle.toGroupIdentifier(battle)
+  };
+
 module Styles = {
   open BsReactNative.Style;
 

@@ -46,6 +46,8 @@ let unbox = deck =>
   | Saved(_saveKey, _name, deck) => deck
   };
 
+let forEach = (deck, iter) => unbox(deck)->Belt.Map.forEach(iter);
+
 let mergeMany = (deck, deckArray) =>
   unbox(deck)->Belt.Map.mergeMany(deckArray);
 
@@ -168,7 +170,28 @@ let increment = (deck, card) => update(deck, card, maybeInc);
 
 let decrement = (deck, card) => update(deck, card, maybeDec);
 
-let isValid = deck => isEmpty(deck) === true || total(deck) === 40;
+let hasValidGroupings = deck => {
+  let counts = Belt.MutableMap.String.make();
+
+  let updater = (count, maybeCount) =>
+    switch (maybeCount) {
+    | Some(prevCount) => Some(prevCount + count)
+    | None => Some(count)
+    };
+
+  forEach(
+    deck,
+    (card, count) => {
+      let groupId = Card.toGroupIdentifier(card);
+      Belt.MutableMap.String.update(counts, groupId, updater(count));
+    },
+  );
+
+  Belt.MutableMap.String.every(counts, (_title, count) => count <= 3);
+};
+
+let isValid = deck =>
+  (isEmpty(deck) === true || total(deck) === 40) && hasValidGroupings(deck);
 
 module Styles = {
   open BsReactNative.Style;

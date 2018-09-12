@@ -29,6 +29,17 @@ let toInt = stat =>
   | StrengthIntelligenceSpecial(_rank) => 6
   };
 
+let toGroupIdentifier = stat =>
+  switch (stat) {
+  | Strength(rank) => Printf.sprintf("strength_%d", rank)
+  | Intelligence(rank) => Printf.sprintf("intelligence_%d", rank)
+  | Special(rank) => Printf.sprintf("special_%d", rank)
+  | StrengthIntelligence(rank) => Printf.sprintf("multi_%d", rank)
+  | IntelligenceSpecial(rank) => Printf.sprintf("multi_%d", rank)
+  | StrengthSpecial(rank) => Printf.sprintf("multi_%d", rank)
+  | StrengthIntelligenceSpecial(rank) => Printf.sprintf("multi_%d", rank)
+  };
+
 let fromStatList: array(Stat.t) => t =
   statList =>
     switch (statList) {
