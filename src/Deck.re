@@ -80,10 +80,6 @@ let isEmpty = deck =>
   | Saved(_) => false
   };
 
-let size = deck => unbox(deck)->Belt.Map.size;
-
-let isValid = deck => isEmpty(deck) === false && size(deck) !== 40;
-
 let toArray = deck => unbox(deck)->Belt.Map.toArray;
 
 let reduce = (deck, init, fn) => unbox(deck)->Belt.Map.reduce(init, fn);
@@ -171,6 +167,8 @@ let update = (deck, key, fn) =>
 let increment = (deck, card) => update(deck, card, maybeInc);
 
 let decrement = (deck, card) => update(deck, card, maybeDec);
+
+let isValid = deck => isEmpty(deck) === true || total(deck) === 40;
 
 module Styles = {
   open BsReactNative.Style;

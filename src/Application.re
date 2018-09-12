@@ -70,11 +70,11 @@ let renderDeckLabel = (deck, ()) => {
 
   let errorIcon =
     if (Deck.isValid(deck)) {
+      ReasonReact.null;
+    } else {
       <View style=Styles.deckErrorWrapper>
         <Icon name="warning" size=16 style=Styles.deckError />
       </View>;
-    } else {
-      ReasonReact.null;
     };
 
   <>
