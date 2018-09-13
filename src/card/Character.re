@@ -1,10 +1,11 @@
+[@bs.deriving abstract]
 type t = {
   /* TODO: This should have card type */
   uid: string,
   rarity: Rarity.t,
   number: int,
   expansion: Expansion.t,
-  title: string,
+  title: Card_Title.t,
   subtitle: string,
   trait: string,
   mp: MP.t,
@@ -14,27 +15,32 @@ type t = {
 };
 
 let decoder: Js.Json.t => t =
-  json => {
-    uid: json |> Json.Decode.field("uid", Json.Decode.string),
-    rarity: json |> Json.Decode.field("rarity", Rarity.decoder),
-    number: json |> Json.Decode.field("number", Json.Decode.int),
-    expansion: json |> Json.Decode.field("set", Expansion.decoder),
-    title: json |> Json.Decode.field("title", Json.Decode.string),
-    subtitle: json |> Json.Decode.field("subtitle", Json.Decode.string),
-    trait:
-      json
-      |> Json.Decode.field(
-           "trait",
-           Json.Decode.field("name", Json.Decode.string),
-         ),
-    mp: json |> Json.Decode.field("mp", MP.decoder),
-    stats: json |> Json.Decode.field("stats", StatList.decoder),
-    effect: json |> Json.Decode.field("effect", Effect.decoder),
-    image: json |> Json.Decode.field("image", CardImage.decoder),
-  };
+  json =>
+    t(
+      ~uid=json |> Json.Decode.field("uid", Json.Decode.string),
+      ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
+      ~number=json |> Json.Decode.field("number", Json.Decode.int),
+      ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
+      ~title=json |> Json.Decode.field("title", Card_Title.decoder),
+      ~subtitle=json |> Json.Decode.field("subtitle", Json.Decode.string),
+      ~trait=
+        json
+        |> Json.Decode.field(
+             "trait",
+             Json.Decode.field("name", Json.Decode.string),
+           ),
+      ~mp=json |> Json.Decode.field("mp", MP.decoder),
+      ~stats=json |> Json.Decode.field("stats", StatList.decoder),
+      ~effect=json |> Json.Decode.field("effect", Effect.decoder),
+      ~image=json |> Json.Decode.field("image", CardImage.decoder),
+    );
 
-let toGroupIdentifier = ({title, subtitle}) =>
-  Printf.sprintf("%s_%s", title, subtitle);
+let toGroupIdentifier = card =>
+  Printf.sprintf(
+    "%s_%s",
+    titleGet(card)->Card_Title.toString,
+    subtitleGet(card),
+  );
 
 module Styles = {
   open BsReactNative.Style;
@@ -56,7 +62,12 @@ let make = (~card, _children) => {
   render: _self => {
     open BsReactNative;
 
-    let {title, subtitle, trait, mp, effect, stats} = card;
+    let title = titleGet(card)->Card_Title.toString;
+    let subtitle = subtitleGet(card);
+    let trait = traitGet(card);
+    let mp = mpGet(card);
+    let effect = effectGet(card);
+    let stats = statsGet(card);
 
     let cardDetails =
       <View style=Styles.details>

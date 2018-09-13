@@ -27,39 +27,40 @@ let sameType = (c1, c2) =>
 
 let uidGet = card =>
   switch (card) {
-  | Character({uid}) => uid
-  | Event({uid}) => uid
-  | Battle({uid}) => uid
+  | Character(character) => Character.uidGet(character)
+  | Event(event) => Event.uidGet(event)
+  | Battle(battle) => Battle.uidGet(battle)
   };
 
 let rarityGet = card =>
   switch (card) {
-  | Character({rarity}) => rarity
-  | Event({rarity}) => rarity
-  | Battle({rarity}) => rarity
+  | Character(character) => Character.rarityGet(character)
+  | Event(event) => Event.rarityGet(event)
+  | Battle(battle) => Battle.rarityGet(battle)
   };
 
 let numberGet = card =>
   switch (card) {
-  | Character({number}) => number
-  | Event({number}) => number
-  | Battle({number}) => number
+  | Character(character) => Character.numberGet(character)
+  | Event(event) => Event.numberGet(event)
+  | Battle(battle) => Battle.numberGet(battle)
   };
 
 let expansionGet = card =>
   switch (card) {
-  | Character({expansion}) => expansion
-  | Event({expansion}) => expansion
-  | Battle({expansion}) => expansion
+  | Character(character) => Character.expansionGet(character)
+  | Event(event) => Event.expansionGet(event)
+  | Battle(battle) => Battle.expansionGet(battle)
   };
 
 let titleGet = card =>
   switch (card) {
-  | Character({title}) => title
-  | Event({title}) => title
-  | Battle({title}) => title
+  | Character(character) => Character.titleGet(character)
+  | Event(event) => Event.titleGet(event)
+  | Battle(battle) => Battle.titleGet(battle)
   };
 
+/* TODO: this should be attached to the card records */
 let typeGet = card =>
   switch (card) {
   | Character(_) => CardType.Character
@@ -69,16 +70,16 @@ let typeGet = card =>
 
 let effectGet = card =>
   switch (card) {
-  | Character({effect}) => effect
-  | Event({effect}) => effect
-  | Battle({effect}) => effect
+  | Character(character) => Character.effectGet(character)
+  | Event(event) => Event.effectGet(event)
+  | Battle(battle) => Battle.effectGet(battle)
   };
 
 let imageGet = card =>
   switch (card) {
-  | Character({image}) => image
-  | Event({image}) => image
-  | Battle({image}) => image
+  | Character(character) => Character.imageGet(character)
+  | Event(event) => Event.imageGet(event)
+  | Battle(battle) => Battle.imageGet(battle)
   };
 
 let toGroupIdentifier = card =>
@@ -145,13 +146,13 @@ module Compare =
         Compare.by(card => typeGet(card)->CardType.toInt),
         Compare.by(card =>
           switch (card) {
-          | Battle(card) => BattleStat.rankGet(card.stat)
+          | Battle(card) => Battle.statGet(card)->BattleStat.rankGet
           | _ => 0
           }
         ),
         Compare.by(card =>
           switch (card) {
-          | Battle(card) => BattleStat.toInt(card.stat)
+          | Battle(card) => Battle.statGet(card)->BattleStat.toInt
           | _ => 0
           }
         ),

@@ -1,10 +1,11 @@
+[@bs.deriving abstract]
 type t = {
   /* TODO: This should have card type */
   uid: string,
   rarity: Rarity.t,
   number: int,
   expansion: Expansion.t,
-  title: string,
+  title: Card_Title.t,
   mp: MP.t,
   stat: BattleStat.t,
   effect: Effect.t,
@@ -12,19 +13,20 @@ type t = {
 };
 
 let decoder: Js.Json.t => t =
-  json => {
-    uid: json |> Json.Decode.field("uid", Json.Decode.string),
-    rarity: json |> Json.Decode.field("rarity", Rarity.decoder),
-    number: json |> Json.Decode.field("number", Json.Decode.int),
-    expansion: json |> Json.Decode.field("set", Expansion.decoder),
-    title: json |> Json.Decode.field("title", Json.Decode.string),
-    mp: json |> Json.Decode.field("mp", MP.decoder),
-    stat: json |> Json.Decode.field("stats", BattleStat.decoder),
-    effect: json |> Json.Decode.field("effect", Effect.decoder),
-    image: json |> Json.Decode.field("image", CardImage.decoder),
-  };
+  json =>
+    t(
+      ~uid=json |> Json.Decode.field("uid", Json.Decode.string),
+      ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
+      ~number=json |> Json.Decode.field("number", Json.Decode.int),
+      ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
+      ~title=json |> Json.Decode.field("title", Card_Title.decoder),
+      ~mp=json |> Json.Decode.field("mp", MP.decoder),
+      ~stat=json |> Json.Decode.field("stats", BattleStat.decoder),
+      ~effect=json |> Json.Decode.field("effect", Effect.decoder),
+      ~image=json |> Json.Decode.field("image", CardImage.decoder),
+    );
 
-let toGroupIdentifier = ({stat}) => BattleStat.toGroupIdentifier(stat);
+let toGroupIdentifier = card => statGet(card)->BattleStat.toGroupIdentifier;
 
 module Styles = {
   open BsReactNative.Style;
@@ -48,7 +50,10 @@ let make = (~card, _children) => {
   render: _self => {
     open BsReactNative;
 
-    let {title, effect, mp, stat} = card;
+    let title = titleGet(card)->Card_Title.toString;
+    let effect = effectGet(card);
+    let mp = mpGet(card);
+    let stat = statGet(card);
 
     let rank = string_of_int(BattleStat.rankGet(stat));
 
