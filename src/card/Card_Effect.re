@@ -1,10 +1,10 @@
 type t = {
-  symbol: Symbol.t,
+  symbol: Card_Symbol.t,
   text: option(string),
 };
 
 let decoder = json => {
-  symbol: json |> Json.Decode.field("symbol", Symbol.decoder),
+  symbol: json |> Json.Decode.field("symbol", Card_Symbol.decoder),
   text:
     json
     |> Json.Decode.optional(Json.Decode.field("text", Json.Decode.string)),

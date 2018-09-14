@@ -40,22 +40,22 @@ let toGroupIdentifier = stat =>
   | StrengthIntelligenceSpecial(rank) => Printf.sprintf("multi_%d", rank)
   };
 
-let fromStatList: array(Stat.t) => t =
-  statList =>
-    switch (statList) {
-    | [|Strength(rank)|] => Strength(rank)
-    | [|Intelligence(rank)|] => Intelligence(rank)
-    | [|Special(rank)|] => Special(rank)
-    /* Alphabetized */
-    | [|Intelligence(rank), Special(_)|] => IntelligenceSpecial(rank)
-    | [|Intelligence(rank), Strength(_)|] => StrengthIntelligence(rank)
-    | [|Special(rank), Strength(_)|] => StrengthSpecial(rank)
-    | [|Intelligence(rank), Special(_), Strength(_)|] =>
-      StrengthIntelligenceSpecial(rank)
-    | _ => failwith("Invalid Battle Card stat list.")
-    };
+let fromStatList = statList =>
+  switch (statList) {
+  | [|Card_Stat.Strength(rank)|] => Strength(rank)
+  | [|Intelligence(rank)|] => Intelligence(rank)
+  | [|Special(rank)|] => Special(rank)
+  /* Alphabetized */
+  | [|Intelligence(rank), Special(_)|] => IntelligenceSpecial(rank)
+  | [|Intelligence(rank), Strength(_)|] => StrengthIntelligence(rank)
+  | [|Special(rank), Strength(_)|] => StrengthSpecial(rank)
+  | [|Intelligence(rank), Special(_), Strength(_)|] =>
+    StrengthIntelligenceSpecial(rank)
+  | _ => failwith("Invalid Battle Card stat list.")
+  };
 
-let decoder = json => json |> Json.Decode.map(fromStatList, StatList.decoder);
+let decoder = json =>
+  json |> Json.Decode.map(fromStatList, Json.Decode.array(Card_Stat.decoder));
 
 module Styles = {
   open BsReactNative.Style;

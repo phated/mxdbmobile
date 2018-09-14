@@ -13,7 +13,8 @@ let maybeEncodeMP = maybeInt => {
 };
 
 let isSymbol = text =>
-  switch (Symbol.fromString(text)) {
+  /* TODO: Not sure if I like this */
+  switch (Card.Symbol.fromString(text)) {
   | Play
   | Push
   | Constant

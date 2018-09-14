@@ -42,6 +42,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     rarity
     number
     set
+    type
     title
     subtitle
     trait {
@@ -77,6 +78,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     rarity
     number
     set
+    type
     title
     mp
     effect {
@@ -105,6 +107,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     number
     set
     title
+    type
     mp
     stats(orderBy: type_ASC) {
       type

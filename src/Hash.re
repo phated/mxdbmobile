@@ -74,13 +74,13 @@ let encodeQty = qty => (qty - 1) * 65536;
 
 let encodeRarity = rarity =>
   /* TODO: Should this be a View in Rarity Component? */
-  Rarity.toInt(rarity) * 8192;
+  Card.Rarity.toInt(rarity) * 8192;
 
 let encodeNumber = number => (number - 1) * 32;
 
 let encodeExpansion = expansion =>
   /* TODO: Should this be a View in expansion Component? */
-  Expansion.toInt(expansion) * 2;
+  Card.Expansion.toInt(expansion) * 2;
 
 let toBase64 = hashIdx => {
   let _ = ();
@@ -108,9 +108,9 @@ let floorToInt = value => int_of_float(floor(value));
 
 let encodeCard = (result, card, qty) => {
   let encodedQty = encodeQty(qty);
-  let rarity = Card.rarityGet(card) |. encodeRarity;
-  let number = Card.numberGet(card) |. encodeNumber;
-  let expansion = Card.expansionGet(card) |. encodeExpansion;
+  let rarity = Card.rarityGet(card)->encodeRarity;
+  let number = Card.numberGet(card)->encodeNumber;
+  let expansion = Card.expansionGet(card)->encodeExpansion;
 
   let hash = encodedQty + rarity + number + expansion;
 
@@ -125,9 +125,7 @@ let encodeCard = (result, card, qty) => {
     floorToInt(float_of_int(hashWithCheckbit - sextet3) /. 64.0) mod 64;
 
   let sextet1 =
-    floorToInt(
-      float_of_int(hashWithCheckbit - sextet2 - sextet3) /. 4096.0,
-    )
+    floorToInt(float_of_int(hashWithCheckbit - sextet2 - sextet3) /. 4096.0)
     mod 64;
 
   let encodedSextet1 = toBase64(sextet1);

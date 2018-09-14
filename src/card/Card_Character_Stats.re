@@ -1,6 +1,6 @@
-type t = array(Stat.t);
+type t = array(Card_Stat.t);
 
-let decoder = json => json |> Json.Decode.array(Stat.decoder);
+let decoder = json => json |> Json.Decode.array(Card_Stat.decoder);
 
 module Styles = {
   open BsReactNative.Style;
@@ -15,7 +15,7 @@ let make = (~stats, _children) => {
   render: _self => {
     open BsReactNative;
 
-    let statElements = Belt.Array.map(stats, stat => <Stat value=stat />);
+    let statElements = Belt.Array.map(stats, stat => <Card_Stat value=stat />);
 
     <View style=Styles.container> ...statElements </View>;
   },

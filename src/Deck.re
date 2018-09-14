@@ -243,7 +243,7 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   |];
 
   let mapper = ((prevCard, _), (nextCard, count)) =>
-    Card.sameType(prevCard, nextCard) ?
+    Card.isTypeEqual(prevCard, nextCard) ?
       [|PositionedList.Item({key: nextCard, value: count, size: 183})|] :
       [|
         toHeader(nextCard),
@@ -309,6 +309,7 @@ query CardList($uids: [String!]!) {
     rarity
     number
     set
+    type
     title
     subtitle
     trait {
@@ -338,6 +339,7 @@ query CardList($uids: [String!]!) {
     rarity
     number
     set
+    type
     title
     mp
     effect {
@@ -359,6 +361,7 @@ query CardList($uids: [String!]!) {
     rarity
     number
     set
+    type
     title
     mp
     stats(orderBy: type_ASC) {
