@@ -12,19 +12,6 @@ let maybeEncodeMP = maybeInt => {
   };
 };
 
-let isSymbol = text =>
-  /* TODO: Not sure if I like this */
-  switch (Card.Symbol.fromString(text)) {
-  | Play
-  | Push
-  | Constant
-  | Attack
-  | Defend
-  | None => true
-  | exception (Failure(_)) => false
-  /* | exception => false */
-  };
-
 let toString = filter =>
   switch (filter) {
   | FreeText(searchString) => searchString
@@ -35,7 +22,7 @@ let encode = filter => {
   let query =
     switch (filter) {
     | Empty => Json.Encode.null
-    | FreeText(text) when isSymbol(text) =>
+    | FreeText(text) when Card.Symbol.isSymbol(text) =>
       Json.Encode.object_([("symbol", Json.Encode.string(text))])
     | FreeText(text) =>
       Json.Encode.object_([

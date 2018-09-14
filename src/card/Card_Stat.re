@@ -50,7 +50,7 @@ module Styles = {
   let special = style([color(Colors.Css.special)]);
 };
 
-let component = ReasonReact.statelessComponent("Stat");
+let component = ReasonReact.statelessComponent("Card.Stat");
 
 let make = (~value, _children) => {
   ...component,

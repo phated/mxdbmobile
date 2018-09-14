@@ -13,12 +13,28 @@ let fromString = value =>
   };
 
 let decoder = json => json |> Json.Decode.map(fromString, Json.Decode.string);
-let decoderOnly = (cardType, json) =>
+let decoderCharacterOnly = json =>
   json
   |> Json.Decode.map(
-       match =>
-         cardType === match ?
-           match : raise(Json.Decode.DecodeError("Incorrect card type.")),
+       cardType =>
+         cardType === Character ?
+           cardType : raise(Json.Decode.DecodeError("Incorrect card type.")),
+       decoder,
+     );
+let decoderEventOnly = json =>
+  json
+  |> Json.Decode.map(
+       cardType =>
+         cardType === Event ?
+           cardType : raise(Json.Decode.DecodeError("Incorrect card type.")),
+       decoder,
+     );
+let decoderBattleOnly = json =>
+  json
+  |> Json.Decode.map(
+       cardType =>
+         cardType === Battle ?
+           cardType : raise(Json.Decode.DecodeError("Incorrect card type.")),
        decoder,
      );
 

@@ -10,12 +10,12 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("StatList");
 
-let make = (~stats, _children) => {
+let make = (~value, _children) => {
   ...component,
   render: _self => {
     open BsReactNative;
 
-    let statElements = Belt.Array.map(stats, stat => <Card_Stat value=stat />);
+    let statElements = Belt.Array.map(value, stat => <Card_Stat value=stat />);
 
     <View style=Styles.container> ...statElements </View>;
   },

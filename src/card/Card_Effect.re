@@ -40,34 +40,16 @@ module Styles = {
     ]);
 
   let effectText = style([fontSize(11.0->Float)]);
-
-  let attack = style([color(Colors.Css.attack)]);
-  let defend = style([color(Colors.Css.defend)]);
-  let constant = style([color(Colors.Css.constant)]);
-  let play = style([color(Colors.Css.play)]);
-  let push = style([color(Colors.Css.push)]);
 };
 
-let component = ReasonReact.statelessComponent("Effect");
+let component = ReasonReact.statelessComponent("Card.Effect");
 
-let make = (~effect, _children) => {
-  let symbolImage =
-    switch (effect.symbol) {
-    | Attack => <Icon name="attack" style=Styles.attack size=16 />
-    | Defend => <Icon name="defend" style=Styles.defend size=16 />
-    | Constant => <Icon name="constant" style=Styles.constant size=14 />
-    | Play => <Icon name="play" style=Styles.play size=16 />
-    | Push => <Icon name="push" style=Styles.push size=16 />
-    | None => ReasonReact.null
-    };
-
+let make = (~value, _children) => {
   let effectStyle =
-    switch (effect.symbol) {
-    | None => Styles.effectWithoutSymbol
-    | _ => Styles.effectWithSymbol
-    };
+    Card_Symbol.hasSymbol(value.symbol) ?
+      Styles.effectWithSymbol : Styles.effectWithoutSymbol;
 
-  let effectText = Belt.Option.getWithDefault(effect.text, "");
+  let effectText = Belt.Option.getWithDefault(value.text, "");
 
   {
     ...component,
@@ -75,7 +57,7 @@ let make = (~effect, _children) => {
       BsReactNative.(
         <View style=Styles.container>
           <View style=Styles.effectContainer>
-            symbolImage
+            <Card_Symbol value={value.symbol} />
             <View style=effectStyle>
               <Text style=Styles.effectText> <S> effectText </S> </Text>
             </View>

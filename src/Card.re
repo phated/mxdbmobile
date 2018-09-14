@@ -35,7 +35,7 @@ module Character = {
         ~number=json |> Json.Decode.field("number", Json.Decode.int),
         ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
         ~cardType=
-          json |> Json.Decode.field("type", Type.decoderOnly(Character)),
+          json |> Json.Decode.field("type", Type.decoderCharacterOnly),
         ~title=json |> Json.Decode.field("title", Title.decoder),
         ~subtitle=json |> Json.Decode.field("subtitle", Json.Decode.string),
         ~trait=
@@ -96,10 +96,13 @@ module Character = {
             <S> subtitle </S>
           </Text>
           <Text> <S> trait </S> </Text>
-          <Effect effect />
+          <Effect value=effect />
         </View>;
       let cardStats =
-        <View style=Styles.stats> <MP value=mp /> <Stats stats /> </View>;
+        <View style=Styles.stats>
+          <MP value=mp />
+          <Stats value=stats />
+        </View>;
 
       <View style=Styles.container> cardDetails cardStats </View>;
     },
@@ -129,7 +132,7 @@ module Event = {
         ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
         ~number=json |> Json.Decode.field("number", Json.Decode.int),
         ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-        ~cardType=json |> Json.Decode.field("type", Type.decoderOnly(Event)),
+        ~cardType=json |> Json.Decode.field("type", Type.decoderEventOnly),
         ~title=json |> Json.Decode.field("title", Title.decoder),
         ~mp=json |> Json.Decode.field("mp", MP.decoder),
         ~effect=json |> Json.Decode.field("effect", Effect.decoder),
@@ -172,7 +175,7 @@ module Event = {
       let cardDetails =
         <View style=Styles.details>
           <Text style=Styles.title> <S> title </S> </Text>
-          <Effect effect />
+          <Effect value=effect />
         </View>;
       let cardStats = <View> <MP value=mp /> </View>;
 
@@ -207,8 +210,7 @@ module Battle = {
         ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
         ~number=json |> Json.Decode.field("number", Json.Decode.int),
         ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-        ~cardType=
-          json |> Json.Decode.field("type", Type.decoderOnly(Battle)),
+        ~cardType=json |> Json.Decode.field("type", Type.decoderBattleOnly),
         ~title=json |> Json.Decode.field("title", Title.decoder),
         ~mp=json |> Json.Decode.field("mp", MP.decoder),
         ~stat=json |> Json.Decode.field("stats", Stat.decoder),
@@ -255,7 +257,7 @@ module Battle = {
         <View style=Styles.details>
           <Text style=Styles.title> <S> title </S> </Text>
           <Text> <S> {"Rank " ++ rank} </S> </Text>
-          <Effect effect />
+          <Effect value=effect />
         </View>;
       let cardStats =
         <View style=Styles.stats> <MP value=mp /> <Stat stat /> </View>;

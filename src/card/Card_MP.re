@@ -1,9 +1,8 @@
-type t =
-  | MP(int);
+type t = int;
 
-let fromInt = value => MP(value);
+let fromInt = value => value;
 
-let decoder = json => json |> Json.Decode.map(fromInt, Json.Decode.int);
+let decoder = json => Json.Decode.int(json);
 
 module Styles = {
   open BsReactNative.Style;
@@ -19,10 +18,9 @@ let make = (~value, _children) => {
   ...component,
   render: _self => {
     open BsReactNative;
-    let MP(intValue) = value;
 
     let sign =
-      if (intValue >= 0) {
+      if (value >= 0) {
         <Text style=Styles.sign> <S> "+" </S> </Text>;
       } else {
         <Text style=Styles.sign> <S> "-" </S> </Text>;
@@ -31,7 +29,7 @@ let make = (~value, _children) => {
     <Text style=Styles.container>
       <S> "MP: " </S>
       sign
-      <S> {string_of_int(abs(intValue))} </S>
+      <S> {string_of_int(abs(value))} </S>
     </Text>;
   },
 };

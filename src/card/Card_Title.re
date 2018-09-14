@@ -1,7 +1,6 @@
-type t =
-  | Title(string);
+type t = string;
 
-let fromString = value => Title(value);
-let toString = (Title(value)) => value;
+let fromString = value => value;
+let toString = value => value;
 
-let decoder = json => json |> Json.Decode.map(fromString, Json.Decode.string);
+let decoder = json => Json.Decode.string(json);

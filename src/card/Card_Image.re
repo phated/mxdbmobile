@@ -15,8 +15,8 @@ let decoder = json => {
 module Styles = {
   open BsReactNative.Style;
 
-  let thumbnail = style([height(150.0 |. Pt), width(108.0 |. Pt)]);
-  let small = style([height(200.0 |. Pt), width(142.0 |. Pt)]);
+  let thumbnail = style([height(150.0->Pt), width(108.0->Pt)]);
+  let small = style([height(200.0->Pt), width(142.0->Pt)]);
 };
 
 type retainedProps = {
@@ -24,7 +24,7 @@ type retainedProps = {
   size,
 };
 
-let component = ReasonReact.statelessComponentWithRetainedProps("CardImage");
+let component = ReasonReact.statelessComponentWithRetainedProps("Card.Image");
 
 let make = (~image, ~size, _children) => {
   ...component,
@@ -49,13 +49,13 @@ let make = (~image, ~size, _children) => {
         <Image
           style=Styles.thumbnail
           defaultSource
-          source=(Image.URI(Image.imageURISource(~uri=image.small, ())))
+          source={Image.URI(Image.imageURISource(~uri=image.small, ()))}
         />
       | Small =>
         <Image
           style=Styles.small
           defaultSource
-          source=(Image.URI(Image.imageURISource(~uri=image.small, ())))
+          source={Image.URI(Image.imageURISource(~uri=image.small, ()))}
         />
       };
 
