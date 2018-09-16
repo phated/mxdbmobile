@@ -76,7 +76,7 @@ let encodeRarity = rarity =>
   /* TODO: Should this be a View in Rarity Component? */
   Card.Rarity.toInt(rarity) * 8192;
 
-let encodeNumber = number => (number - 1) * 32;
+let encodeNumber = number => (Card.Number.toInt(number) - 1) * 32;
 
 let encodeExpansion = expansion =>
   /* TODO: Should this be a View in expansion Component? */

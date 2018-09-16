@@ -7,23 +7,23 @@ module Styles = {
       backgroundColor(Colors.Css.transparentWhite),
       alignItems(Center),
       justifyContent(Center),
-      top(60.0 |. Pt),
-      height(30.0 |. Pt),
-      width(35.0 |. Pt),
+      top(60.0->Pt),
+      height(30.0->Pt),
+      width(35.0->Pt),
     ]);
 
-  let disabled = style([opacity(0.5 |. Float)]);
+  let disabled = style([opacity(0.5->Float)]);
   let enabled = style([]);
 
   let left =
     style([
-      left(0.0 |. Pt),
+      left(0.0->Pt),
       borderTopRightRadius(15.0),
       borderBottomRightRadius(15.0),
     ]);
   let right =
     style([
-      right(0.0 |. Pt),
+      right(0.0->Pt),
       borderTopLeftRadius(15.0),
       borderBottomLeftRadius(15.0),
     ]);
@@ -36,23 +36,24 @@ type action =
   | Grow
   | Shrink;
 
+type direction =
+  | Left
+  | Right;
+
 let vibrationPattern = [|10, 10|];
 
 let component = ReasonReact.reducerComponent("StepperButton");
 
-let make = (~side, ~onPress, ~disabled, children) => {
+let make = (~direction, ~onPress, ~disabled, children) => {
   let directional =
-    switch (side) {
-    | "left" => Styles.left
-    | "right" => Styles.right
+    switch (direction) {
+    | Left => Styles.left
+    | Right => Styles.right
     };
   let grow = (_, self) => self.ReasonReact.send(Grow);
   let shrink = (_, self) => self.ReasonReact.send(Shrink);
   let press = _ => {
-    BsReactNative.Vibration.vibrate(
-      ~pattern=vibrationPattern,
-      ~repeat=false,
-    );
+    BsReactNative.Vibration.vibrate(~pattern=vibrationPattern, ~repeat=false);
     onPress();
   };
 
@@ -82,8 +83,8 @@ let make = (~side, ~onPress, ~disabled, children) => {
         disabled
         hitSlop
         onPress=press
-        onPressIn=(self.handle(grow))
-        onPressOut=(self.handle(shrink))>
+        onPressIn={self.handle(grow)}
+        onPressOut={self.handle(shrink)}>
         <View style> ...children </View>
       </TouchableWithoutFeedback>;
     },

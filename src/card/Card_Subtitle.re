@@ -7,15 +7,15 @@ let decoder = json => Json.Decode.string(json);
 
 module Styles = {
   open BsReactNative.Style;
-  let title = style([fontWeight(`Bold)]);
+  let subtitle = style([fontWeight(`Bold)]);
 };
 
-let component = ReasonReact.statelessComponent("Card.Title");
+let component = ReasonReact.statelessComponent("Card.Subtitle");
 
 let make = (~value, _children) => {
   ...component,
   render: _self =>
     BsReactNative.(
-      <Text style=Styles.title> <S> {toString(value)} </S> </Text>
+      <Text style=Styles.subtitle> <S> "-" {toString(value)} </S> </Text>
     ),
 };

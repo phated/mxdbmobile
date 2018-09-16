@@ -35,17 +35,17 @@ let make = (~onIncrement, ~onDecrement, ~value, children) => {
   ...component,
   render: _self => {
     open BsReactNative;
-    let [|image|] = children;
+    let image = Belt.Array.getExn(children, 0);
 
     let opac = value == 0 ? Styles.isZero : Styles.notZero;
     let counterStyle = StyleSheet.flatten([opac, Styles.counter]);
 
     <View style=Styles.container>
       image
-      <StepperButton side="left" onPress=onDecrement disabled={value == 0}>
+      <StepperButton direction=Left onPress=onDecrement disabled={value == 0}>
         <Icon style=Styles.stepperIcon name="remove" />
       </StepperButton>
-      <StepperButton side="right" onPress=onIncrement disabled={value == 3}>
+      <StepperButton direction=Right onPress=onIncrement disabled={value == 3}>
         <Icon style=Styles.stepperIcon name="add" />
       </StepperButton>
       <View style=counterStyle>

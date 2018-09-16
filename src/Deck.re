@@ -234,7 +234,7 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   let keyExtractor = (item, _idx) =>
     switch (item) {
     | PositionedList.Header(title) => title
-    | PositionedList.Item({key}) => Card.uidGet(key)
+    | PositionedList.Item({key}) => Card.uidGet(key)->Card.UID.toString
     };
 
   let init = ((card, count)) => [|
@@ -406,7 +406,7 @@ let loadFromHash = (~key=?, ~name=?, hash) => {
                 CardList.map(
                   cards,
                   card => {
-                    let uid = Card.uidGet(card);
+                    let uid = Card.uidGet(card)->Card.UID.toString;
                     let count = Js.Dict.unsafeGet(dict, uid);
                     (card, count);
                   },

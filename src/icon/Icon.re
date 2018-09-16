@@ -61,7 +61,7 @@ let make = (~name, ~style=?, ~onPress=?, ~size=24, _children) => {
     | name when isCustom(name) => customIcon
     | name when isCommunity(name) => communityIcon
     | name when isFontAwesome(name) => faIcon
-    | name => materialIcon
+    | _name => materialIcon
     };
   ReasonReact.wrapJsForReason(
     ~reactClass,

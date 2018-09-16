@@ -1,60 +1,56 @@
+module UID = Card_UID;
+module Rarity = Card_Rarity;
+module Number = Card_Number;
+module Expansion = Card_Expansion;
 module Title = Card_Title;
+module Subtitle = Card_Subtitle;
 module Type = Card_Type;
 module Effect = Card_Effect;
 module MP = Card_MP;
-module Expansion = Card_Expansion;
 module Image = Card_Image;
-module Rarity = Card_Rarity;
 module Symbol = Card_Symbol;
+module Trait = Card_Trait;
 
 module Character = {
   module Stats = Card_Character_Stats;
 
   [@bs.deriving abstract]
   type t = {
-    /* TODO: This should have card type */
-    uid: string,
+    uid: UID.t,
     rarity: Rarity.t,
-    number: int,
+    number: Number.t,
     expansion: Expansion.t,
     cardType: Type.t,
     title: Title.t,
-    subtitle: string,
-    trait: string,
+    subtitle: Subtitle.t,
+    trait: Trait.t,
     mp: MP.t,
     stats: Stats.t,
     effect: Effect.t,
     image: Image.t,
   };
 
-  let decoder: Js.Json.t => t =
-    json =>
-      t(
-        ~uid=json |> Json.Decode.field("uid", Json.Decode.string),
-        ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
-        ~number=json |> Json.Decode.field("number", Json.Decode.int),
-        ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-        ~cardType=
-          json |> Json.Decode.field("type", Type.decoderCharacterOnly),
-        ~title=json |> Json.Decode.field("title", Title.decoder),
-        ~subtitle=json |> Json.Decode.field("subtitle", Json.Decode.string),
-        ~trait=
-          json
-          |> Json.Decode.field(
-               "trait",
-               Json.Decode.field("name", Json.Decode.string),
-             ),
-        ~mp=json |> Json.Decode.field("mp", MP.decoder),
-        ~stats=json |> Json.Decode.field("stats", Stats.decoder),
-        ~effect=json |> Json.Decode.field("effect", Effect.decoder),
-        ~image=json |> Json.Decode.field("image", Image.decoder),
-      );
+  let decoder = json =>
+    t(
+      ~uid=json |> Json.Decode.field("uid", UID.decoder),
+      ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
+      ~number=json |> Json.Decode.field("number", Number.decoder),
+      ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
+      ~cardType=json |> Json.Decode.field("type", Type.decoderCharacterOnly),
+      ~title=json |> Json.Decode.field("title", Title.decoder),
+      ~subtitle=json |> Json.Decode.field("subtitle", Subtitle.decoder),
+      ~trait=json |> Json.Decode.field("trait", Trait.decoder),
+      ~mp=json |> Json.Decode.field("mp", MP.decoder),
+      ~stats=json |> Json.Decode.field("stats", Stats.decoder),
+      ~effect=json |> Json.Decode.field("effect", Effect.decoder),
+      ~image=json |> Json.Decode.field("image", Image.decoder),
+    );
 
   let toGroupIdentifier = card =>
     Printf.sprintf(
       "%s_%s",
       titleGet(card)->Title.toString,
-      subtitleGet(card),
+      subtitleGet(card)->Subtitle.toString,
     );
 
   module Styles = {
@@ -69,55 +65,38 @@ module Character = {
         paddingHorizontal(8.0->Pt),
       ]);
 
-    let title = style([fontWeight(`Bold)]);
-
     let stats = style([width(45.0->Pt), alignItems(FlexEnd)]);
   };
 
-  let component = ReasonReact.statelessComponent("Character");
+  let component = ReasonReact.statelessComponent("Card.Character");
   let make = (~card, _children) => {
     ...component,
     shouldUpdate: _ => false,
-    render: _self => {
-      open BsReactNative;
-
-      let title = titleGet(card)->Title.toString;
-      let subtitle = subtitleGet(card);
-      let trait = traitGet(card);
-      let mp = mpGet(card);
-      let effect = effectGet(card);
-      let stats = statsGet(card);
-
-      let cardDetails =
-        <View style=Styles.details>
-          <Text style=Styles.title>
-            <S> title </S>
-            <S> " - " </S>
-            <S> subtitle </S>
-          </Text>
-          <Text> <S> trait </S> </Text>
-          <Effect value=effect />
-        </View>;
-      let cardStats =
-        <View style=Styles.stats>
-          <MP value=mp />
-          <Stats value=stats />
-        </View>;
-
-      <View style=Styles.container> cardDetails cardStats </View>;
-    },
+    render: _self =>
+      BsReactNative.(
+        <View style=Styles.container>
+          <View style=Styles.details>
+            <Title value={titleGet(card)} />
+            <Subtitle value={subtitleGet(card)} />
+            <Trait value={traitGet(card)} />
+            <Effect value={effectGet(card)} />
+          </View>
+          <View style=Styles.stats>
+            <MP value={mpGet(card)} />
+            <Stats value={statsGet(card)} />
+          </View>
+        </View>
+      ),
   };
 };
 
 module Event = {
   [@bs.deriving abstract]
   type t = {
-    /* TODO: This should have card type */
-    uid: string,
+    uid: UID.t,
     rarity: Rarity.t,
-    number: int,
+    number: Number.t,
     expansion: Expansion.t,
-    [@bs.as "type"]
     cardType: Type.t,
     title: Title.t,
     mp: MP.t,
@@ -125,19 +104,18 @@ module Event = {
     image: Image.t,
   };
 
-  let decoder: Js.Json.t => t =
-    json =>
-      t(
-        ~uid=json |> Json.Decode.field("uid", Json.Decode.string),
-        ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
-        ~number=json |> Json.Decode.field("number", Json.Decode.int),
-        ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-        ~cardType=json |> Json.Decode.field("type", Type.decoderEventOnly),
-        ~title=json |> Json.Decode.field("title", Title.decoder),
-        ~mp=json |> Json.Decode.field("mp", MP.decoder),
-        ~effect=json |> Json.Decode.field("effect", Effect.decoder),
-        ~image=json |> Json.Decode.field("image", Image.decoder),
-      );
+  let decoder = json =>
+    t(
+      ~uid=json |> Json.Decode.field("uid", UID.decoder),
+      ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
+      ~number=json |> Json.Decode.field("number", Number.decoder),
+      ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
+      ~cardType=json |> Json.Decode.field("type", Type.decoderEventOnly),
+      ~title=json |> Json.Decode.field("title", Title.decoder),
+      ~mp=json |> Json.Decode.field("mp", MP.decoder),
+      ~effect=json |> Json.Decode.field("effect", Effect.decoder),
+      ~image=json |> Json.Decode.field("image", Image.decoder),
+    );
 
   let toGroupIdentifier = card => titleGet(card)->Title.toString;
 
@@ -152,35 +130,22 @@ module Event = {
         flexDirection(Column),
         paddingHorizontal(8.0->Pt),
       ]);
-
-    let title = style([fontWeight(`Bold)]);
-
-    let cardListItem =
-      style([height(182.0->Pt), flexDirection(Row), padding(16.0->Pt)]);
-
-    let image = style([height(150.0->Pt), width(108.0->Pt)]);
   };
 
-  let component = ReasonReact.statelessComponent("Event");
+  let component = ReasonReact.statelessComponent("Card.Event");
   let make = (~card, _children) => {
     ...component,
     shouldUpdate: _ => false,
-    render: _self => {
-      open BsReactNative;
-
-      let title = titleGet(card)->Title.toString;
-      let effect = effectGet(card);
-      let mp = mpGet(card);
-
-      let cardDetails =
-        <View style=Styles.details>
-          <Text style=Styles.title> <S> title </S> </Text>
-          <Effect value=effect />
-        </View>;
-      let cardStats = <View> <MP value=mp /> </View>;
-
-      <View style=Styles.container> cardDetails cardStats </View>;
-    },
+    render: _self =>
+      BsReactNative.(
+        <View style=Styles.container>
+          <View style=Styles.details>
+            <Title value={titleGet(card)} />
+            <Effect value={effectGet(card)} />
+          </View>
+          <View> <MP value={mpGet(card)} /> </View>
+        </View>
+      ),
   };
 };
 
@@ -189,12 +154,10 @@ module Battle = {
 
   [@bs.deriving abstract]
   type t = {
-    /* TODO: This should have card type */
-    uid: string,
+    uid: UID.t,
     rarity: Rarity.t,
-    number: int,
+    number: Number.t,
     expansion: Expansion.t,
-    [@bs.as "type"]
     cardType: Type.t,
     title: Title.t,
     mp: MP.t,
@@ -203,20 +166,21 @@ module Battle = {
     image: Image.t,
   };
 
-  let decoder: Js.Json.t => t =
-    json =>
-      t(
-        ~uid=json |> Json.Decode.field("uid", Json.Decode.string),
-        ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
-        ~number=json |> Json.Decode.field("number", Json.Decode.int),
-        ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-        ~cardType=json |> Json.Decode.field("type", Type.decoderBattleOnly),
-        ~title=json |> Json.Decode.field("title", Title.decoder),
-        ~mp=json |> Json.Decode.field("mp", MP.decoder),
-        ~stat=json |> Json.Decode.field("stats", Stat.decoder),
-        ~effect=json |> Json.Decode.field("effect", Effect.decoder),
-        ~image=json |> Json.Decode.field("image", Image.decoder),
-      );
+  let decoder = json =>
+    t(
+      ~uid=json |> Json.Decode.field("uid", UID.decoder),
+      ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
+      ~number=json |> Json.Decode.field("number", Number.decoder),
+      ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
+      ~cardType=json |> Json.Decode.field("type", Type.decoderBattleOnly),
+      ~title=json |> Json.Decode.field("title", Title.decoder),
+      ~mp=json |> Json.Decode.field("mp", MP.decoder),
+      ~stat=json |> Json.Decode.field("stats", Stat.decoder),
+      ~effect=json |> Json.Decode.field("effect", Effect.decoder),
+      ~image=json |> Json.Decode.field("image", Image.decoder),
+    );
+
+  let rankGet = card => statGet(card)->Stat.rankGet;
 
   let toGroupIdentifier = card => statGet(card)->Stat.toGroupIdentifier;
 
@@ -232,10 +196,6 @@ module Battle = {
         paddingHorizontal(8.0->Pt),
       ]);
 
-    let title = style([fontWeight(`Bold)]);
-
-    let image = style([height(150.0->Pt), width(108.0->Pt)]);
-
     let stats = style([alignItems(FlexEnd)]);
   };
 
@@ -246,23 +206,21 @@ module Battle = {
     render: _self => {
       open BsReactNative;
 
-      let title = titleGet(card)->Title.toString;
-      let effect = effectGet(card);
-      let mp = mpGet(card);
       let stat = statGet(card);
 
       let rank = string_of_int(Stat.rankGet(stat));
 
-      let cardDetails =
+      <View style=Styles.container>
         <View style=Styles.details>
-          <Text style=Styles.title> <S> title </S> </Text>
+          <Title value={titleGet(card)} />
           <Text> <S> {"Rank " ++ rank} </S> </Text>
-          <Effect value=effect />
-        </View>;
-      let cardStats =
-        <View style=Styles.stats> <MP value=mp /> <Stat stat /> </View>;
-
-      <View style=Styles.container> cardDetails cardStats </View>;
+          <Effect value={effectGet(card)} />
+        </View>
+        <View style=Styles.stats>
+          <MP value={mpGet(card)} />
+          <Stat stat />
+        </View>
+      </View>;
     },
   };
 };

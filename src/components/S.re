@@ -3,7 +3,7 @@ let component = ReasonReact.statelessComponent("String");
 let make = children => {
   ...component,
   render: _self => {
-    let [|text|] = children;
+    let text = Js.Array.joinWith(" ", children);
     ReasonReact.string(text);
   },
 };
