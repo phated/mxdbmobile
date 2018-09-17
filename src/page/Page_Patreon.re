@@ -38,7 +38,7 @@ let make = _children => {
         <Text> <S> "subscribe to us on Patreon!" </S> </Text>
         <LinkOut
           style=Styles.patreonButton url="https://www.patreon.com/metaxdb">
-          <Image source={Image.Required(patreonLogo)} />
+          <Image source={`Required(patreonLogo)} />
         </LinkOut>
       </View>
       <View style=Styles.blockContainer>

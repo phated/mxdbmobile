@@ -41,7 +41,7 @@ let make = (~image, ~size, _children) => {
     let _ = ();
 
     let defaultSource =
-      Image.Required(Packager.require("../assets/card-back.jpg"));
+      `Required(Packager.require("../assets/card-back.jpg"));
 
     let image =
       switch (size) {
@@ -49,13 +49,13 @@ let make = (~image, ~size, _children) => {
         <Image
           style=Styles.thumbnail
           defaultSource
-          source={Image.URI(Image.imageURISource(~uri=image.small, ()))}
+          source={`URI(Image.imageURISource(~uri=image.small, ()))}
         />
       | Small =>
         <Image
           style=Styles.small
           defaultSource
-          source={Image.URI(Image.imageURISource(~uri=image.small, ()))}
+          source={`URI(Image.imageURISource(~uri=image.small, ()))}
         />
       };
 

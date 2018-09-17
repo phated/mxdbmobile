@@ -14,23 +14,29 @@ let push = "#A53796";
 let constant = "#F8A81E";
 let play = "#20B14A";
 
+module Wat = {
+  open BsReactNative.Style;
+  let ourBlue = String(ourBlue);
+};
+
 module Css = {
   open BsReactNative.Style;
-  let primary = String(primary);
-  let white = String(white);
-  let gray = String(gray);
+  let primary: string_interpolated = String(primary);
+  let white: string_interpolated = String(white);
+  let gray: string_interpolated = String(gray);
 
-  let ourBlue = String(ourBlue);
-  let ourBlueDark = String(ourBlueDark);
+  let ourBlue: string_interpolated = String(ourBlue);
+  let ourBlueDark: string_interpolated = String(ourBlueDark);
 
-  let transparentWhite = String("rgba(255, 255, 255, 0.9)");
+  let transparentWhite: string_interpolated =
+    String("rgba(255, 255, 255, 0.9)");
 
-  let strength = String(strength);
-  let intelligence = String(intelligence);
-  let special = String(special);
-  let attack = String(attack);
-  let defend = String(defend);
-  let push = String(push);
-  let constant = String(constant);
-  let play = String(play);
+  let strength: string_interpolated = String(strength);
+  let intelligence: string_interpolated = String(intelligence);
+  let special: string_interpolated = String(special);
+  let attack: string_interpolated = String(attack);
+  let defend: string_interpolated = String(defend);
+  let push: string_interpolated = String(push);
+  let constant: string_interpolated = String(constant);
+  let play: string_interpolated = String(play);
 };

@@ -14,7 +14,7 @@ let make = _children => {
     let _ = ();
 
     <View style=Styles.loadingContainer>
-      <ActivityIndicator size=`large color=Colors.ourBlue />
+      <ActivityIndicator size=`large color=Colors.Wat.ourBlue />
     </View>;
   },
 };

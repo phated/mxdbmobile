@@ -29,7 +29,7 @@ let make = _children => {
       </View>
       <View style=Styles.blockContainer>
         <LinkOut url="https://www.graph.cool/cloud/">
-          <Image source={Image.Required(graphcoolLogo)} />
+          <Image source={`Required(graphcoolLogo)} />
         </LinkOut>
       </View>
     </View>;
