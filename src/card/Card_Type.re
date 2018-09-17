@@ -12,31 +12,25 @@ let fromString = value =>
   | _ => failwith("Invalid card type.")
   };
 
+let isCharacter =
+  fun
+  | Character => true
+  | Event => false
+  | Battle => false;
+
+let isEvent =
+  fun
+  | Character => false
+  | Event => true
+  | Battle => false;
+
+let isBattle =
+  fun
+  | Character => false
+  | Event => false
+  | Battle => true;
+
 let decoder = json => json |> Json.Decode.map(fromString, Json.Decode.string);
-let decoderCharacterOnly = json =>
-  json
-  |> Json.Decode.map(
-       cardType =>
-         cardType === Character ?
-           cardType : raise(Json.Decode.DecodeError("Incorrect card type.")),
-       decoder,
-     );
-let decoderEventOnly = json =>
-  json
-  |> Json.Decode.map(
-       cardType =>
-         cardType === Event ?
-           cardType : raise(Json.Decode.DecodeError("Incorrect card type.")),
-       decoder,
-     );
-let decoderBattleOnly = json =>
-  json
-  |> Json.Decode.map(
-       cardType =>
-         cardType === Battle ?
-           cardType : raise(Json.Decode.DecodeError("Incorrect card type.")),
-       decoder,
-     );
 
 let toInt = cardType =>
   switch (cardType) {

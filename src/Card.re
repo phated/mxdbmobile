@@ -30,13 +30,15 @@ module Character = {
     image: Image.t,
   };
 
-  let decoder = json =>
+  let decoder = json => {
+    let typeDecoder = Type.decoder |> Decode.onlyIf(Type.isCharacter);
+
     t(
       ~uid=json |> Json.Decode.field("uid", UID.decoder),
       ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
       ~number=json |> Json.Decode.field("number", Number.decoder),
       ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-      ~cardType=json |> Json.Decode.field("type", Type.decoderCharacterOnly),
+      ~cardType=json |> Json.Decode.field("type", typeDecoder),
       ~title=json |> Json.Decode.field("title", Title.decoder),
       ~subtitle=json |> Json.Decode.field("subtitle", Subtitle.decoder),
       ~trait=json |> Json.Decode.field("trait", Trait.decoder),
@@ -45,6 +47,7 @@ module Character = {
       ~effect=json |> Json.Decode.field("effect", Effect.decoder),
       ~image=json |> Json.Decode.field("image", Image.decoder),
     );
+  };
 
   let toGroupIdentifier = card =>
     Printf.sprintf(
@@ -104,18 +107,21 @@ module Event = {
     image: Image.t,
   };
 
-  let decoder = json =>
+  let decoder = json => {
+    let typeDecoder = Type.decoder |> Decode.onlyIf(Type.isEvent);
+
     t(
       ~uid=json |> Json.Decode.field("uid", UID.decoder),
       ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
       ~number=json |> Json.Decode.field("number", Number.decoder),
       ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-      ~cardType=json |> Json.Decode.field("type", Type.decoderEventOnly),
+      ~cardType=json |> Json.Decode.field("type", typeDecoder),
       ~title=json |> Json.Decode.field("title", Title.decoder),
       ~mp=json |> Json.Decode.field("mp", MP.decoder),
       ~effect=json |> Json.Decode.field("effect", Effect.decoder),
       ~image=json |> Json.Decode.field("image", Image.decoder),
     );
+  };
 
   let toGroupIdentifier = card => titleGet(card)->Title.toString;
 
@@ -166,19 +172,22 @@ module Battle = {
     image: Image.t,
   };
 
-  let decoder = json =>
+  let decoder = json => {
+    let typeDecoder = Type.decoder |> Decode.onlyIf(Type.isBattle);
+
     t(
       ~uid=json |> Json.Decode.field("uid", UID.decoder),
       ~rarity=json |> Json.Decode.field("rarity", Rarity.decoder),
       ~number=json |> Json.Decode.field("number", Number.decoder),
       ~expansion=json |> Json.Decode.field("set", Expansion.decoder),
-      ~cardType=json |> Json.Decode.field("type", Type.decoderBattleOnly),
+      ~cardType=json |> Json.Decode.field("type", typeDecoder),
       ~title=json |> Json.Decode.field("title", Title.decoder),
       ~mp=json |> Json.Decode.field("mp", MP.decoder),
       ~stat=json |> Json.Decode.field("stats", Stat.decoder),
       ~effect=json |> Json.Decode.field("effect", Effect.decoder),
       ~image=json |> Json.Decode.field("image", Image.decoder),
     );
+  };
 
   let rankGet = card => statGet(card)->Stat.rankGet;
 
@@ -230,17 +239,16 @@ type t =
   | Event(Event.t)
   | Battle(Battle.t);
 
-let character = character => Character(character);
-let event = event => Event(event);
-let battle = battle => Battle(battle);
+let ofCharacter = character => Character(character);
+let ofEvent = event => Event(event);
+let ofBattle = battle => Battle(battle);
 
-/* TODO: Character/Battle/Event need card type so we don't accidentally decode to the wrong type */
 let decoder = json =>
   json
   |> Json.Decode.oneOf([
-       Json.Decode.map(character, Character.decoder),
-       Json.Decode.map(battle, Battle.decoder),
-       Json.Decode.map(event, Event.decoder),
+       Json.Decode.map(ofCharacter, Character.decoder),
+       Json.Decode.map(ofEvent, Event.decoder),
+       Json.Decode.map(ofBattle, Battle.decoder),
      ]);
 
 let uidGet =
