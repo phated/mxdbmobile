@@ -79,8 +79,10 @@ module Character = {
       BsReactNative.(
         <View style=Styles.container>
           <View style=Styles.details>
-            <Title value={titleGet(card)} />
-            <Subtitle value={subtitleGet(card)} />
+            <Text>
+              <Title value={titleGet(card)} />
+              <Subtitle value={subtitleGet(card)} />
+            </Text>
             <Trait value={traitGet(card)} />
             <Effect value={effectGet(card)} />
           </View>

@@ -16,6 +16,6 @@ let make = (~value, _children) => {
   ...component,
   render: _self =>
     BsReactNative.(
-      <Text style=Styles.subtitle> <S> "-" {toString(value)} </S> </Text>
+      <Text style=Styles.subtitle> <S> " -" {toString(value)} </S> </Text>
     ),
 };
