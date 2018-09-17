@@ -47,7 +47,7 @@ type action =
   | PersistCardListPosition(float)
   | PersistDeckPosition(float)
   | Error
-  | StoreDeckKey(string);
+  | StorePersistedDeck(Deck.t);
 type state = {
   page: Page.t,
   filter: Filter.t,
@@ -126,7 +126,8 @@ let create = () => {
     PrivateDeck.persist(self.Oolong.state.deck)
     |> Repromise.wait(result =>
          switch (result) {
-         | Belt.Result.Ok(key) => self.Oolong.send(StoreDeckKey(key))
+         | Belt.Result.Ok(deck) =>
+           self.Oolong.send(StorePersistedDeck(deck))
          | Belt.Result.Error(_) => self.Oolong.send(Error)
          }
        );
@@ -160,8 +161,15 @@ let create = () => {
       | Error =>
         Js.log("something went terribly wrong");
         Oolong.NoUpdate;
-      | StoreDeckKey(key) =>
-        Oolong.Update({...state, deck: Deck.keySet(state.deck, key)})
+      | StorePersistedDeck(deck) =>
+        Oolong.UpdateWithSideEffects(
+          {...state, deck},
+          (
+            self =>
+              Deck.isEmpty(self.state.deck) ?
+                self.send(NavigateTo(SavedDecks)) : ()
+          ),
+        )
       | NavigateTo(page) => Oolong.Update({...state, page})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);

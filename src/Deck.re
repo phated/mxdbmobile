@@ -190,8 +190,10 @@ let hasValidGroupings = deck => {
   Belt.MutableMap.String.every(counts, (_title, count) => count <= 3);
 };
 
-let isValid = deck =>
-  (isEmpty(deck) === true || total(deck) === 40) && hasValidGroupings(deck);
+/* Technically only exactly 40 is valid but the indicator is annoying for <40 */
+let hasValidDeckSize = deck => total(deck) <= 40;
+
+let isValid = deck => hasValidDeckSize(deck) && hasValidGroupings(deck);
 
 module Styles = {
   open BsReactNative.Style;

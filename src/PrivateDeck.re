@@ -21,12 +21,28 @@ let persist = deck => {
   let maybeName = Deck.nameGet(deck);
   let maybeHash = Deck.hash(deck);
 
-  /* TODO: What should happen if the hash is empty? This is basically when a user removes the last card from a deck */
   switch (maybeKey, maybeName, maybeHash) {
-  | (_, _, None) => Repromise.resolved(Belt.Result.Error("Unable to Hash"))
-  | (None, Some(name), Some(hash)) => Database.Decks.insert(~name, ~hash)
+  | (Some(key), _, None) =>
+    Database.Decks.delete(~key)
+    |> Repromise.map(
+         fun
+         | Belt.Result.Ok(_key) => Belt.Result.Ok(Deck.empty)
+         | Belt.Result.Error(msg) => Belt.Result.Error(msg),
+       )
+  | (None, Some(name), Some(hash)) =>
+    Database.Decks.insert(~name, ~hash)
+    |> Repromise.map(
+         fun
+         | Belt.Result.Ok(key) => Belt.Result.Ok(Deck.keySet(deck, key))
+         | Belt.Result.Error(msg) => Belt.Result.Error(msg),
+       )
   | (Some(key), Some(name), Some(hash)) =>
     Database.Decks.update(~key, ~name, ~hash)
+    |> Repromise.map(
+         fun
+         | Belt.Result.Ok(_key) => Belt.Result.Ok(deck)
+         | Belt.Result.Error(msg) => Belt.Result.Error(msg),
+       )
   | _ => Repromise.resolved(Belt.Result.Error("Invalid configuration"))
   };
 };

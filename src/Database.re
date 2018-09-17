@@ -12,6 +12,7 @@ module Levelup = {
     "";
   [@bs.send] external put: (t('a), string, 'a) => Repromise.t(unit) = "";
   [@bs.send] external get: (t('a), string) => Repromise.t('a) = "";
+  [@bs.send] external del: (t('a), string) => Repromise.t('a) = "";
   [@bs.send] external createReadStream: (t('a), unit) => stream = "";
   [@bs.send] external createValueStream: (t('a), unit) => stream = "";
 
@@ -51,6 +52,9 @@ module Decks = {
     let record = toJS(~key, ~name, ~hash, ~createdAt=now, ~updatedAt=now);
     Levelup.put(db, key, record) |> Repromise.map(_ => Belt.Result.Ok(key));
   };
+
+  let delete = (~key) =>
+    Levelup.del(db, key) |> Repromise.map(_ => Belt.Result.Ok(key));
 
   let getAll = () => {
     let records = Belt.MutableQueue.make();
