@@ -165,8 +165,9 @@ let create = () => {
           {...state, deck},
           (
             self =>
-              Deck.isEmpty(self.state.deck) ?
-                self.send(NavigateTo(SavedDecks)) : ()
+              ()
+              /* Deck.isEmpty(self.state.deck) ? */
+              /* self.send(NavigateTo(SavedDecks)) : () */
           ),
         )
       | NavigateTo(page) => Oolong.Update({...state, page})
