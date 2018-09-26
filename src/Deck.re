@@ -144,6 +144,77 @@ let countBattles = deck =>
     | _ => total
     }
   );
+let countStrength = deck =>
+  reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Battle(battle) when Card.Battle.isStrength(battle) =>
+      count + total
+    | _ => total
+    }
+  );
+let countIntelligence = deck =>
+  reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Battle(battle) when Card.Battle.isIntelligence(battle) =>
+      count + total
+    | _ => total
+    }
+  );
+let countSpecial = deck =>
+  reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Battle(battle) when Card.Battle.isSpecial(battle) => count + total
+    | _ => total
+    }
+  );
+let countMulti = deck =>
+  reduce(deck, 0, (total, card, count) =>
+    switch (card) {
+    | Card.Battle(battle) when Card.Battle.isMulti(battle) => count + total
+    | _ => total
+    }
+  );
+
+let countBattleCardRanks = deck => {
+  let strength = Belt.MutableMap.Int.make();
+  let intelligence = Belt.MutableMap.Int.make();
+  let special = Belt.MutableMap.Int.make();
+  let multi = Belt.MutableMap.Int.make();
+
+  let updater = (count, maybeCount) =>
+    switch (maybeCount) {
+    | Some(prevCount) => Some(prevCount + count)
+    | None => Some(count)
+    };
+
+  forEach(deck, (card, count) =>
+    switch (card) {
+    | Card.Battle(battle) when Card.Battle.isStrength(battle) =>
+      let rank = Card.Battle.rankGet(battle);
+      Belt.MutableMap.Int.update(strength, rank, updater(count));
+    | Card.Battle(battle) when Card.Battle.isIntelligence(battle) =>
+      let rank = Card.Battle.rankGet(battle);
+      Belt.MutableMap.Int.update(intelligence, rank, updater(count));
+    | Card.Battle(battle) when Card.Battle.isSpecial(battle) =>
+      let rank = Card.Battle.rankGet(battle);
+      Belt.MutableMap.Int.update(special, rank, updater(count));
+    | Card.Battle(battle) when Card.Battle.isMulti(battle) =>
+      let rank = Card.Battle.rankGet(battle);
+      Belt.MutableMap.Int.update(multi, rank, updater(count));
+    | _ => ()
+    }
+  );
+
+  let toData = (result, rank, count) =>
+    Belt.Array.concat(result, [|{"x": rank, "y": count}|]);
+
+  {
+    "strength": Belt.MutableMap.Int.reduce(strength, [||], toData),
+    "intelligence": Belt.MutableMap.Int.reduce(intelligence, [||], toData),
+    "special": Belt.MutableMap.Int.reduce(special, [||], toData),
+    "multi": Belt.MutableMap.Int.reduce(multi, [||], toData),
+  };
+};
 
 let total = deck => reduce(deck, 0, (total, _card, count) => count + total);
 
@@ -170,24 +241,88 @@ let increment = (deck, card) => update(deck, card, maybeInc);
 
 let decrement = (deck, card) => update(deck, card, maybeDec);
 
-let hasValidGroupings = deck => {
-  let counts = Belt.MutableMap.String.make();
+let makeGroupings = deck => {
+  let groupings = Belt.MutableMap.String.make();
 
-  let updater = (count, maybeCount) =>
-    switch (maybeCount) {
-    | Some(prevCount) => Some(prevCount + count)
-    | None => Some(count)
+  let updater = (amount, maybeAmount) =>
+    switch (maybeAmount) {
+    | Some(prevAmount) => Some(prevAmount + amount)
+    | None => Some(amount)
     };
 
   forEach(
     deck,
-    (card, count) => {
+    (card, amount) => {
       let groupId = Card.toGroupIdentifier(card);
-      Belt.MutableMap.String.update(counts, groupId, updater(count));
+      Belt.MutableMap.String.update(groupings, groupId, updater(amount));
     },
   );
 
-  Belt.MutableMap.String.every(counts, (_title, count) => count <= 3);
+  Belt.MutableMap.String.toList(groupings);
+};
+
+let getDeckSizeWarnings = deck => {
+  let size = total(deck);
+  if (size < 40) {
+    ["Less than 40 cards."];
+  } else if (size > 40) {
+    ["More than 40 cards."];
+  } else {
+    [];
+  };
+};
+
+let getAmountWarnings = deck => {
+  let groupings = makeGroupings(deck);
+
+  Belt.List.reduceReverse(groupings, [], (result, (identifier, amount)) =>
+    if (amount > 3) {
+      let (name, color) =
+        switch (Js.String.splitAtMost(~limit=2, ":", identifier)) {
+        | [|"1CHARACTER", name|] => (name, Colors.MetaX.Css.character)
+        | [|"2EVENT", name|] => (name, Colors.MetaX.Css.event)
+        | [|"3BATTLE", name|] =>
+          switch (name) {
+          | _ when Js.String.indexOf("Strength", name) === 0 => (
+              name,
+              Colors.MetaX.Css.strength,
+            )
+          | _ when Js.String.indexOf("Intelligence", name) === 0 => (
+              name,
+              Colors.MetaX.Css.intelligence,
+            )
+          | _ when Js.String.indexOf("Special", name) === 0 => (
+              name,
+              Colors.MetaX.Css.special,
+            )
+          | _ when Js.String.indexOf("Multi", name) === 0 => (
+              name,
+              Colors.MetaX.Css.multi,
+            )
+          | _ => failwith(name)
+          }
+        | _ => failwith(identifier)
+        };
+
+      [
+        {
+          "name": name,
+          "amount": string_of_int(amount),
+          "max": string_of_int(3),
+          "color": color,
+        },
+        ...result,
+      ];
+    } else {
+      result;
+    }
+  );
+};
+
+let hasValidGroupings = deck => {
+  let groupings = makeGroupings(deck);
+
+  Belt.List.every(groupings, ((_identifier, amount)) => amount <= 3);
 };
 
 /* Technically only exactly 40 is valid but the indicator is annoying for <40 */
