@@ -26,7 +26,7 @@ module Styles = {
     style([color(Colors.MetaX.Css.strength), fontWeight(`Bold)]);
 
   let chartContainer =
-    style([height(450.0->Pt), padding(10.0->Pt), paddingTop(20.0->Pt)]);
+    style([height(460.0->Pt), padding(10.0->Pt), paddingTop(20.0->Pt)]);
 };
 
 let toAmountWarningMessage = warning => {
