@@ -31,14 +31,52 @@ let toInt = stat =>
 
 let toGroupIdentifier = stat =>
   switch (stat) {
-  | Strength(rank) => Printf.sprintf("strength_%d", rank)
-  | Intelligence(rank) => Printf.sprintf("intelligence_%d", rank)
-  | Special(rank) => Printf.sprintf("special_%d", rank)
-  | StrengthIntelligence(rank) => Printf.sprintf("multi_%d", rank)
-  | IntelligenceSpecial(rank) => Printf.sprintf("multi_%d", rank)
-  | StrengthSpecial(rank) => Printf.sprintf("multi_%d", rank)
-  | StrengthIntelligenceSpecial(rank) => Printf.sprintf("multi_%d", rank)
+  | Strength(rank) => Printf.sprintf("Strength (Rank %d)", rank)
+  | Intelligence(rank) => Printf.sprintf("Intelligence (Rank %d)", rank)
+  | Special(rank) => Printf.sprintf("Special (Rank %d)", rank)
+  | StrengthIntelligence(rank) => Printf.sprintf("Multi (Rank %d)", rank)
+  | IntelligenceSpecial(rank) => Printf.sprintf("Multi (Rank %d)", rank)
+  | StrengthSpecial(rank) => Printf.sprintf("Multi (Rank %d)", rank)
+  | StrengthIntelligenceSpecial(rank) =>
+    Printf.sprintf("Multi (Rank %d)", rank)
   };
+
+let isStrength =
+  fun
+  | Strength(_rank) => true
+  | Intelligence(_rank) => false
+  | Special(_rank) => false
+  | StrengthIntelligence(_rank) => false
+  | IntelligenceSpecial(_rank) => false
+  | StrengthSpecial(_rank) => false
+  | StrengthIntelligenceSpecial(_rank) => false;
+let isIntelligence =
+  fun
+  | Strength(_rank) => false
+  | Intelligence(_rank) => true
+  | Special(_rank) => false
+  | StrengthIntelligence(_rank) => false
+  | IntelligenceSpecial(_rank) => false
+  | StrengthSpecial(_rank) => false
+  | StrengthIntelligenceSpecial(_rank) => false;
+let isSpecial =
+  fun
+  | Strength(_rank) => false
+  | Intelligence(_rank) => false
+  | Special(_rank) => true
+  | StrengthIntelligence(_rank) => false
+  | IntelligenceSpecial(_rank) => false
+  | StrengthSpecial(_rank) => false
+  | StrengthIntelligenceSpecial(_rank) => false;
+let isMulti =
+  fun
+  | Strength(_rank) => false
+  | Intelligence(_rank) => false
+  | Special(_rank) => false
+  | StrengthIntelligence(_rank) => true
+  | IntelligenceSpecial(_rank) => true
+  | StrengthSpecial(_rank) => true
+  | StrengthIntelligenceSpecial(_rank) => true;
 
 let fromStatList: array(Card_Stat.t) => t =
   statList =>

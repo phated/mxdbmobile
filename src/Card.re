@@ -51,7 +51,7 @@ module Character = {
 
   let toGroupIdentifier = card =>
     Printf.sprintf(
-      "%s_%s",
+      "1CHARACTER:%s - %s",
       titleGet(card)->Title.toString,
       subtitleGet(card)->Subtitle.toString,
     );
@@ -125,7 +125,8 @@ module Event = {
     );
   };
 
-  let toGroupIdentifier = card => titleGet(card)->Title.toString;
+  let toGroupIdentifier = card =>
+    Printf.sprintf("2EVENT:%s", titleGet(card)->Title.toString);
 
   module Styles = {
     open BsReactNative.Style;
@@ -193,7 +194,13 @@ module Battle = {
 
   let rankGet = card => statGet(card)->Stat.rankGet;
 
-  let toGroupIdentifier = card => statGet(card)->Stat.toGroupIdentifier;
+  let toGroupIdentifier = card =>
+    Printf.sprintf("3BATTLE:%s", statGet(card)->Stat.toGroupIdentifier);
+
+  let isStrength = card => statGet(card)->Stat.isStrength;
+  let isIntelligence = card => statGet(card)->Stat.isIntelligence;
+  let isSpecial = card => statGet(card)->Stat.isSpecial;
+  let isMulti = card => statGet(card)->Stat.isMulti;
 
   module Styles = {
     open BsReactNative.Style;
