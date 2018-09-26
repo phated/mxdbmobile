@@ -31,7 +31,8 @@
         "icon",
         "card",
         "components",
-        "page"
+        "page",
+        "charts"
       ]
     }
   ]

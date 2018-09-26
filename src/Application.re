@@ -335,7 +335,7 @@ let create = () => {
           <Page.SavedDecks position onPersistPosition>
             ...renderDeck
           </Page.SavedDecks>;
-        | Page.Stats => <Page.Stats />
+        | Page.Stats => <Page.Stats deck />
         | Page.Settings =>
           let data = [|
             Page.Settings.{title: "Patreon", onPress: handle(toPatreon)},
