@@ -50,12 +50,22 @@ let make = (~direction, ~onPress, ~disabled, children) => {
     | Left => Styles.left
     | Right => Styles.right
     };
-  let grow = (_, self) => self.ReasonReact.send(Grow);
-  let shrink = (_, self) => self.ReasonReact.send(Shrink);
-  let press = _ => {
-    BsReactNative.Vibration.vibrate(~pattern=vibrationPattern, ~repeat=false);
-    onPress();
-  };
+  let grow = (_, self) =>
+    if (disabled === false) {
+      self.ReasonReact.send(Grow);
+    };
+  let shrink = (_, self) =>
+    if (disabled === false) {
+      self.ReasonReact.send(Shrink);
+    };
+  let press = _ =>
+    if (disabled === false) {
+      BsReactNative.Vibration.vibrate(
+        ~pattern=vibrationPattern,
+        ~repeat=false,
+      );
+      onPress();
+    };
 
   let makeScale = scale =>
     BsReactNative.Style.(
@@ -80,7 +90,6 @@ let make = (~direction, ~onPress, ~disabled, children) => {
         StyleSheet.flatten([scale, onOff, directional, Styles.container]);
 
       <TouchableWithoutFeedback
-        disabled
         hitSlop
         onPress=press
         onPressIn={self.handle(grow)}
