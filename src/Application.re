@@ -25,8 +25,7 @@ module Styles = {
   let deckErrorWrapper = style([width(16.0->Pt), position(Absolute)]);
   let deckError =
     style([
-      /* TODO: this should be "yellow" */
-      color(Colors.Css.constant),
+      color(Colors.Css.warning),
       position(Absolute),
       top(4.0->Pt),
       right((-20.0)->Pt),

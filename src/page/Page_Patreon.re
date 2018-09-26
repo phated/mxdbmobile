@@ -15,7 +15,7 @@ module Styles = {
 
   let patreonName = style([marginTop(10.0->Pt), fontWeight(`Bold)]);
 
-  let special = style([color(Colors.Css.special)]);
+  let special = style([color(Colors.MetaX.Css.special)]);
 };
 
 let component = ReasonReact.statelessComponent("Page.Patreon");

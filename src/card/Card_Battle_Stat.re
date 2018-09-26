@@ -127,9 +127,9 @@ module Styles = {
       /* textAlignVertical(Center), */
     ]);
 
-  let strength = style([color(Colors.Css.strength)]);
-  let intelligence = style([color(Colors.Css.intelligence)]);
-  let special = style([color(Colors.Css.special)]);
+  let strength = style([color(Colors.MetaX.Css.strength)]);
+  let intelligence = style([color(Colors.MetaX.Css.intelligence)]);
+  let special = style([color(Colors.MetaX.Css.special)]);
 };
 
 let component = ReasonReact.statelessComponent("Card.Battle.Stat");

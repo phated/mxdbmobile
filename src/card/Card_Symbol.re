@@ -39,11 +39,11 @@ let hasSymbol =
 module Styles = {
   open BsReactNative.Style;
 
-  let attack = style([color(Colors.Css.attack)]);
-  let defend = style([color(Colors.Css.defend)]);
-  let constant = style([color(Colors.Css.constant)]);
-  let play = style([color(Colors.Css.play)]);
-  let push = style([color(Colors.Css.push)]);
+  let attack = style([color(Colors.MetaX.Css.attack)]);
+  let defend = style([color(Colors.MetaX.Css.defend)]);
+  let constant = style([color(Colors.MetaX.Css.constant)]);
+  let play = style([color(Colors.MetaX.Css.play)]);
+  let push = style([color(Colors.MetaX.Css.push)]);
 };
 
 let component = ReasonReact.statelessComponent("Card.Symbol");
