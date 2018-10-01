@@ -47,7 +47,9 @@ let make = _children => {
           <Icon name="special" style=Styles.special />
           <S> " thanks to our Rank 5+ subscribers:" </S>
         </Text>
-        <Text style=Styles.patreonName> <S> "Matt Smith" </S> </Text>
+        <Text style=Styles.patreonName>
+          <S> "Matt Smith & Mark de la Fuente" </S>
+        </Text>
       </View>
     </View>;
   },
