@@ -17,6 +17,7 @@
   "dependencies": {
     "@aantron/repromise": "^0.6.0",
     "@glennsl/bs-json": "^3.0.0",
+    "@reasonableconsulting/bs-victory": "0.0.0",
     "@reasonableconsulting/compare": "0.0.0",
     "@reasonableconsulting/oolong": "reasonableconsulting/oolong",
     "appcenter": "^1.7.1",
