@@ -45,6 +45,7 @@ type action =
   | Decrement(Card.t)
   | PersistCardListPosition(float)
   | PersistDeckPosition(float)
+  | PersistSavedDeckPosition(float)
   | Error
   | StorePersistedDeck(Deck.t);
 type state = {
@@ -53,6 +54,7 @@ type state = {
   deck: Deck.t,
   cardListPosition: float,
   deckPosition: float,
+  savedDeckPosition: float,
 };
 
 let renderLabeledIcon = (~label, ~icon, ()) =>
@@ -119,6 +121,8 @@ let create = () => {
     self.Oolong.send(PersistCardListPosition(position));
   let persistDeckPosition = (position, self) =>
     self.Oolong.send(PersistDeckPosition(position));
+  let persistSavedDeckPosition = (position, self) =>
+    self.Oolong.send(PersistSavedDeckPosition(position));
 
   let saveDeck = self =>
     /* TODO: Indicator for saving deck (if this takes long/can fail) */
@@ -142,6 +146,7 @@ let create = () => {
           deck: Deck.empty,
           cardListPosition: 0.0,
           deckPosition: 0.0,
+          savedDeckPosition: 0.0,
         })
       | Push => Oolong.NoUpdate
       | _ => Oolong.NoUpdate
@@ -201,6 +206,8 @@ let create = () => {
         Oolong.Update({...state, cardListPosition})
       | PersistDeckPosition(deckPosition) =>
         Oolong.Update({...state, deckPosition})
+      | PersistSavedDeckPosition(savedDeckPosition) =>
+        Oolong.Update({...state, savedDeckPosition})
       | Search(filter) =>
         Oolong.Update({
           ...state,
@@ -330,8 +337,8 @@ let create = () => {
           let onPersistPosition = handle(persistDeckPosition);
           <Deck deck position onPersistPosition> ...renderCard </Deck>;
         | Page.SavedDecks =>
-          let position = 0.0;
-          let onPersistPosition = handle((_, _) => ());
+          let position = state.savedDeckPosition;
+          let onPersistPosition = handle(persistSavedDeckPosition);
           <Page.SavedDecks position onPersistPosition>
             ...renderDeck
           </Page.SavedDecks>;

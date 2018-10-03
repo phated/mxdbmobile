@@ -11,6 +11,7 @@ type activeState =
 
 type state('data) = {
   activeState,
+  position: float,
   data: 'data,
 };
 
@@ -126,7 +127,7 @@ let renderHeader = title =>
 
 let make = (~position, ~onPersistPosition, renderItem) => {
   ...component,
-  initialState: () => {data: [||], activeState: Loading},
+  initialState: () => {data: [||], position, activeState: Loading},
   reducer: (action, state) =>
     switch (action) {
     | FetchDecks =>
@@ -134,11 +135,12 @@ let make = (~position, ~onPersistPosition, renderItem) => {
         {...state, activeState: Loading},
         getDecks,
       )
-    | StoreData(data) => ReasonReact.Update({data, activeState: Completed})
+    | StoreData(data) =>
+      ReasonReact.Update({...state, data, activeState: Completed})
     },
   didMount: self => self.send(FetchDecks),
   render: self => {
-    let {data, activeState} = self.state;
+    let {data, activeState, position} = self.state;
 
     switch (activeState) {
     | Loading => <Loading />
