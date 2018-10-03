@@ -1,10 +1,15 @@
-type state('a) =
+type activeState('a) =
   | Fetching
   | Stored('a);
 
 type action('a) =
   | FetchCards
   | StoreCards('a);
+
+type state('a) = {
+  activeState: activeState('a),
+  position: float,
+};
 
 type retainedProps = {filter: Filter.t};
 
@@ -38,12 +43,16 @@ let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
     retainedProps: {
       filter: filter,
     },
-    initialState: () => Fetching,
-    reducer: (action, _state) =>
+    initialState: () => {activeState: Fetching, position},
+    reducer: (action, state) =>
       switch (action) {
       | FetchCards =>
-        ReasonReact.UpdateWithSideEffects(Fetching, fetchCards(filter))
-      | StoreCards(cards) => ReasonReact.Update(Stored(cards))
+        ReasonReact.UpdateWithSideEffects(
+          {...state, activeState: Fetching},
+          fetchCards(filter),
+        )
+      | StoreCards(cards) =>
+        ReasonReact.Update({...state, activeState: Stored(cards)})
       },
     didUpdate: ({oldSelf, newSelf}) => {
       let _ = ();
@@ -53,13 +62,13 @@ let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
     },
     didMount: self => self.send(FetchCards),
     render: self =>
-      switch (self.state) {
+      switch (self.state.activeState) {
       | Fetching => <Loading />
       | Stored(data) =>
         <PositionedList
           data
           renderItem
-          position
+          position={self.state.position}
           onPersistPosition
           keyExtractor
         />
