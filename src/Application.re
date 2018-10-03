@@ -335,7 +335,9 @@ let create = () => {
         | Page.Deck =>
           let position = state.deckPosition;
           let onPersistPosition = handle(persistDeckPosition);
-          <Deck deck position onPersistPosition> ...renderCard </Deck>;
+          <Page.Deck deck position onPersistPosition>
+            ...renderCard
+          </Page.Deck>;
         | Page.SavedDecks =>
           let position = state.savedDeckPosition;
           let onPersistPosition = handle(persistSavedDeckPosition);
