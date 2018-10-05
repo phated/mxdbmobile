@@ -1,6 +1,5 @@
 module Styles = {
   open BsReactNative.Style;
-  let container = style([flex(1.)]);
 
   let header =
     style([
@@ -56,6 +55,14 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
       |];
 
   let cards = Deck.flatMap2(deck, init, mapper);
+  /*
+   I'm not too sure why my Header items cause the list to jump when restoring position
+   but if I render all elements up front, it doesn't jump.
+   This shouldn't be an issue because decks aren't super long.
+
+   TODO: Maybe add the `initialScrollIndex` to positioned list
+    */
+  let initialNumToRender = Belt.Array.length(cards);
 
   let renderHeader = title =>
     BsReactNative.(
@@ -70,6 +77,7 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
     render: _self =>
       <PositionedList
         data=cards
+        initialNumToRender
         renderItem
         renderHeader
         position
