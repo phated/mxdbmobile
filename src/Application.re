@@ -4,15 +4,6 @@ module Styles = {
   /* backgroundColor is set to avoid showing the splash logo during app use */
   let container = style([flex(1.), backgroundColor(Colors.Css.white)]);
 
-  let title =
-    style([
-      color(Colors.Css.white),
-      fontSize(20.0->Float),
-      margin(8.0->Pt),
-      fontWeight(`Bold),
-      flex(1.0),
-    ]);
-
   let deck =
     style([
       flex(1.0),
@@ -253,7 +244,7 @@ let create = () => {
           </>
         | Toolbar.Disabled =>
           <>
-            <Text style=Styles.title> <S> "MetaX Deck Builder" </S> </Text>
+            <ToolbarTitle> <S> "MetaX Deck Builder" </S> </ToolbarTitle>
             <IconButton icon="search" onPress=enable />
           </>
         };
@@ -271,27 +262,23 @@ let create = () => {
           </>
         | Toolbar.Disabled =>
           <>
-            <Text
-              ellipsizeMode=`tail
-              numberOfLines=1
-              style=Styles.title
-              onPress=enable>
+            <ToolbarTitle ellipsizeMode=`tail numberOfLines=1 onPress=enable>
               <Icon name="edit" size=16 />
               <S> " " </S>
               <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
-            </Text>
+            </ToolbarTitle>
             <IconButton icon="playlist-remove" onPress={handle(clearDeck)} />
           </>
         };
 
       let savedDecksToolbarRender = (~enable as _, ~disable as _, _mode) =>
-        <> <Text style=Styles.title> <S> "Choose a Deck" </S> </Text> </>;
+        <> <ToolbarTitle> <S> "Choose a Deck" </S> </ToolbarTitle> </>;
 
       let settingsToolbarRender = (~enable as _, ~disable as _, _mode) =>
-        <> <Text style=Styles.title> <S> "Settings" </S> </Text> </>;
+        <> <ToolbarTitle> <S> "Settings" </S> </ToolbarTitle> </>;
 
       let emptyToolbarRender = (~enable as _, ~disable as _, _mode) =>
-        <> <Text style=Styles.title> <S> "MetaX Deck Builder" </S> </Text> </>;
+        <> <ToolbarTitle> <S> "MetaX Deck Builder" </S> </ToolbarTitle> </>;
 
       let toolbarRender =
         switch (page) {

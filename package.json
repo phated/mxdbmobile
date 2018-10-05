@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@aantron/repromise": "^0.6.0",
+    "@emotion/native": "^9.2.9",
     "@glennsl/bs-json": "^3.0.0",
     "@reasonableconsulting/bs-victory": "0.0.0",
     "@reasonableconsulting/compare": "0.0.0",

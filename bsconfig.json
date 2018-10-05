@@ -32,6 +32,7 @@
         "icon",
         "card",
         "components",
+        "styled-components",
         "page",
         "charts"
       ]
