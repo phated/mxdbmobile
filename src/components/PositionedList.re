@@ -26,22 +26,15 @@ let component = ReasonReact.reducerComponent("PositionedList");
 
 let noop = _ => failwith("No renderHeader method provided");
 
-let getItemLayout = (maybeData, idx) => {
-  let maybeItem =
-    switch (maybeData) {
-    | Some(data) => Some(data[idx])
-    | None => None
-    };
-  switch (maybeItem) {
-  | Some(Header(_)) => {"length": 40, "offset": 40 * idx, "index": idx}
-  | Some(Item({size})) => {
-      "length": size,
-      "offset": size * idx,
-      "index": idx,
+let getItemLayout = (maybeData, idx) =>
+  switch (maybeData) {
+  | Some(data) =>
+    switch (data[idx]) {
+    | Header(_) => {"length": 40, "offset": 40 * idx, "index": idx}
+    | Item({size}) => {"length": size, "offset": size * idx, "index": idx}
     }
   | None => {"length": 0, "offset": 0, "index": idx}
   };
-};
 
 let onScroll = (evt, {ReasonReact.state}) => {
   let pt = BsReactNative.RNEvent.NativeScrollEvent.contentOffset(evt);
@@ -92,7 +85,7 @@ let make =
 
   {
     ...component,
-    initialState: () => {position: ref(0.0), listRef: ref(None)},
+    initialState: () => {position: ref(position), listRef: ref(None)},
     reducer: ((), _state) => ReasonReact.NoUpdate,
     didMount: ({state, onUnmount}) =>
       switch (state.listRef^) {
