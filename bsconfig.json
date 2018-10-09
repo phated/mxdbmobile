@@ -31,8 +31,8 @@
       "subdirs": [
         "icon",
         "card",
+        "react-native",
         "components",
-        "styled-components",
         "page",
         "charts"
       ]

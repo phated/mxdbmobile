@@ -55,23 +55,21 @@ let component = ReasonReact.statelessComponent("Card.Stat");
 let make = (~value, _children) => {
   ...component,
   render: _self =>
-    BsReactNative.(
-      switch (value) {
-      | Strength(rank) =>
-        <View style=Styles.container>
-          <Icon name="strength" style=Styles.strength />
-          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
-        </View>
-      | Intelligence(rank) =>
-        <View style=Styles.container>
-          <Icon name="intelligence" style=Styles.intelligence />
-          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
-        </View>
-      | Special(rank) =>
-        <View style=Styles.container>
-          <Icon name="special" style=Styles.special />
-          <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
-        </View>
-      }
-    ),
+    switch (value) {
+    | Strength(rank) =>
+      <View style=Styles.container>
+        <Icon name="strength" style=Styles.strength />
+        <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
+      </View>
+    | Intelligence(rank) =>
+      <View style=Styles.container>
+        <Icon name="intelligence" style=Styles.intelligence />
+        <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
+      </View>
+    | Special(rank) =>
+      <View style=Styles.container>
+        <Icon name="special" style=Styles.special />
+        <Text style=Styles.rank> <S> {string_of_int(rank)} </S> </Text>
+      </View>
+    },
 };

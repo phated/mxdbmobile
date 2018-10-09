@@ -13,9 +13,8 @@ let component = ReasonReact.statelessComponent("Page.Legal");
 let make = _children => {
   ...component,
   render: _self => {
-    open BsReactNative;
-
-    let graphcoolLogo = Packager.require("../assets/graphcool.png");
+    let graphcoolLogo =
+      BsReactNative.Packager.require("../assets/graphcool.png");
 
     <View style=Styles.container>
       <View style=Styles.blockContainer>

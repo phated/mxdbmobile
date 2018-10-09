@@ -81,13 +81,16 @@ let make = (~direction, ~onPress, ~disabled, children) => {
       | Shrink => ReasonReact.Update({scale: 1.0})
       },
     render: self => {
-      open BsReactNative;
-
       let scale = makeScale(self.state.scale);
       let onOff = disabled ? Styles.disabled : Styles.enabled;
 
       let style =
-        StyleSheet.flatten([scale, onOff, directional, Styles.container]);
+        BsReactNative.StyleSheet.flatten([
+          scale,
+          onOff,
+          directional,
+          Styles.container,
+        ]);
 
       <TouchableWithoutFeedback
         hitSlop

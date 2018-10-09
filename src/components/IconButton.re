@@ -5,12 +5,12 @@ let noop = _ => ();
 module Styles = {
   open BsReactNative.Style;
 
-  let iconWrapper = style([height(40.0 |. Pt), width(40.0 |. Pt)]);
+  let iconWrapper = style([height(40.0->Pt), width(40.0->Pt)]);
 
   let icon =
     style([
       color(Colors.Css.white),
-      margin(8.0 |. Pt),
+      margin(8.0->Pt),
       textAlignVertical(Center),
     ]);
 };
@@ -19,15 +19,10 @@ let component = ReasonReact.statelessComponent("IconButton");
 
 let make = (~icon, ~onPress=noop, _children) => {
   ...component,
-  render: _self => {
-    open BsReactNative;
-
-    let _ = ();
-
+  render: _self =>
     <TouchableOpacity hitSlop=iconHitSlop onPress>
       <View style=Styles.iconWrapper>
         <Icon name=icon style=Styles.icon />
       </View>
-    </TouchableOpacity>;
-  },
+    </TouchableOpacity>,
 };

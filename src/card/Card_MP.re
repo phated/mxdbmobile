@@ -17,8 +17,6 @@ let component = ReasonReact.statelessComponent("MP");
 let make = (~value, _children) => {
   ...component,
   render: _self => {
-    open BsReactNative;
-
     let sign =
       if (value >= 0) {
         <Text style=Styles.sign> <S> "+" </S> </Text>;

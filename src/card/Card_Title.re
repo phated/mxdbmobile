@@ -15,7 +15,5 @@ let component = ReasonReact.statelessComponent("Card.Title");
 let make = (~value, _children) => {
   ...component,
   render: _self =>
-    BsReactNative.(
-      <Text style=Styles.title> <S> {toString(value)} </S> </Text>
-    ),
+    <Text style=Styles.title> <S> {toString(value)} </S> </Text>,
 };

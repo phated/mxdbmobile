@@ -43,12 +43,7 @@ let onScroll = (evt, {ReasonReact.state}) => {
 
 let scrollToOffset = (~position, listRef) =>
   Utils.nextTick(_ =>
-    BsReactNative.FlatList.scrollToOffset(
-      ~offset=position,
-      ~animated=false,
-      listRef,
-      (),
-    )
+    FlatList.scrollToOffset(~offset=position, ~animated=false, listRef, ())
   );
 
 let setRef = (listRef, {ReasonReact.state}) =>
@@ -65,7 +60,7 @@ let make =
       ~initialNumToRender=4,
       _children,
     ) => {
-  open BsReactNative;
+  /* TODO: We lose scrollTo* methods with emotion */
 
   let renderItem =
     FlatList.renderItem(({item}) =>
@@ -96,17 +91,18 @@ let make =
       },
     willUnmount: self => onPersistPosition(self.state.position^),
     render: self =>
-      <FlatList
-        data
-        getItemLayout
-        initialNumToRender
-        maxToRenderPerBatch=1
-        keyExtractor
-        renderItem
-        removeClippedSubviews=true
-        itemSeparatorComponent
-        ref={self.handle(setRef)}
-        onScroll={self.handle(onScroll)}
-      />,
+      <Emotion.WithRef innerRef={self.handle(setRef)}>
+        <FlatList
+          data
+          getItemLayout
+          initialNumToRender
+          maxToRenderPerBatch=1
+          keyExtractor
+          renderItem
+          removeClippedSubviews=true
+          itemSeparatorComponent
+          onScroll={self.handle(onScroll)}
+        />
+      </Emotion.WithRef>,
   };
 };

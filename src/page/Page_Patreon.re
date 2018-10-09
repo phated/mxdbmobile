@@ -24,10 +24,7 @@ let component = ReasonReact.statelessComponent("Page.Patreon");
 let make = _children => {
   ...component,
   render: _self => {
-    open BsReactNative;
-    let _ = ();
-
-    let patreonLogo = Packager.require("../assets/patron.png");
+    let patreonLogo = BsReactNative.Packager.require("../assets/patron.png");
 
     <View style=Styles.container>
       <View style=Styles.blockContainer>

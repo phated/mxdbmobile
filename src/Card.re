@@ -59,16 +59,9 @@ module Character = {
   module Styles = {
     open BsReactNative.Style;
 
-    let container = style([flex(1.0), flexDirection(Row)]);
+    let details = style([paddingHorizontal(8.0->Pt)]);
 
-    let details =
-      style([
-        flex(1.0),
-        flexDirection(Column),
-        paddingHorizontal(8.0->Pt),
-      ]);
-
-    let stats = style([width(45.0->Pt), alignItems(FlexEnd)]);
+    let stats = style([flex(0.0), width(45.0->Pt), alignItems(FlexEnd)]);
   };
 
   let component = ReasonReact.statelessComponent("Card.Character");
@@ -76,22 +69,20 @@ module Character = {
     ...component,
     shouldUpdate: _ => false,
     render: _self =>
-      BsReactNative.(
-        <View style=Styles.container>
-          <View style=Styles.details>
-            <Text>
-              <Title value={titleGet(card)} />
-              <Subtitle value={subtitleGet(card)} />
-            </Text>
-            <Trait value={traitGet(card)} />
-            <Effect value={effectGet(card)} />
-          </View>
-          <View style=Styles.stats>
-            <MP value={mpGet(card)} />
-            <Stats value={statsGet(card)} />
-          </View>
-        </View>
-      ),
+      <Container.Row>
+        <Container.Column style=Styles.details>
+          <Text>
+            <Title value={titleGet(card)} />
+            <Subtitle value={subtitleGet(card)} />
+          </Text>
+          <Trait value={traitGet(card)} />
+          <Effect value={effectGet(card)} />
+        </Container.Column>
+        <Container.Column style=Styles.stats>
+          <MP value={mpGet(card)} />
+          <Stats value={statsGet(card)} />
+        </Container.Column>
+      </Container.Row>,
   };
 };
 
@@ -131,14 +122,9 @@ module Event = {
   module Styles = {
     open BsReactNative.Style;
 
-    let container = style([flex(1.0), flexDirection(Row)]);
+    let details = style([paddingHorizontal(8.0->Pt)]);
 
-    let details =
-      style([
-        flex(1.0),
-        flexDirection(Column),
-        paddingHorizontal(8.0->Pt),
-      ]);
+    let stats = style([flex(0.0)]);
   };
 
   let component = ReasonReact.statelessComponent("Card.Event");
@@ -146,15 +132,15 @@ module Event = {
     ...component,
     shouldUpdate: _ => false,
     render: _self =>
-      BsReactNative.(
-        <View style=Styles.container>
-          <View style=Styles.details>
-            <Title value={titleGet(card)} />
-            <Effect value={effectGet(card)} />
-          </View>
-          <View> <MP value={mpGet(card)} /> </View>
-        </View>
-      ),
+      <Container.Row>
+        <Container.Column style=Styles.details>
+          <Title value={titleGet(card)} />
+          <Effect value={effectGet(card)} />
+        </Container.Column>
+        <Container.Column style=Styles.stats>
+          <MP value={mpGet(card)} />
+        </Container.Column>
+      </Container.Row>,
   };
 };
 
@@ -205,16 +191,9 @@ module Battle = {
   module Styles = {
     open BsReactNative.Style;
 
-    let container = style([flex(1.0), flexDirection(Row)]);
+    let details = style([paddingHorizontal(8.0->Pt)]);
 
-    let details =
-      style([
-        flex(1.0),
-        flexDirection(Column),
-        paddingHorizontal(8.0->Pt),
-      ]);
-
-    let stats = style([alignItems(FlexEnd)]);
+    let stats = style([flex(0.0), alignItems(FlexEnd)]);
   };
 
   let component = ReasonReact.statelessComponent("Battle");
@@ -222,23 +201,21 @@ module Battle = {
     ...component,
     shouldUpdate: _ => false,
     render: _self => {
-      open BsReactNative;
-
       let stat = statGet(card);
 
       let rank = string_of_int(Stat.rankGet(stat));
 
-      <View style=Styles.container>
-        <View style=Styles.details>
+      <Container.Row>
+        <Container.Column style=Styles.details>
           <Title value={titleGet(card)} />
           <Text> <S> {"Rank " ++ rank} </S> </Text>
           <Effect value={effectGet(card)} />
-        </View>
-        <View style=Styles.stats>
+        </Container.Column>
+        <Container.Column style=Styles.stats>
           <MP value={mpGet(card)} />
           <Stat stat />
-        </View>
-      </View>;
+        </Container.Column>
+      </Container.Row>;
     },
   };
 };
@@ -319,8 +296,7 @@ let isTypeEqual = (c1, c2) => typeGet(c1) === typeGet(c2);
 module Styles = {
   open BsReactNative.Style;
 
-  let container =
-    style([height(182.0->Pt), flexDirection(Row), padding(16.0->Pt)]);
+  let container = style([height(182.0->Pt), padding(16.0->Pt)]);
 };
 
 type retainedProps = {
@@ -352,12 +328,12 @@ let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
       oldSelf.retainedProps.card != newSelf.retainedProps.card
       || oldSelf.retainedProps.count != newSelf.retainedProps.count,
     render: _self =>
-      <BsReactNative.View style=Styles.container>
+      <Container.Row style=Styles.container>
         <CardCounter onIncrement=increment onDecrement=decrement value=count>
           <Image image size=Thumbnail />
         </CardCounter>
         details
-      </BsReactNative.View>,
+      </Container.Row>,
   };
 };
 

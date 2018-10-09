@@ -36,12 +36,8 @@ let make = (~image, ~size, _children) => {
     oldSelf.retainedProps.image != newSelf.retainedProps.image
     || oldSelf.retainedProps.size != newSelf.retainedProps.size,
   render: _self => {
-    open BsReactNative;
-
-    let _ = ();
-
     let defaultSource =
-      `Required(Packager.require("../assets/card-back.jpg"));
+      `Required(BsReactNative.Packager.require("../assets/card-back.jpg"));
 
     let image =
       switch (size) {

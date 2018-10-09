@@ -23,7 +23,6 @@ module Styles = {
     ]);
 
   let icon = style([color(Colors.Css.white)]);
-  let label = style([fontSize(12.0->Float), color(Colors.Css.white)]);
 };
 
 type action =
@@ -51,13 +50,10 @@ type state = {
 let renderLabeledIcon = (~label, ~icon, ()) =>
   <>
     <Icon name=icon style=Styles.icon />
-    <BsReactNative.Text style=Styles.label>
-      <S> label </S>
-    </BsReactNative.Text>
+    <NavigationLabel> <S> label </S> </NavigationLabel>
   </>;
 
 let renderDeckLabel = (deck, ()) => {
-  open BsReactNative;
   let deckSize = Deck.total(deck);
 
   let errorIcon =
@@ -72,9 +68,9 @@ let renderDeckLabel = (deck, ()) => {
   <>
     <Icon name="deck" style=Styles.icon />
     errorIcon
-    <Text style=Styles.label>
+    <NavigationLabel>
       <S> {Printf.sprintf("Deck (%d)", deckSize)} </S>
-    </Text>
+    </NavigationLabel>
   </>;
 };
 
@@ -207,8 +203,6 @@ let create = () => {
         })
       },
     view: ({state, handle}) => {
-      open BsReactNative;
-
       let {deck, filter, page} = state;
 
       let renderCard = (card, count) =>

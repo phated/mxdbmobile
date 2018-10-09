@@ -9,5 +9,5 @@ let component = ReasonReact.statelessComponent("Card.Trait");
 
 let make = (~value, _children) => {
   ...component,
-  render: _self => BsReactNative.(<Text> <S> {toString(value)} </S> </Text>),
+  render: _self => <Text> <S> {toString(value)} </S> </Text>,
 };

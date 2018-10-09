@@ -19,7 +19,6 @@ let getText = effect =>
 module Styles = {
   open BsReactNative.Style;
 
-  let container = style([flex(1.)]);
   let effectContainer =
     style([
       justifyContent(FlexEnd),
@@ -54,15 +53,13 @@ let make = (~value, _children) => {
   {
     ...component,
     render: _self =>
-      BsReactNative.(
-        <View style=Styles.container>
-          <View style=Styles.effectContainer>
-            <Card_Symbol value={value.symbol} />
-            <View style=effectStyle>
-              <Text style=Styles.effectText> <S> effectText </S> </Text>
-            </View>
+      <Container.Column>
+        <View style=Styles.effectContainer>
+          <Card_Symbol value={value.symbol} />
+          <View style=effectStyle>
+            <Text style=Styles.effectText> <S> effectText </S> </Text>
           </View>
         </View>
-      ),
+      </Container.Column>,
   };
 };

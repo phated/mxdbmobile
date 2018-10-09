@@ -1,5 +1,16 @@
 module Styles = {
   open BsReactNative.Style;
+  /*
+   let listItem =
+     Emotion.style(
+       ~flex=1.0,
+       ~flexDirection="row",
+       ~justifyContent="space-between",
+       ~alignItems="center",
+       ~height=54.0,
+       ~paddingHorizontal=16.0,
+       (),
+     ); */
 
   let listItem =
     style([
@@ -20,14 +31,12 @@ type t = {
 let component = ReasonReact.statelessComponent("Page.Settings");
 
 let renderItem = ({title, onPress}) =>
-  BsReactNative.(
-    <TouchableOpacity onPress>
-      <View style=Styles.listItem>
-        <Text> <S> title </S> </Text>
-        <Icon name="chevron-right" />
-      </View>
-    </TouchableOpacity>
-  );
+  <TouchableOpacity onPress>
+    <View style=Styles.listItem>
+      <Text> <S> title </S> </Text>
+      <Icon name="chevron-right" />
+    </View>
+  </TouchableOpacity>;
 
 /* TODO: retained props */
 let make = (~data, _children) => {

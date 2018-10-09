@@ -34,11 +34,11 @@ let component = ReasonReact.statelessComponent("CardCounter");
 let make = (~onIncrement, ~onDecrement, ~value, children) => {
   ...component,
   render: _self => {
-    open BsReactNative;
     let image = Belt.Array.getExn(children, 0);
 
     let opac = value == 0 ? Styles.isZero : Styles.notZero;
-    let counterStyle = StyleSheet.flatten([opac, Styles.counter]);
+    let counterStyle =
+      BsReactNative.StyleSheet.flatten([opac, Styles.counter]);
 
     <View style=Styles.container>
       image

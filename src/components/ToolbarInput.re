@@ -28,22 +28,20 @@ let make =
     | Submit => ReasonReact.SideEffects((self => onSubmit(self.state)))
     },
   render: self =>
-    BsReactNative.(
-      <TextInput
-        style=Styles.input
-        autoFocus=true
-        autoCorrect=false
-        spellCheck=false
-        autoCapitalize=`none
-        selectTextOnFocus=true
-        underlineColorAndroid="transparent"
-        placeholder
-        placeholderTextColor=Colors.gray
-        onBlur
-        blurOnSubmit=true
-        value={self.state}
-        onChangeText={text => self.send(UpdateText(text))}
-        onSubmitEditing={_ => self.send(Submit)}
-      />
-    ),
+    <BsReactNative.TextInput
+      style=Styles.input
+      autoFocus=true
+      autoCorrect=false
+      spellCheck=false
+      autoCapitalize=`none
+      selectTextOnFocus=true
+      underlineColorAndroid="transparent"
+      placeholder
+      placeholderTextColor=Colors.gray
+      onBlur
+      blurOnSubmit=true
+      value={self.state}
+      onChangeText={text => self.send(UpdateText(text))}
+      onSubmitEditing={_ => self.send(Submit)}
+    />,
 };

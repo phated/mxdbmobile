@@ -4,8 +4,8 @@ module Styles = {
   let container =
     style([
       flexDirection(Row),
-      padding(8.0 |. Pt),
-      height(60.0 |. Pt),
+      padding(8.0->Pt),
+      height(60.0->Pt),
       backgroundColor(Colors.Css.ourBlue),
     ]);
 };
@@ -38,7 +38,7 @@ let make = renderChild => {
           ~disable=self.handle(disable),
           self.state,
         );
-      BsReactNative.(<View style=Styles.container> child </View>);
+      <View style=Styles.container> child </View>;
     },
   };
 };

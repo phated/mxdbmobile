@@ -119,11 +119,9 @@ let getDecks = self => {
 };
 
 let renderHeader = title =>
-  BsReactNative.(
-    <View style=Styles.header>
-      <Text style=Styles.headerText> <S> title </S> </Text>
-    </View>
-  );
+  <View style=Styles.header>
+    <Text style=Styles.headerText> <S> title </S> </Text>
+  </View>;
 
 let make = (~position, ~onPersistPosition, renderItem) => {
   ...component,

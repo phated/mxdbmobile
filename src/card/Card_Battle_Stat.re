@@ -175,7 +175,6 @@ let component = ReasonReact.statelessComponent("Card.Battle.Stat");
 let make = (~stat, _children) => {
   ...component,
   render: _self => {
-    open BsReactNative;
     /* Elements comprising Doubles are reveresed because zIndex doesn't work on Android */
     let child =
       switch (stat) {

@@ -30,7 +30,6 @@ module Styles = {
 };
 
 let toAmountWarningMessage = warning => {
-  open BsReactNative;
   open BsReactNative.Style;
 
   let titleStyle = style([color(warning##color), fontWeight(`Bold)]);
@@ -53,14 +52,12 @@ let toAmountWarningMessage = warning => {
 };
 
 let toDeckSizeWarningMessage = warning =>
-  BsReactNative.(
-    <View style=Styles.warningContainer>
-      <Icon name="warning" style=Styles.warningIcon />
-      <View style=Styles.warningMessageWrapper>
-        <Text style=Styles.warningMessage> <S> warning </S> </Text>
-      </View>
+  <View style=Styles.warningContainer>
+    <Icon name="warning" style=Styles.warningIcon />
+    <View style=Styles.warningMessageWrapper>
+      <Text style=Styles.warningMessage> <S> warning </S> </Text>
     </View>
-  );
+  </View>;
 
 let component = ReasonReact.statelessComponent("Page.Stats");
 
@@ -68,8 +65,6 @@ let component = ReasonReact.statelessComponent("Page.Stats");
 let make = (~deck, _children) => {
   ...component,
   render: _self => {
-    open BsReactNative;
-
     let characterCount = Deck.countCharacters(deck);
     let eventCount = Deck.countEvents(deck);
     let battleCount = Deck.countBattles(deck);

@@ -9,12 +9,8 @@ let component = ReasonReact.statelessComponent("Loading");
 
 let make = _children => {
   ...component,
-  render: _self => {
-    open BsReactNative;
-    let _ = ();
-
+  render: _self =>
     <View style=Styles.loadingContainer>
       <ActivityIndicator size=`large color=Colors.Wat.ourBlue />
-    </View>;
-  },
+    </View>,
 };

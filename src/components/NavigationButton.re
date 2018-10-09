@@ -10,13 +10,9 @@ let component = ReasonReact.statelessComponent("NavigationButton");
 let make = (~active, ~onPress, renderChild) => {
   ...component,
   render: _self => {
-    open BsReactNative;
-
-    let _ = ();
-
     let containerStyle =
       if (active) {
-        StyleSheet.flatten([Styles.container, Styles.active]);
+        BsReactNative.StyleSheet.flatten([Styles.container, Styles.active]);
       } else {
         Styles.container;
       };

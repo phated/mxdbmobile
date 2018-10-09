@@ -65,11 +65,9 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   let initialNumToRender = Belt.Array.length(cards);
 
   let renderHeader = title =>
-    BsReactNative.(
-      <View style=Styles.header>
-        <Text style=Styles.headerText> <S> title </S> </Text>
-      </View>
-    );
+    <View style=Styles.header>
+      <Text style=Styles.headerText> <S> title </S> </Text>
+    </View>;
   let renderItem = (card, count) => renderChild(card, count);
 
   {
