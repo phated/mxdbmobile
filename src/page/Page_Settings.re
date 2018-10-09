@@ -1,26 +1,14 @@
 module Styles = {
-  open BsReactNative.Style;
-  /*
-   let listItem =
-     Emotion.style(
-       ~flex=1.0,
-       ~flexDirection="row",
-       ~justifyContent="space-between",
-       ~alignItems="center",
-       ~height=54.0,
-       ~paddingHorizontal=16.0,
-       (),
-     ); */
-
   let listItem =
-    style([
-      flex(1.0),
-      flexDirection(Row),
-      justifyContent(SpaceBetween),
-      alignItems(Center),
-      height(54.0->Pt),
-      paddingHorizontal(16.0->Pt),
-    ]);
+    Emotion.style(
+      ~flex=1.0,
+      ~flexDirection="row",
+      ~justifyContent="space-between",
+      ~alignItems="center",
+      ~height=54.0,
+      ~paddingHorizontal=16.0,
+      (),
+    );
 };
 
 type t = {

@@ -22,21 +22,16 @@ type action('data) =
 let component = ReasonReact.reducerComponent("Page.SavedDecks");
 
 module Styles = {
-  open BsReactNative.Style;
-
   let header =
-    style([
-      height(40.0->Pt),
-      backgroundColor(Colors.Css.ourBlueDark),
-      alignItems(Center),
-      justifyContent(Center),
-    ]);
+    Emotion.style(
+      ~height=40.0,
+      ~backgroundColor=Colors.ourBlueDark,
+      ~alignItems="center",
+      ~justifyContent="center",
+      (),
+    );
   let headerText =
-    style([
-      color(Colors.Css.white),
-      fontSize(20.0->Float),
-      fontWeight(`_800),
-    ]);
+    Emotion.style(~color=Colors.white, ~fontSize=20.0, ~fontWeight="800", ());
 };
 
 let toItem = savedDeck =>

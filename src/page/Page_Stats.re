@@ -1,38 +1,38 @@
 module Styles = {
-  open BsReactNative.Style;
-
-  let scroller = style([flex(1.0)]);
+  let scroller = Emotion.style(~flex=1.0, ());
   let container =
-    style([paddingTop(4.0->Pt), justifyContent(SpaceBetween)]);
+    Emotion.style(~paddingTop=4.0, ~justifyContent="space-between", ());
 
   let warningContainer =
-    style([
-      flexDirection(Row),
-      alignItems(Center),
-      paddingHorizontal(10.0->Pt),
-      paddingVertical(4.0->Pt),
-    ]);
+    Emotion.style(
+      ~flexDirection="row",
+      ~alignItems="center",
+      ~paddingHorizontal=10.0,
+      ~paddingVertical=4.0,
+      (),
+    );
 
   let warningMessageWrapper =
-    style([flex(1.0), paddingHorizontal(4.0->Pt)]);
+    Emotion.style(~flex=1.0, ~paddingHorizontal=4.0, ());
 
-  let warningIcon = style([color(Colors.Css.warning)]);
-  let warningMessage = style([color(Colors.Css.black)]);
-  let warningCounts = style([color(Colors.Css.black), textAlign(Right)]);
+  let warningIcon = Emotion.style(~color=Colors.warning, ());
+  let warningMessage = Emotion.style(~color=Colors.black, ());
+  let warningCounts =
+    Emotion.style(~color=Colors.black, ~textAlign="right", ());
 
   let testCharacter =
-    style([color(Colors.MetaX.Css.character), fontWeight(`Bold)]);
+    Emotion.style(~color=Colors.MetaX.character, ~fontWeight="bold", ());
   let testStrength =
-    style([color(Colors.MetaX.Css.strength), fontWeight(`Bold)]);
+    Emotion.style(~color=Colors.MetaX.strength, ~fontWeight="bold", ());
 
   let chartContainer =
-    style([height(460.0->Pt), padding(10.0->Pt), paddingTop(20.0->Pt)]);
+    Emotion.style(~height=460.0, ~padding=10.0, ~paddingTop=20.0, ());
 };
 
 let toAmountWarningMessage = warning => {
-  open BsReactNative.Style;
+  let titleStyle =
+    Emotion.style(~color=warning##color, ~fontWeight="bold", ());
 
-  let titleStyle = style([color(warning##color), fontWeight(`Bold)]);
   <View style=Styles.warningContainer>
     <Icon name="warning" style=Styles.warningIcon />
     <View style=Styles.warningMessageWrapper>

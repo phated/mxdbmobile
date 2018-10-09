@@ -279,25 +279,25 @@ let getAmountWarnings = deck => {
     if (amount > 3) {
       let (name, color) =
         switch (Js.String.splitAtMost(~limit=2, ":", identifier)) {
-        | [|"1CHARACTER", name|] => (name, Colors.MetaX.Css.character)
-        | [|"2EVENT", name|] => (name, Colors.MetaX.Css.event)
+        | [|"1CHARACTER", name|] => (name, Colors.MetaX.character)
+        | [|"2EVENT", name|] => (name, Colors.MetaX.event)
         | [|"3BATTLE", name|] =>
           switch (name) {
           | _ when Js.String.indexOf("Strength", name) === 0 => (
               name,
-              Colors.MetaX.Css.strength,
+              Colors.MetaX.strength,
             )
           | _ when Js.String.indexOf("Intelligence", name) === 0 => (
               name,
-              Colors.MetaX.Css.intelligence,
+              Colors.MetaX.intelligence,
             )
           | _ when Js.String.indexOf("Special", name) === 0 => (
               name,
-              Colors.MetaX.Css.special,
+              Colors.MetaX.special,
             )
           | _ when Js.String.indexOf("Multi", name) === 0 => (
               name,
-              Colors.MetaX.Css.multi,
+              Colors.MetaX.multi,
             )
           | _ => failwith(name)
           }

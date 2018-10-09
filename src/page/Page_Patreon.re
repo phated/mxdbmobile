@@ -1,21 +1,20 @@
 module Styles = {
-  open BsReactNative.Style;
-
   let container =
-    style([
-      flex(1.0),
-      justifyContent(SpaceBetween),
-      /* marginVertical(50.0 |. Pt), */
-    ]);
+    Emotion.style(~flex=1.0, ~justifyContent="space-between", ());
 
   let blockContainer =
-    style([flex(1.0), justifyContent(Center), alignItems(Center)]);
+    Emotion.style(
+      ~flex=1.0,
+      ~justifyContent="center",
+      ~alignItems="center",
+      (),
+    );
 
-  let patreonButton = style([marginTop(32.0->Pt)]);
+  let patreonButton = Emotion.style(~marginTop=32.0, ());
 
-  let patreonName = style([marginTop(10.0->Pt), fontWeight(`Bold)]);
+  let patreonName = Emotion.style(~marginTop=10.0, ~fontWeight="bold", ());
 
-  let special = style([color(Colors.MetaX.Css.special)]);
+  let special = Emotion.style(~color=Colors.MetaX.special, ());
 };
 
 let component = ReasonReact.statelessComponent("Page.Patreon");

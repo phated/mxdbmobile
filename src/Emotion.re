@@ -1,26 +1,28 @@
-[@bs.deriving abstract]
-type style = {
-  [@bs.optional]
-  color: string,
-  [@bs.optional]
-  fontSize: float,
-  [@bs.optional]
-  margin: float,
-  [@bs.optional]
-  fontWeight: string,
-  [@bs.optional]
-  flex: float,
-  [@bs.optional]
-  flexDirection: string,
-  [@bs.optional]
-  justifyContent: string,
-  [@bs.optional]
-  alignItems: string,
-  [@bs.optional]
-  height: float,
-  [@bs.optional]
-  paddingHorizontal: float,
-};
+type style = BsReactNative.Style.t;
+
+[@bs.obj]
+external style:
+  (
+    ~color: string=?,
+    ~fontSize: float=?,
+    ~margin: float=?,
+    ~fontWeight: string=?,
+    ~flex: float=?,
+    ~flexDirection: string=?,
+    ~justifyContent: string=?,
+    ~alignItems: string=?,
+    ~height: float=?,
+    ~padding: float=?,
+    ~paddingHorizontal: float=?,
+    ~paddingVertical: float=?,
+    ~backgroundColor: string=?,
+    ~marginTop: float=?,
+    ~paddingTop: float=?,
+    ~textAlign: string=?,
+    unit
+  ) =>
+  BsReactNative.Style.t =
+  "";
 
 module type Styled = {let style: style;};
 

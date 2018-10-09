@@ -1,10 +1,14 @@
 module Styles = {
-  open BsReactNative.Style;
-
-  let container = style([flex(1.0), justifyContent(SpaceBetween)]);
+  let container =
+    Emotion.style(~flex=1.0, ~justifyContent="space-between", ());
 
   let blockContainer =
-    style([flex(1.0), alignItems(Center), justifyContent(Center)]);
+    Emotion.style(
+      ~flex=1.0,
+      ~alignItems="center",
+      ~justifyContent="center",
+      (),
+    );
 };
 
 let component = ReasonReact.statelessComponent("Page.Legal");
