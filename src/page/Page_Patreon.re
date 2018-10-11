@@ -48,7 +48,7 @@ let make = _children => {
           <S> " thanks to our Rank 5+ subscribers:" </S>
         </Text>
         <Text style=Styles.patreonName>
-          <S> "Matt Smith, Mark de la Fuente & Steve Paulson" </S>
+          <S> "Matt Smith, Mason Knox, Mark de la Fuente & Steve Paulson" </S>
         </Text>
       </View>
     </View>;
