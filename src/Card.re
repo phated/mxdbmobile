@@ -57,11 +57,10 @@ module Character = {
     );
 
   module Styles = {
-    open BsReactNative.Style;
+    let details = Emotion.style(~paddingHorizontal=8.0, ());
 
-    let details = style([paddingHorizontal(8.0->Pt)]);
-
-    let stats = style([flex(0.0), width(45.0->Pt), alignItems(FlexEnd)]);
+    let stats =
+      Emotion.style(~flex=0.0, ~width=45.0, ~alignItems="flex-end", ());
   };
 
   let component = ReasonReact.statelessComponent("Card.Character");
@@ -120,11 +119,9 @@ module Event = {
     Printf.sprintf("2EVENT:%s", titleGet(card)->Title.toString);
 
   module Styles = {
-    open BsReactNative.Style;
+    let details = Emotion.style(~paddingHorizontal=8.0, ());
 
-    let details = style([paddingHorizontal(8.0->Pt)]);
-
-    let stats = style([flex(0.0)]);
+    let stats = Emotion.style(~flex=0.0, ());
   };
 
   let component = ReasonReact.statelessComponent("Card.Event");
@@ -189,11 +186,9 @@ module Battle = {
   let isMulti = card => statGet(card)->Stat.isMulti;
 
   module Styles = {
-    open BsReactNative.Style;
+    let details = Emotion.style(~paddingHorizontal=8.0, ());
 
-    let details = style([paddingHorizontal(8.0->Pt)]);
-
-    let stats = style([flex(0.0), alignItems(FlexEnd)]);
+    let stats = Emotion.style(~flex=0.0, ~alignItems="flex-end", ());
   };
 
   let component = ReasonReact.statelessComponent("Battle");
@@ -294,9 +289,7 @@ let toGroupIdentifier =
 let isTypeEqual = (c1, c2) => typeGet(c1) === typeGet(c2);
 
 module Styles = {
-  open BsReactNative.Style;
-
-  let container = style([height(182.0->Pt), padding(16.0->Pt)]);
+  let container = Emotion.style(~height=182.0, ~padding=16.0, ());
 };
 
 type retainedProps = {

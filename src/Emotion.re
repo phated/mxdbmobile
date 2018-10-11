@@ -12,6 +12,7 @@ external style:
     ~justifyContent: string=?,
     ~alignItems: string=?,
     ~height: float=?,
+    ~width: float=?,
     ~padding: float=?,
     ~paddingHorizontal: float=?,
     ~paddingVertical: float=?,

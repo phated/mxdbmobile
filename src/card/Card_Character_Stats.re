@@ -3,9 +3,7 @@ type t = array(Card_Stat.t);
 let decoder = json => json |> Json.Decode.array(Card_Stat.decoder);
 
 module Styles = {
-  open BsReactNative.Style;
-
-  let container = style([marginTop(Auto)]);
+  let container = Emotion.style(~marginTop="auto", ());
 };
 
 let component = ReasonReact.statelessComponent("StatList");
