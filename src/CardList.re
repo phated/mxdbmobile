@@ -60,6 +60,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     image {
       thumbnail
       small
+      medium
     }
   }
   events: allCards(filter: {
@@ -88,6 +89,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     image {
       thumbnail
       small
+      medium
     }
   }
   battles: allCards(filter: {
@@ -120,6 +122,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     image {
       thumbnail
       small
+      medium
     }
   }
 }

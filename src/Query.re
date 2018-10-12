@@ -1,6 +1,6 @@
 exception Graphql_error(string);
 
-let send = (q, v) =>
+let send = (q, v, decoder) =>
   Fetch.(
     fetchWithInit(
       "https://api.graph.cool/simple/v1/metaxdb",
@@ -26,7 +26,7 @@ let send = (q, v) =>
                 switch (Js.Json.decodeObject(data)) {
                 | Some(obj) =>
                   Js.Dict.unsafeGet(obj, "data")
-                  |> CardList.decode
+                  |> decoder
                   |> Js.Promise.resolve
                 | None =>
                   Js.Promise.reject(

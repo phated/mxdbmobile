@@ -19,7 +19,7 @@ let getText = effect =>
 module Styles = {
   open BsReactNative.Style;
 
-  let container = style([flex(1.)]);
+  let container = style([flex(1.0)]);
   let effectContainer =
     style([
       justifyContent(FlexEnd),

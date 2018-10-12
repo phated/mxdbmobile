@@ -3,11 +3,10 @@ module Styles = {
 
   let container =
     style([
-      position(Absolute),
       backgroundColor(Colors.Css.transparentWhite),
       alignItems(Center),
       justifyContent(Center),
-      top(60.0->Pt),
+      alignSelf(Center),
       height(30.0->Pt),
       width(35.0->Pt),
     ]);

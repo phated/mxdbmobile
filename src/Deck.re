@@ -456,7 +456,7 @@ let loadFromHash = (~key=?, ~name=?, hash) => {
          let uids =
            Js.Dict.keys(dict) |> Json.Encode.array(Json.Encode.string);
          let vars = Json.Encode.object_([("uids", uids)]);
-         Query.send(query, vars)
+         Query.send(query, vars, CardList.decode)
          |> Js.Promise.then_(cards => {
               let deckArray =
                 CardList.map(

@@ -1,6 +1,7 @@
 type t =
   | Loading
   | Cards
+  | IndividualCard(Card.UID.t)
   | Deck
   | SavedDecks
   | Settings
@@ -15,10 +16,12 @@ module Patreon = Page_Patreon;
 module CardList = Page_CardList;
 module Deck = Page_Deck;
 module SavedDecks = Page_SavedDecks;
+module IndividualCard = Page_IndividualCard;
 
 let fromPath = path =>
   switch (path) {
   | [""] => Cards
+  | ["card", uid] => IndividualCard(Card.UID.fromString(uid))
   | ["loading"] => Loading
   | ["deck"] => Deck
   | ["saved-decks"] => SavedDecks
@@ -32,6 +35,7 @@ let fromPath = path =>
 let toPath = page =>
   switch (page) {
   | Cards => [""]
+  | IndividualCard(uid) => ["card", Card.UID.toString(uid)]
   | Loading => ["loading"]
   | Deck => ["deck"]
   | SavedDecks => ["saved-decks"]

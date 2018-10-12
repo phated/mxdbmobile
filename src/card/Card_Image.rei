@@ -2,16 +2,15 @@ type t;
 
 type size =
   | Thumbnail
-  | Small;
+  | Small
+  | Medium;
 
 let decoder: Js.Json.t => t;
 
-type retainedProps;
-
 let make:
-  (~image: t, ~size: size, array(unit)) =>
+  (~image: t, ~size: size, array(ReasonReact.reactElement)) =>
   ReasonReact.component(
     ReasonReact.stateless,
-    retainedProps,
+    ReasonReact.noRetainedProps,
     ReasonReact.actionless,
   );

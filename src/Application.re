@@ -33,6 +33,16 @@ module Styles = {
 
   let icon = style([color(Colors.Css.white)]);
   let label = style([fontSize(12.0->Float), color(Colors.Css.white)]);
+
+  let individualCard =
+    style([
+      flex(1.0),
+      paddingHorizontal(16.0->Pt),
+      paddingVertical(8.0->Pt),
+    ]);
+
+  let individualCardImage = style([alignItems(Center)]);
+  let individualCardDetails = style([flex(1.0), paddingTop(8.0->Pt)]);
 };
 
 type action =
@@ -104,9 +114,13 @@ let create = () => {
        );
   };
   let clearDeck = (_text, self) => self.Oolong.send(ClearDeck);
-  let increment = (card, self) => self.Oolong.send(Increment(card));
-  let decrement = (card, self) => self.Oolong.send(Decrement(card));
+  let increment = (card, _, self) => self.Oolong.send(Increment(card));
+  let decrement = (card, _, self) => self.Oolong.send(Decrement(card));
   let toCards = (_, self) => self.Oolong.send(NavigateTo(Cards));
+  let toIndividualCard = (card, _, self) => {
+    let uid = Card.uidGet(card);
+    self.Oolong.send(NavigateTo(IndividualCard(uid)));
+  };
   let toDeck = (_, self) =>
     if (Deck.isEmpty(self.Oolong.state.deck)) {
       self.Oolong.send(NavigateTo(SavedDecks));
@@ -220,23 +234,60 @@ let create = () => {
 
       let {deck, filter, page} = state;
 
-      let renderCard = (card, count) =>
-        <Card
-          card
-          count
-          onIncrement={handle(increment)}
-          onDecrement={handle(decrement)}
-        />;
+      let deckListRender = (card, count) => {
+        let renderDetails = details =>
+          <>
+            <Card.Image image={Card.imageGet(card)} size=Thumbnail>
+              <CardCounter
+                onIncrement={handle(increment(card))}
+                onDecrement={handle(decrement(card))}
+                value=count
+              />
+            </Card.Image>
+            details
+          </>;
+
+        <Card card> ...renderDetails </Card>;
+      };
 
       let cardListRender = card => {
         let count = Deck.count(deck, card);
 
-        <Card
-          card
-          count
-          onIncrement={handle(increment)}
-          onDecrement={handle(decrement)}
-        />;
+        let renderDetails = details =>
+          <>
+            <TouchableOpacity onPress={handle(toIndividualCard(card))}>
+              <Card.Image image={Card.imageGet(card)} size=Thumbnail>
+                <CardCounter
+                  onIncrement={handle(increment(card))}
+                  onDecrement={handle(decrement(card))}
+                  value=count
+                />
+              </Card.Image>
+            </TouchableOpacity>
+            details
+          </>;
+
+        <Card card> ...renderDetails </Card>;
+      };
+
+      let cardRender = card => {
+        let count = Deck.count(deck, card);
+
+        let renderDetails = details =>
+          <>
+            <View style=Styles.individualCardImage>
+              <Card.Image image={Card.imageGet(card)} size=Medium>
+                <CardCounter
+                  onIncrement={handle(increment(card))}
+                  onDecrement={handle(decrement(card))}
+                  value=count
+                />
+              </Card.Image>
+            </View>
+            <View style=Styles.individualCardDetails> details </View>
+          </>;
+
+        <Card card style=Styles.individualCard> ...renderDetails </Card>;
       };
 
       let cardListToolbarRender = (~enable, ~disable, mode) =>
@@ -332,11 +383,13 @@ let create = () => {
           <Page.CardList filter position onPersistPosition>
             ...cardListRender
           </Page.CardList>;
+        | Page.IndividualCard(uid) =>
+          <Page.IndividualCard uid> ...cardRender </Page.IndividualCard>
         | Page.Deck =>
           let position = state.deckPosition;
           let onPersistPosition = handle(persistDeckPosition);
           <Page.Deck deck position onPersistPosition>
-            ...renderCard
+            ...deckListRender
           </Page.Deck>;
         | Page.SavedDecks =>
           let position = state.savedDeckPosition;

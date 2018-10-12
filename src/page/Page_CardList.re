@@ -17,7 +17,7 @@ let component =
   ReasonReact.reducerComponentWithRetainedProps("Page.CardList");
 
 let fetchCards = (filter, self) =>
-  Query.send(CardList.query, Filter.encode(filter))
+  Query.send(CardList.query, Filter.encode(filter), CardList.decode)
   /* |> Js.Promise.then_(Utils.tapLog) */
   |> Js.Promise.then_(cards => {
        let data =

@@ -1,5 +1,6 @@
 type t =
   | Empty
+  | UID(Card.UID.t)
   | FreeText(string);
 
 let maybeEncodeMP = maybeInt => {
@@ -15,6 +16,7 @@ let maybeEncodeMP = maybeInt => {
 let toString = filter =>
   switch (filter) {
   | FreeText(searchString) => searchString
+  | UID(uid) => Card.UID.toString(uid)
   | Empty => ""
   };
 
@@ -22,6 +24,10 @@ let encode = filter => {
   let query =
     switch (filter) {
     | Empty => Json.Encode.null
+    | UID(uid) =>
+      Json.Encode.object_([
+        ("uid", Json.Encode.string(Card.UID.toString(uid))),
+      ])
     | FreeText(text) when Card.Symbol.isSymbol(text) =>
       Json.Encode.object_([("symbol", Json.Encode.string(text))])
     | FreeText(text) =>

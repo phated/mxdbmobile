@@ -323,18 +323,9 @@ module Styles = {
     style([height(182.0->Pt), flexDirection(Row), padding(16.0->Pt)]);
 };
 
-type retainedProps = {
-  card: t,
-  count: int,
-};
+let component = ReasonReact.statelessComponent("Card");
 
-let component = ReasonReact.statelessComponentWithRetainedProps("Card");
-
-let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
-  let increment = _ => onIncrement(card);
-  let decrement = _ => onDecrement(card);
-  let image = imageGet(card);
-
+let make = (~card, ~style=Styles.container, renderChildren) => {
   let details =
     switch (card) {
     | Character(card) => <Character card />
@@ -344,19 +335,9 @@ let make = (~card, ~count, ~onIncrement, ~onDecrement, _children) => {
 
   {
     ...component,
-    retainedProps: {
-      card,
-      count,
-    },
-    shouldUpdate: ({oldSelf, newSelf}) =>
-      oldSelf.retainedProps.card != newSelf.retainedProps.card
-      || oldSelf.retainedProps.count != newSelf.retainedProps.count,
     render: _self =>
-      <BsReactNative.View style=Styles.container>
-        <CardCounter onIncrement=increment onDecrement=decrement value=count>
-          <Image image size=Thumbnail />
-        </CardCounter>
-        details
+      <BsReactNative.View style>
+        {renderChildren(details)}
       </BsReactNative.View>,
   };
 };
@@ -386,3 +367,35 @@ module Compare =
         Compare.by(card => uidGet(card)),
       ]);
   });
+
+let query = {|
+query IndividualCard($uid: String) {
+  Card(uid: $uid) {
+    uid
+    rarity
+    number
+    set
+    type
+    title
+    subtitle
+    trait {
+      name
+    }
+    mp
+    stats {
+      type
+      rank
+    }
+    effect {
+      symbol
+      text
+    }
+    image {
+      thumbnail
+      small
+      medium
+      large
+    }
+  }
+}
+|};

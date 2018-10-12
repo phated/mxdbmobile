@@ -1,40 +1,31 @@
 type t = {
   thumbnail: string,
   small: string,
+  medium: string,
 };
 
 type size =
   | Thumbnail
-  | Small;
+  | Small
+  | Medium;
 
 let decoder = json => {
   thumbnail: json |> Json.Decode.field("thumbnail", Json.Decode.string),
   small: json |> Json.Decode.field("small", Json.Decode.string),
+  medium: json |> Json.Decode.field("medium", Json.Decode.string),
 };
 
 module Styles = {
   open BsReactNative.Style;
-
   let thumbnail = style([height(150.0->Pt), width(108.0->Pt)]);
   let small = style([height(200.0->Pt), width(142.0->Pt)]);
+  let medium = style([height(400.0->Pt), width(285.0->Pt)]);
 };
 
-type retainedProps = {
-  image: t,
-  size,
-};
+let component = ReasonReact.statelessComponent("Card.Image");
 
-let component = ReasonReact.statelessComponentWithRetainedProps("Card.Image");
-
-let make = (~image, ~size, _children) => {
+let make = (~image, ~size, children) => {
   ...component,
-  retainedProps: {
-    image,
-    size,
-  },
-  shouldUpdate: ({oldSelf, newSelf}) =>
-    oldSelf.retainedProps.image != newSelf.retainedProps.image
-    || oldSelf.retainedProps.size != newSelf.retainedProps.size,
   render: _self => {
     open BsReactNative;
 
@@ -46,17 +37,26 @@ let make = (~image, ~size, _children) => {
     let image =
       switch (size) {
       | Thumbnail =>
-        <Image
+        <ImageBackground
           style=Styles.thumbnail
           defaultSource
-          source={`URI(Image.imageURISource(~uri=image.small, ()))}
-        />
+          source={`URI(Image.imageURISource(~uri=image.small, ()))}>
+          ...children
+        </ImageBackground>
       | Small =>
-        <Image
+        <ImageBackground
           style=Styles.small
           defaultSource
-          source={`URI(Image.imageURISource(~uri=image.small, ()))}
-        />
+          source={`URI(Image.imageURISource(~uri=image.small, ()))}>
+          ...children
+        </ImageBackground>
+      | Medium =>
+        <ImageBackground
+          style=Styles.medium
+          defaultSource
+          source={`URI(Image.imageURISource(~uri=image.medium, ()))}>
+          ...children
+        </ImageBackground>
       };
 
     <View> image </View>;
