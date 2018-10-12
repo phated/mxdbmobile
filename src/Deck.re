@@ -383,6 +383,7 @@ query CardList($uids: [String!]!) {
     image {
       thumbnail
       small
+      medium
     }
   }
   events: allCards(filter: {
@@ -405,6 +406,7 @@ query CardList($uids: [String!]!) {
     image {
       thumbnail
       small
+      medium
     }
   }
   battles: allCards(filter: {
@@ -431,6 +433,7 @@ query CardList($uids: [String!]!) {
     image {
       thumbnail
       small
+      medium
     }
   }
 }
