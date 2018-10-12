@@ -3,7 +3,8 @@ type activeState('a) =
   | Stored('a);
 
 type action('a) =
-  | FetchCards
+  | InitialFetch
+  | NewSearchFetch
   | StoreCards('a);
 
 type state('a) = {
@@ -46,9 +47,14 @@ let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
     initialState: () => {activeState: Fetching, position},
     reducer: (action, state) =>
       switch (action) {
-      | FetchCards =>
+      | InitialFetch =>
         ReasonReact.UpdateWithSideEffects(
           {...state, activeState: Fetching},
+          fetchCards(filter),
+        )
+      | NewSearchFetch =>
+        ReasonReact.UpdateWithSideEffects(
+          {activeState: Fetching, position: 0.0},
           fetchCards(filter),
         )
       | StoreCards(cards) =>
@@ -57,10 +63,10 @@ let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
     didUpdate: ({oldSelf, newSelf}) => {
       let _ = ();
       if (oldSelf.retainedProps.filter !== newSelf.retainedProps.filter) {
-        newSelf.send(FetchCards);
+        newSelf.send(NewSearchFetch);
       };
     },
-    didMount: self => self.send(FetchCards),
+    didMount: self => self.send(InitialFetch),
     render: self =>
       switch (self.state.activeState) {
       | Fetching => <Loading />

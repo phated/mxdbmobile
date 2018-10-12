@@ -199,6 +199,7 @@ let create = () => {
       | Decrement(card) =>
         let deck = Deck.decrement(state.deck, card);
         Oolong.UpdateWithSideEffects(
+          /* TODO: move all the deckPosition resetting into the Page.Deck component */
           {...state, deck, deckPosition: 0.0},
           saveDeck,
         );
@@ -223,11 +224,7 @@ let create = () => {
       | PersistSavedDeckPosition(savedDeckPosition) =>
         Oolong.Update({...state, savedDeckPosition})
       | Search(filter) =>
-        Oolong.Update({
-          ...state,
-          cardListPosition: 0.0,
-          filter: FreeText(filter),
-        })
+        Oolong.Update({...state, filter: FreeText(filter)})
       },
     view: ({state, handle}) => {
       open BsReactNative;
