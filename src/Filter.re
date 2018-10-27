@@ -20,6 +20,13 @@ let toString = filter =>
   | Empty => ""
   };
 
+/* TODO: This needs to handle UID and other types */
+let fromString = str =>
+  switch (str) {
+  | "" => Empty
+  | searchString => FreeText(searchString)
+  };
+
 let encode = filter => {
   let query =
     switch (filter) {

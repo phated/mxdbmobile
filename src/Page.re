@@ -20,7 +20,7 @@ module IndividualCard = Page_IndividualCard;
 
 let fromPath = path =>
   switch (path) {
-  | [""] => Cards
+  | [] => Cards
   | ["card", uid] => IndividualCard(Card.UID.fromString(uid))
   | ["loading"] => Loading
   | ["deck"] => Deck
@@ -34,13 +34,24 @@ let fromPath = path =>
 
 let toPath = page =>
   switch (page) {
-  | Cards => [""]
+  | Cards => []
   | IndividualCard(uid) => ["card", Card.UID.toString(uid)]
   | Loading => ["loading"]
   | Deck => ["deck"]
   | SavedDecks => ["saved-decks"]
-  | Settings => ["stats"]
+  | Settings => ["settings"]
   | Legal => ["legal"]
   | Patreon => ["patreon"]
-  | Stats => ["settings"]
+  | Stats => ["stats"]
   };
+
+module Path = {
+  let cards = toPath(Cards);
+  let individualCard = uid => toPath(IndividualCard(uid));
+  let deck = toPath(Deck);
+  let savedDecks = toPath(SavedDecks);
+  let settings = toPath(Settings);
+  let legal = toPath(Legal);
+  let patreon = toPath(Patreon);
+  let stats = toPath(Stats);
+};

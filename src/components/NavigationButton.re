@@ -7,7 +7,8 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("NavigationButton");
 
-let make = (~active, ~onPress, renderChild) => {
+/* TODO: I'm thinking that this shouldn't contain the link */
+let make = (~active, ~path, renderChild) => {
   ...component,
   render: _self => {
     open BsReactNative;
@@ -21,8 +22,6 @@ let make = (~active, ~onPress, renderChild) => {
         Styles.container;
       };
 
-    <TouchableOpacity style=containerStyle onPress>
-      {renderChild()}
-    </TouchableOpacity>;
+    <Link style=containerStyle path> {renderChild()} </Link>;
   },
 };

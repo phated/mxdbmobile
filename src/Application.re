@@ -46,7 +46,6 @@ module Styles = {
 };
 
 type action =
-  | NavigateTo(Page.t)
   | Search(string)
   | ReplaceDeck(Deck.t)
   | RenameDeck(string)
@@ -57,6 +56,7 @@ type action =
   | PersistDeckPosition(float)
   | PersistSavedDeckPosition(float)
   | Error
+  | GoBack
   | StorePersistedDeck(Deck.t);
 type state = {
   page: Page.t,
@@ -98,13 +98,33 @@ let renderDeckLabel = (deck, ()) => {
 };
 
 let create = () => {
-  let program = Oolong.routerProgram("Main App");
+  let serializeState = state => {
+    Js.log(state);
+    let path = Page.toPath(state.page);
+    let filter = Filter.toString(state.filter);
+    let hash = Belt.Option.getWithDefault(Deck.hash(state.deck), "");
+    let deckName = Deck.nameGet(state.deck);
+    let search =
+      Printf.sprintf(
+        "filter=%s&cardPos=%f&deckPos=%f&savedDeckPos=%f",
+        filter,
+        state.cardListPosition,
+        state.deckPosition,
+        state.savedDeckPosition,
+      );
+    let searchWithDeckName =
+      Belt.Option.mapWithDefault(deckName, search, deckName =>
+        search ++ "deckName=" ++ deckName
+      );
+    Oolong.Url.make(path, searchWithDeckName, hash);
+  };
+
+  let program = Oolong.routerProgram(~serializeState, "Main App");
 
   let search = (text, self) => self.Oolong.send(Search(text));
   let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
-  let loadDeck = (~key=?, deckName, hash, _, self) => {
-    self.Oolong.send(NavigateTo(Loading));
-
+  let loadDeck = (~key=?, deckName, hash, _, self) =>
+    /* self.Oolong.send(NavigateTo(Loading)); */
     Deck.loadFromHash(~key?, ~name=deckName, hash)
     |> Repromise.wait(result =>
          switch (result) {
@@ -112,25 +132,10 @@ let create = () => {
          | Belt.Result.Error(msg) => Js.log(msg)
          }
        );
-  };
   let clearDeck = (_text, self) => self.Oolong.send(ClearDeck);
   let increment = (card, _, self) => self.Oolong.send(Increment(card));
   let decrement = (card, _, self) => self.Oolong.send(Decrement(card));
-  let toCards = (_, self) => self.Oolong.send(NavigateTo(Cards));
-  let toIndividualCard = (card, _, self) => {
-    let uid = Card.uidGet(card);
-    self.Oolong.send(NavigateTo(IndividualCard(uid)));
-  };
-  let toDeck = (_, self) =>
-    if (Deck.isEmpty(self.Oolong.state.deck)) {
-      self.Oolong.send(NavigateTo(SavedDecks));
-    } else {
-      self.Oolong.send(NavigateTo(Deck));
-    };
-  let toSettings = (_, self) => self.Oolong.send(NavigateTo(Settings));
-  let toStats = (_, self) => self.Oolong.send(NavigateTo(Stats));
-  let toPatreon = (_, self) => self.Oolong.send(NavigateTo(Patreon));
-  let toLegal = (_, self) => self.Oolong.send(NavigateTo(Legal));
+
   let persistCardListPosition = (position, self) =>
     self.Oolong.send(PersistCardListPosition(position));
   let persistDeckPosition = (position, self) =>
@@ -151,82 +156,119 @@ let create = () => {
 
   {
     ...program,
-    fromRoute: (action, route) =>
-      switch (action) {
-      | Init =>
-        Oolong.Update({
-          page: Page.fromPath(route.path),
-          filter: Filter.Empty,
+    subscriptions: _state => [
+      self =>
+        BsReactNative.BackHandler.addEventListener("hardwareBackPress", () =>
+          if (Router.router->Oolong.Router.canGo(-1)) {
+            self.send(GoBack);
+            true;
+          } else {
+            false;
+          }
+        ),
+    ],
+    init: (path, search, hash) => {
+      let params = QueryString.parse(search);
+      let deckName = params->QueryString.get("deckName");
+      let cardListPosition =
+        params->QueryString.getFloat(~default=0.0, "cardPos");
+      let deckPosition =
+        params->QueryString.getFloat(~default=0.0, "deckPos");
+      let savedDeckPosition =
+        params->QueryString.getFloat(~default=0.0, "savedDeckPos");
+      let filter =
+        params
+        ->QueryString.getString(~default="", "filter")
+        ->Filter.fromString;
+      if (hash === "") {
+        Oolong.State({
+          page: Page.fromPath(path),
+          /* TODO: populate these from search/hash */
           deck: Deck.empty,
-          cardListPosition: 0.0,
-          deckPosition: 0.0,
-          savedDeckPosition: 0.0,
-        })
-      | Push => Oolong.NoUpdate
-      | _ => Oolong.NoUpdate
-      },
-    toRoute: ({previous, next}) =>
-      if (previous == next) {
-        Oolong.NoTransition;
+          filter,
+          cardListPosition,
+          deckPosition,
+          savedDeckPosition,
+        });
       } else {
-        let search = Filter.toString(next.filter);
-        Oolong.Push(
-          Oolong.Route.make(~path=Page.toPath(next.page), ~search, ~hash=""),
+        Oolong.StateWithSideEffects(
+          {
+            page: Page.fromPath(path),
+            /* TODO: populate these from search/hash */
+            deck: Deck.empty,
+            filter,
+            cardListPosition,
+            deckPosition,
+            savedDeckPosition,
+          },
+          self =>
+            Deck.loadFromHash(~name=?deckName, hash)
+            |> Repromise.wait(result =>
+                 switch (result) {
+                 | Belt.Result.Ok(deck) =>
+                   self.Oolong.send(ReplaceDeck(deck))
+                 | Belt.Result.Error(msg) => Js.log(msg)
+                 }
+               ),
         );
+      };
+    },
+    fromRoute: (action, state) =>
+      switch (action) {
+      | Push(path, _search, _hash)
+      | Replace(path, _search, _hash) =>
+        Oolong.State({...state, page: Page.fromPath(path)})
+      | Pop(path, _search, _hash) =>
+        let page = Page.fromPath(path);
+        /* TODO: check this logic */
+        page === SavedDecks && state.page === Deck ?
+          Oolong.State({...state, page, deck: Deck.empty}) :
+          Oolong.State({...state, page});
       },
-    update: (action, state) =>
+    toRoute: (action, state) =>
       switch (action) {
       | Error =>
         Js.log("something went terribly wrong");
-        Oolong.NoUpdate;
-      | StorePersistedDeck(deck) =>
-        Oolong.UpdateWithSideEffects(
-          {...state, deck},
-          (
-            self =>
-              ()
-              /* Deck.isEmpty(self.state.deck) ? */
-              /* self.send(NavigateTo(SavedDecks)) : () */
-          ),
-        )
-      | NavigateTo(page) => Oolong.Update({...state, page})
+        Oolong.Ignore;
+      | StorePersistedDeck(deck) => Oolong.Replace({...state, deck})
+      /* | NavigateTo(page) => Oolong.Push({...state, page}) */
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
-        Oolong.UpdateWithSideEffects(
+        Oolong.ReplaceWithSideEffects(
           {...state, deck, deckPosition: 0.0},
           saveDeck,
         );
       | Decrement(card) =>
         let deck = Deck.decrement(state.deck, card);
-        Oolong.UpdateWithSideEffects(
+        Oolong.ReplaceWithSideEffects(
           /* TODO: move all the deckPosition resetting into the Page.Deck component */
           {...state, deck, deckPosition: 0.0},
           saveDeck,
         );
       | ReplaceDeck(deck) =>
-        Oolong.Update({...state, deck, page: Deck, deckPosition: 0.0})
+        Oolong.Push({...state, page: Deck, deck, deckPosition: 0.0})
       | RenameDeck(deckName) =>
-        Oolong.UpdateWithSideEffects(
+        Oolong.ReplaceWithSideEffects(
           {...state, deck: Deck.nameSet(state.deck, deckName)},
           saveDeck,
         )
       | ClearDeck =>
-        Oolong.Update({
+        Oolong.Push({
           ...state,
           deck: Deck.empty,
           page: SavedDecks,
           deckPosition: 0.0,
         })
       | PersistCardListPosition(cardListPosition) =>
-        Oolong.Update({...state, cardListPosition})
+        Oolong.Replace({...state, cardListPosition})
       | PersistDeckPosition(deckPosition) =>
-        Oolong.Update({...state, deckPosition})
+        Oolong.Replace({...state, deckPosition})
       | PersistSavedDeckPosition(savedDeckPosition) =>
-        Oolong.Update({...state, savedDeckPosition})
-      | Search(filter) =>
-        Oolong.Update({...state, filter: FreeText(filter)})
+        Oolong.Replace({...state, savedDeckPosition})
+      | Search(filter) => Oolong.Push({...state, filter: FreeText(filter)})
+      | GoBack => Oolong.Pop
       },
-    view: ({state, handle}) => {
+    render: ({state, handle}) => {
       open BsReactNative;
 
       let {deck, filter, page} = state;
@@ -249,10 +291,11 @@ let create = () => {
 
       let cardListRender = card => {
         let count = Deck.count(deck, card);
+        let uid = Card.uidGet(card);
 
         let renderDetails = details =>
           <>
-            <TouchableOpacity onPress={handle(toIndividualCard(card))}>
+            <Link path={Page.Path.individualCard(uid)}>
               <Card.Image image={Card.imageGet(card)} size=Thumbnail>
                 <CardCounter
                   onIncrement={handle(increment(card))}
@@ -260,7 +303,7 @@ let create = () => {
                   value=count
                 />
               </Card.Image>
-            </TouchableOpacity>
+            </Link>
             details
           </>;
 
@@ -397,12 +440,24 @@ let create = () => {
         | Page.Stats => <Page.Stats deck />
         | Page.Settings =>
           let data = [|
-            Page.Settings.{title: "Patreon", onPress: handle(toPatreon)},
-            Page.Settings.{title: "Legal", onPress: handle(toLegal)},
+            Page.Settings.{title: "Patreon", path: Page.Path.patreon},
+            Page.Settings.{title: "Legal", path: Page.Path.legal},
           |];
           <Page.Settings data />;
         | Page.Patreon => <Page.Patreon />
         | Page.Legal => <Page.Legal />
+        };
+
+      let deckOrSaved = () =>
+        if (Deck.isEmpty(deck)) {
+          <NavigationButton
+            active={state.page === SavedDecks} path=Page.Path.savedDecks>
+            ...{renderLabeledIcon(~icon="deck", ~label="Saved Decks")}
+          </NavigationButton>;
+        } else {
+          <NavigationButton active={state.page === Deck} path=Page.Path.deck>
+            ...{renderDeckLabel(deck)}
+          </NavigationButton>;
         };
 
       <SafeAreaView style=Styles.container>
@@ -410,21 +465,15 @@ let create = () => {
         <Toolbar> ...toolbarRender </Toolbar>
         page
         <NavigationBar>
-          <NavigationButton
-            active={state.page === Cards} onPress={handle(toCards)}>
+          <NavigationButton active={state.page === Cards} path=Page.Path.cards>
             ...{renderLabeledIcon(~icon="cards", ~label="Cards")}
           </NavigationButton>
-          <NavigationButton
-            active={state.page === Deck || state.page === SavedDecks}
-            onPress={handle(toDeck)}>
-            ...{renderDeckLabel(deck)}
-          </NavigationButton>
-          <NavigationButton
-            active={state.page === Stats} onPress={handle(toStats)}>
+          {deckOrSaved()}
+          <NavigationButton active={state.page === Stats} path=Page.Path.stats>
             ...{renderLabeledIcon(~icon="chart-bar", ~label="Stats")}
           </NavigationButton>
           <NavigationButton
-            active={state.page === Settings} onPress={handle(toSettings)}>
+            active={state.page === Settings} path=Page.Path.settings>
             ...{renderLabeledIcon(~icon="settings", ~label="Settings")}
           </NavigationButton>
         </NavigationBar>

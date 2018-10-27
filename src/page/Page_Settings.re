@@ -14,19 +14,19 @@ module Styles = {
 
 type t = {
   title: string,
-  onPress: unit => unit,
+  path: list(string),
 };
 
 let component = ReasonReact.statelessComponent("Page.Settings");
 
-let renderItem = ({title, onPress}) =>
+let renderItem = ({title, path}) =>
   BsReactNative.(
-    <TouchableOpacity onPress>
+    <Link path>
       <View style=Styles.listItem>
         <Text> <S> title </S> </Text>
         <Icon name="chevron-right" />
       </View>
-    </TouchableOpacity>
+    </Link>
   );
 
 /* TODO: retained props */
