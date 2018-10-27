@@ -31,7 +31,7 @@ module Styles = {
       right((-20.0)->Pt),
     ]);
 
-  let icon = style([color(Colors.Css.white)]);
+  let icon = style([color(Colors.Css.white), alignSelf(Center)]);
   let label = style([fontSize(12.0->Float), color(Colors.Css.white)]);
 
   let individualCard =
@@ -67,34 +67,47 @@ type state = {
   savedDeckPosition: float,
 };
 
-let renderLabeledIcon = (~label, ~icon, ()) =>
-  <>
-    <Icon name=icon style=Styles.icon />
-    <BsReactNative.Text style=Styles.label>
-      <S> label </S>
-    </BsReactNative.Text>
-  </>;
+module LabeledIcon = {
+  let component = ReasonReact.statelessComponent("LabeledIcon");
 
-let renderDeckLabel = (deck, ()) => {
-  open BsReactNative;
-  let deckSize = Deck.total(deck);
+  let make = (~label, ~icon, _children) => {
+    ...component,
+    render: _self =>
+      <>
+        <Icon name=icon style=Styles.icon />
+        <BsReactNative.Text style=Styles.label>
+          <S> label </S>
+        </BsReactNative.Text>
+      </>,
+  };
+};
+module DeckLabeledIcon = {
+  let component = ReasonReact.statelessComponent("DeckLabeledIcon");
 
-  let errorIcon =
-    if (Deck.isValid(deck)) {
-      ReasonReact.null;
-    } else {
-      <View style=Styles.deckErrorWrapper>
-        <Icon name="warning" size=16 style=Styles.deckError />
-      </View>;
-    };
+  let make = (~deck, _children) => {
+    ...component,
+    render: _self => {
+      open BsReactNative;
+      let deckSize = Deck.total(deck);
 
-  <>
-    <Icon name="deck" style=Styles.icon />
-    errorIcon
-    <Text style=Styles.label>
-      <S> {Printf.sprintf("Deck (%d)", deckSize)} </S>
-    </Text>
-  </>;
+      let errorIcon =
+        if (Deck.isValid(deck)) {
+          ReasonReact.null;
+        } else {
+          <View style=Styles.deckErrorWrapper>
+            <Icon name="warning" size=16 style=Styles.deckError />
+          </View>;
+        };
+
+      <>
+        <Icon name="deck" style=Styles.icon />
+        errorIcon
+        <Text style=Styles.label>
+          <S> {Printf.sprintf("Deck (%d)", deckSize)} </S>
+        </Text>
+      </>;
+    },
+  };
 };
 
 let create = () => {
@@ -439,6 +452,7 @@ let create = () => {
           </Page.SavedDecks>;
         | Page.Stats => <Page.Stats deck />
         | Page.Settings =>
+          /* TODO: This is gross, probably want render children */
           let data = [|
             Page.Settings.{title: "Patreon", path: Page.Path.patreon},
             Page.Settings.{title: "Legal", path: Page.Path.legal},
@@ -448,15 +462,16 @@ let create = () => {
         | Page.Legal => <Page.Legal />
         };
 
-      let deckOrSaved = () =>
+      let deckOrSaved =
         if (Deck.isEmpty(deck)) {
-          <NavigationButton
-            active={state.page === SavedDecks} path=Page.Path.savedDecks>
-            ...{renderLabeledIcon(~icon="deck", ~label="Saved Decks")}
+          <NavigationButton active={state.page === SavedDecks}>
+            <Link path=Page.Path.savedDecks>
+              <LabeledIcon icon="deck" label="Saved Decks" />
+            </Link>
           </NavigationButton>;
         } else {
-          <NavigationButton active={state.page === Deck} path=Page.Path.deck>
-            ...{renderDeckLabel(deck)}
+          <NavigationButton active={state.page === Deck}>
+            <Link path=Page.Path.deck> <DeckLabeledIcon deck /> </Link>
           </NavigationButton>;
         };
 
@@ -465,16 +480,21 @@ let create = () => {
         <Toolbar> ...toolbarRender </Toolbar>
         page
         <NavigationBar>
-          <NavigationButton active={state.page === Cards} path=Page.Path.cards>
-            ...{renderLabeledIcon(~icon="cards", ~label="Cards")}
+          <NavigationButton active={state.page === Cards}>
+            <Link path=Page.Path.cards>
+              <LabeledIcon icon="cards" label="Cards" />
+            </Link>
           </NavigationButton>
-          {deckOrSaved()}
-          <NavigationButton active={state.page === Stats} path=Page.Path.stats>
-            ...{renderLabeledIcon(~icon="chart-bar", ~label="Stats")}
+          deckOrSaved
+          <NavigationButton active={state.page === Stats}>
+            <Link path=Page.Path.stats>
+              <LabeledIcon icon="chart-bar" label="Stats" />
+            </Link>
           </NavigationButton>
-          <NavigationButton
-            active={state.page === Settings} path=Page.Path.settings>
-            ...{renderLabeledIcon(~icon="settings", ~label="Settings")}
+          <NavigationButton active={state.page === Settings}>
+            <Link path=Page.Path.settings>
+              <LabeledIcon icon="settings" label="Settings" />
+            </Link>
           </NavigationButton>
         </NavigationBar>
       </SafeAreaView>;

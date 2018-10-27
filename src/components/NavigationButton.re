@@ -7,13 +7,10 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("NavigationButton");
 
-/* TODO: I'm thinking that this shouldn't contain the link */
-let make = (~active, ~path, renderChild) => {
+let make = (~active, children) => {
   ...component,
   render: _self => {
     open BsReactNative;
-
-    let _ = ();
 
     let containerStyle =
       if (active) {
@@ -22,6 +19,6 @@ let make = (~active, ~path, renderChild) => {
         Styles.container;
       };
 
-    <Link style=containerStyle path> {renderChild()} </Link>;
+    <View style=containerStyle> ...children </View>;
   },
 };
