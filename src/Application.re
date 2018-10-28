@@ -108,7 +108,11 @@ let create = () => {
     |> Repromise.wait(result =>
          switch (result) {
          | Belt.Result.Ok(deck) =>
-           self.Oolong.send(StorePersistedDeck(deck))
+           if (Deck.isEmpty(deck)) {
+             self.Oolong.send(ClearDeck);
+           } else {
+             self.Oolong.send(StorePersistedDeck(deck));
+           }
          | Belt.Result.Error(_) => self.Oolong.send(Error)
          }
        );
@@ -211,10 +215,12 @@ let create = () => {
           saveDeck,
         )
       | ClearDeck =>
-        Oolong.Push({
+        /* TODO: This REPLACE is overwriting the "/deck" url which causes a "double back" scenario */
+        /* I might be able to solve it by combining the Deck/SavedDeck stuff and maybe creating a HashedDeck type */
+        Oolong.Replace({
           ...state,
+          page: state.page === Deck ? SavedDecks : state.page,
           deck: Deck.empty,
-          page: SavedDecks,
           deckPosition: 0.0,
         })
       | PersistCardListPosition(cardListPosition) =>
