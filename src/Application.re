@@ -31,7 +31,7 @@ module Styles = {
       right((-20.0)->Pt),
     ]);
 
-  let icon = style([color(Colors.Css.white), alignSelf(Center)]);
+  let icon = style([color(Colors.Css.white)]);
   let label = style([fontSize(12.0->Float), color(Colors.Css.white)]);
 
   let individualCard =
@@ -465,13 +465,21 @@ let create = () => {
       let deckOrSaved =
         if (Deck.isEmpty(deck)) {
           <NavigationButton active={state.page === SavedDecks}>
-            <Link path=Page.Path.savedDecks>
-              <LabeledIcon icon="deck" label="Saved Decks" />
-            </Link>
+            ...{
+                 style =>
+                   <Link style path=Page.Path.savedDecks>
+                     <LabeledIcon icon="view-list" label="Saved Decks" />
+                   </Link>
+               }
           </NavigationButton>;
         } else {
           <NavigationButton active={state.page === Deck}>
-            <Link path=Page.Path.deck> <DeckLabeledIcon deck /> </Link>
+            ...{
+                 style =>
+                   <Link style path=Page.Path.deck>
+                     <DeckLabeledIcon deck />
+                   </Link>
+               }
           </NavigationButton>;
         };
 
@@ -481,20 +489,29 @@ let create = () => {
         page
         <NavigationBar>
           <NavigationButton active={state.page === Cards}>
-            <Link path=Page.Path.cards>
-              <LabeledIcon icon="cards" label="Cards" />
-            </Link>
+            ...{
+                 style =>
+                   <Link style path=Page.Path.cards>
+                     <LabeledIcon icon="cards" label="Cards" />
+                   </Link>
+               }
           </NavigationButton>
           deckOrSaved
           <NavigationButton active={state.page === Stats}>
-            <Link path=Page.Path.stats>
-              <LabeledIcon icon="chart-bar" label="Stats" />
-            </Link>
+            ...{
+                 style =>
+                   <Link style path=Page.Path.stats>
+                     <LabeledIcon icon="chart-bar" label="Stats" />
+                   </Link>
+               }
           </NavigationButton>
           <NavigationButton active={state.page === Settings}>
-            <Link path=Page.Path.settings>
-              <LabeledIcon icon="settings" label="Settings" />
-            </Link>
+            ...{
+                 style =>
+                   <Link style path=Page.Path.settings>
+                     <LabeledIcon icon="settings" label="Settings" />
+                   </Link>
+               }
           </NavigationButton>
         </NavigationBar>
       </SafeAreaView>;

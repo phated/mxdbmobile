@@ -7,7 +7,7 @@ module Styles = {
 
 let component = ReasonReact.statelessComponent("NavigationButton");
 
-let make = (~active, children) => {
+let make = (~active, renderChildren) => {
   ...component,
   render: _self => {
     open BsReactNative;
@@ -19,6 +19,6 @@ let make = (~active, children) => {
         Styles.container;
       };
 
-    <View style=containerStyle> ...children </View>;
+    renderChildren(containerStyle);
   },
 };
