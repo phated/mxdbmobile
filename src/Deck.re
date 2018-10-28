@@ -6,12 +6,14 @@ type name = string;
 
 type t =
   | Empty
+  | Waiting
   | Named(name, decklist)
   | Saved(saveKey, name, decklist);
 
 let keyGet = deck =>
   switch (deck) {
   | Empty => None
+  | Waiting => None
   | Named(_) => None
   | Saved(saveKey, _name, _deck) => Some(saveKey)
   };
@@ -19,6 +21,7 @@ let keyGet = deck =>
 let keySet = (deck, saveKey) =>
   switch (deck) {
   | Empty => Empty
+  | Waiting => Waiting
   | Named(name, deck) => Saved(saveKey, name, deck)
   | Saved(_saveKey, name, deck) => Saved(saveKey, name, deck)
   };
@@ -26,6 +29,7 @@ let keySet = (deck, saveKey) =>
 let nameGet = deck =>
   switch (deck) {
   | Empty => None
+  | Waiting => None
   | Named(name, _deck) => Some(name)
   | Saved(_saveKey, name, _deck) => Some(name)
   };
@@ -35,13 +39,16 @@ let nameSet = (deck, name) =>
   | Saved(saveKey, _name, deck) => Saved(saveKey, name, deck)
   | Named(_name, deck) => Named(name, deck)
   | Empty => Named(name, emptyDecklist)
+  | Waiting => Waiting
   };
 
 let empty = Empty;
+let waiting = Waiting;
 
 let unbox = deck =>
   switch (deck) {
   | Empty => emptyDecklist
+  | Waiting => emptyDecklist
   | Named(_name, deck) => deck
   | Saved(_saveKey, _name, deck) => deck
   };
@@ -78,6 +85,15 @@ let isEmpty = deck =>
   /* TODO: not sure if I should check this */
   /* | Some({deck}) => Belt.Map.isEmpty(deck) */
   | Empty => true
+  | Waiting => false
+  | Named(_) => false
+  | Saved(_) => false
+  };
+
+let isWaiting = deck =>
+  switch (deck) {
+  | Waiting => true
+  | Empty => false
   | Named(_) => false
   | Saved(_) => false
   };
@@ -220,6 +236,7 @@ let total = deck => reduce(deck, 0, (total, _card, count) => count + total);
 
 let update = (deck, key, fn) =>
   switch (deck) {
+  | Waiting => Waiting
   | Empty =>
     let newDeck = Belt.Map.update(emptyDecklist, key, fn);
     if (Belt.Map.isEmpty(newDeck)) {

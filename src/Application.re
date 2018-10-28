@@ -22,18 +22,6 @@ module Styles = {
     ]);
   let deckName = style([fontSize(20.0->Float)]);
 
-  let deckErrorWrapper = style([width(16.0->Pt), position(Absolute)]);
-  let deckError =
-    style([
-      color(Colors.Css.warning),
-      position(Absolute),
-      top(4.0->Pt),
-      right((-20.0)->Pt),
-    ]);
-
-  let icon = style([color(Colors.Css.white)]);
-  let label = style([fontSize(12.0->Float), color(Colors.Css.white)]);
-
   let individualCard =
     style([
       flex(1.0),
@@ -47,7 +35,8 @@ module Styles = {
 
 type action =
   | Search(string)
-  | ReplaceDeck(Deck.t)
+  | DeckLoaded(Deck.t)
+  | DeckRestored(Deck.t)
   | RenameDeck(string)
   | ClearDeck
   | Increment(Card.t)
@@ -65,49 +54,6 @@ type state = {
   cardListPosition: float,
   deckPosition: float,
   savedDeckPosition: float,
-};
-
-module LabeledIcon = {
-  let component = ReasonReact.statelessComponent("LabeledIcon");
-
-  let make = (~label, ~icon, _children) => {
-    ...component,
-    render: _self =>
-      <>
-        <Icon name=icon style=Styles.icon />
-        <BsReactNative.Text style=Styles.label>
-          <S> label </S>
-        </BsReactNative.Text>
-      </>,
-  };
-};
-module DeckLabeledIcon = {
-  let component = ReasonReact.statelessComponent("DeckLabeledIcon");
-
-  let make = (~deck, _children) => {
-    ...component,
-    render: _self => {
-      open BsReactNative;
-      let deckSize = Deck.total(deck);
-
-      let errorIcon =
-        if (Deck.isValid(deck)) {
-          ReasonReact.null;
-        } else {
-          <View style=Styles.deckErrorWrapper>
-            <Icon name="warning" size=16 style=Styles.deckError />
-          </View>;
-        };
-
-      <>
-        <Icon name="deck" style=Styles.icon />
-        errorIcon
-        <Text style=Styles.label>
-          <S> {Printf.sprintf("Deck (%d)", deckSize)} </S>
-        </Text>
-      </>;
-    },
-  };
 };
 
 let create = () => {
@@ -141,7 +87,7 @@ let create = () => {
     Deck.loadFromHash(~key?, ~name=deckName, hash)
     |> Repromise.wait(result =>
          switch (result) {
-         | Belt.Result.Ok(deck) => self.Oolong.send(ReplaceDeck(deck))
+         | Belt.Result.Ok(deck) => self.Oolong.send(DeckLoaded(deck))
          | Belt.Result.Error(msg) => Js.log(msg)
          }
        );
@@ -196,7 +142,6 @@ let create = () => {
       if (hash === "") {
         Oolong.State({
           page: Page.fromPath(path),
-          /* TODO: populate these from search/hash */
           deck: Deck.empty,
           filter,
           cardListPosition,
@@ -207,8 +152,7 @@ let create = () => {
         Oolong.StateWithSideEffects(
           {
             page: Page.fromPath(path),
-            /* TODO: populate these from search/hash */
-            deck: Deck.empty,
+            deck: Deck.waiting,
             filter,
             cardListPosition,
             deckPosition,
@@ -219,7 +163,7 @@ let create = () => {
             |> Repromise.wait(result =>
                  switch (result) {
                  | Belt.Result.Ok(deck) =>
-                   self.Oolong.send(ReplaceDeck(deck))
+                   self.Oolong.send(DeckRestored(deck))
                  | Belt.Result.Error(msg) => Js.log(msg)
                  }
                ),
@@ -244,7 +188,6 @@ let create = () => {
         Js.log("something went terribly wrong");
         Oolong.Ignore;
       | StorePersistedDeck(deck) => Oolong.Replace({...state, deck})
-      /* | NavigateTo(page) => Oolong.Push({...state, page}) */
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);
         Oolong.ReplaceWithSideEffects(
@@ -258,8 +201,10 @@ let create = () => {
           {...state, deck, deckPosition: 0.0},
           saveDeck,
         );
-      | ReplaceDeck(deck) =>
+      | DeckLoaded(deck) =>
         Oolong.Push({...state, page: Deck, deck, deckPosition: 0.0})
+      | DeckRestored(deck) =>
+        Oolong.Replace({...state, deck, deckPosition: 0.0})
       | RenameDeck(deckName) =>
         Oolong.ReplaceWithSideEffects(
           {...state, deck: Deck.nameSet(state.deck, deckName)},
@@ -462,27 +407,6 @@ let create = () => {
         | Page.Legal => <Page.Legal />
         };
 
-      let deckOrSaved =
-        if (Deck.isEmpty(deck)) {
-          <NavigationButton active={state.page === SavedDecks}>
-            ...{
-                 style =>
-                   <Link style path=Page.Path.savedDecks>
-                     <LabeledIcon icon="view-list" label="Saved Decks" />
-                   </Link>
-               }
-          </NavigationButton>;
-        } else {
-          <NavigationButton active={state.page === Deck}>
-            ...{
-                 style =>
-                   <Link style path=Page.Path.deck>
-                     <DeckLabeledIcon deck />
-                   </Link>
-               }
-          </NavigationButton>;
-        };
-
       <SafeAreaView style=Styles.container>
         <StatusBar backgroundColor=Colors.ourBlueDark />
         <Toolbar> ...toolbarRender </Toolbar>
@@ -496,7 +420,25 @@ let create = () => {
                    </Link>
                }
           </NavigationButton>
-          deckOrSaved
+          <NavigationButton
+            active={state.page === SavedDecks || state.page === Deck}>
+            ...{
+                 style =>
+                   if (Deck.isEmpty(deck)) {
+                     <Link style path=Page.Path.savedDecks>
+                       <LabeledIcon icon="view-list" label="Decks" />
+                     </Link>;
+                   } else if (Deck.isWaiting(deck)) {
+                     <Link style path=Page.Path.deck>
+                       <LabeledIcon icon="loop" label="Loading" />
+                     </Link>;
+                   } else {
+                     <Link style path=Page.Path.deck>
+                       <DeckLabeledIcon deck />
+                     </Link>;
+                   }
+               }
+          </NavigationButton>
           <NavigationButton active={state.page === Stats}>
             ...{
                  style =>
