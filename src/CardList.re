@@ -21,6 +21,7 @@ let decode = json => {
        |]
      );
 };
+let parse = decode;
 
 let query = {|
 query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $effect: String, $symbol: CardSymbol) {
