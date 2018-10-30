@@ -39,6 +39,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
       { effect: { symbol: $symbol } }
     ]
   }, orderBy: title_ASC) {
+    id
     uid
     rarity
     number
@@ -47,18 +48,22 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     title
     subtitle
     trait {
+      id
       name
     }
     mp
     stats {
+      id
       type
       rank
     }
     effect {
+      id
       symbol
       text
     }
     image {
+      id
       thumbnail
       small
       medium
@@ -76,6 +81,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
       { effect: { symbol: $symbol } }
     ]
   }, orderBy: title_ASC) {
+    id
     uid
     rarity
     number
@@ -84,10 +90,12 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     title
     mp
     effect {
+      id
       symbol
       text
     }
     image {
+      id
       thumbnail
       small
       medium
@@ -105,6 +113,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
       { effect: { symbol: $symbol } }
     ]
   }, orderBy: title_ASC) {
+    id
     uid
     rarity
     number
@@ -113,14 +122,17 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
     type
     mp
     stats(orderBy: type_ASC) {
+      id
       type
       rank
     }
     effect {
+      id
       symbol
       text
     }
     image {
+      id
       thumbnail
       small
       medium

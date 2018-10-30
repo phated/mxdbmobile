@@ -14,7 +14,10 @@ let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
   {
     ...component,
     render: _self =>
-      <GetCardsQuery client=Apollo.client variables={Filter.encode(filter)}>
+      <GetCardsQuery
+        client=Apollo.client
+        fetchPolicy="no-cache"
+        variables={Filter.encode(filter)}>
         ...{
              ({result}) =>
                switch (result) {
