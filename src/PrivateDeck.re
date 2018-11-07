@@ -19,7 +19,7 @@ let getAll = () => {
 let persist = deck => {
   let maybeKey = Deck.keyGet(deck);
   let maybeName = Deck.nameGet(deck);
-  let maybeHash = Deck.hash(deck);
+  let maybeHash = Deck.asMap(deck)->Deck.Hash.encode;
 
   switch (maybeKey, maybeName, maybeHash) {
   | (Some(key), _, None) =>

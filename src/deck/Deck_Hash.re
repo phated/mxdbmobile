@@ -1,3 +1,5 @@
+type t = string;
+
 type encodeResult = {
   cardHashes: list(string),
   checksum: int,
@@ -150,4 +152,27 @@ let encodeCard = (result, card, qty) => {
 let emptyResult = encodedVersion => {
   cardHashes: [],
   checksum: encodeChecksum(encodedVersion),
+};
+
+let encode = deck => {
+  let version = 0;
+
+  let encodedVersion = toBase64(version);
+
+  let result = emptyResult(encodedVersion);
+
+  let encodeResult = Belt.Map.reduce(deck, result, encodeCard);
+
+  let encodedDeck =
+    encodedVersion ++ String.concat("", encodeResult.cardHashes);
+
+  let base64Checksum = toBase64(encodeResult.checksum mod 64);
+
+  let encoded = encodedDeck ++ base64Checksum;
+  /* AiAASAhA */
+  if (Belt.List.size(encodeResult.cardHashes) > 0) {
+    Some(encoded);
+  } else {
+    None;
+  };
 };

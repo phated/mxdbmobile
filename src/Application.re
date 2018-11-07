@@ -1,3 +1,5 @@
+[%%debugger.chrome];
+
 module Styles = {
   open BsReactNative.Style;
 
@@ -61,7 +63,11 @@ let create = () => {
     Js.log(state);
     let path = Page.toPath(state.page);
     let filter = Filter.toString(state.filter);
-    let hash = Belt.Option.getWithDefault(Deck.hash(state.deck), "");
+    let hash =
+      Belt.Option.getWithDefault(
+        Deck.asMap(state.deck)->Deck.Hash.encode,
+        "",
+      );
     let deckName = Deck.nameGet(state.deck);
     let search =
       Printf.sprintf(
@@ -83,14 +89,14 @@ let create = () => {
   let search = (text, self) => self.Oolong.send(Search(text));
   let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
   let loadDeck = (~key=?, deckName, hash, _, self) =>
-    /* self.Oolong.send(NavigateTo(Loading)); */
-    Deck.loadFromHash(~key?, ~name=deckName, hash)
-    |> Repromise.wait(result =>
-         switch (result) {
-         | Belt.Result.Ok(deck) => self.Oolong.send(DeckLoaded(deck))
-         | Belt.Result.Error(msg) => Js.log(msg)
-         }
-       );
+    self.Oolong.send(DeckLoaded(Hashed(hash)));
+  /* Deck.loadFromHash(~key?, ~name=deckName, hash)
+     |> Repromise.wait(result =>
+          switch (result) {
+          | Belt.Result.Ok(deck) => self.Oolong.send(DeckLoaded(deck))
+          | Belt.Result.Error(msg) => Js.log(msg)
+          }
+        ); */
   let clearDeck = (_text, self) => self.Oolong.send(ClearDeck);
   let increment = (card, _, self) => self.Oolong.send(Increment(card));
   let decrement = (card, _, self) => self.Oolong.send(Decrement(card));
@@ -156,21 +162,21 @@ let create = () => {
         Oolong.StateWithSideEffects(
           {
             page: Page.fromPath(path),
-            deck: Deck.waiting,
+            deck: Deck.empty,
             filter,
             cardListPosition,
             deckPosition,
             savedDeckPosition,
           },
-          self =>
-            Deck.loadFromHash(~name=?deckName, hash)
-            |> Repromise.wait(result =>
-                 switch (result) {
-                 | Belt.Result.Ok(deck) =>
-                   self.Oolong.send(DeckRestored(deck))
-                 | Belt.Result.Error(msg) => Js.log(msg)
-                 }
-               ),
+          self => self.Oolong.send(DeckRestored(Hashed(hash))),
+          /* Deck.loadFromHash(~name=?deckName, hash)
+             |> Repromise.wait(result =>
+                  switch (result) {
+                  | Belt.Result.Ok(deck) =>
+                    self.Oolong.send(DeckRestored(deck))
+                  | Belt.Result.Error(msg) => Js.log(msg)
+                  }
+                ), */
         );
       };
     },
@@ -190,7 +196,7 @@ let create = () => {
       switch (action) {
       | Error =>
         Js.log("something went terribly wrong");
-        Oolong.Ignore;
+        Oolong.Replace(state);
       | StorePersistedDeck(deck) => Oolong.Replace({...state, deck})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);

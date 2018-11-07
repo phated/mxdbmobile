@@ -1,3 +1,5 @@
+module Hash = Deck_Hash;
+
 type decklist = Belt.Map.t(Card.Compare.t, int, Card.Compare.identity);
 let emptyDecklist = Belt.Map.make(~id=(module Card.Compare));
 
@@ -6,14 +8,14 @@ type name = string;
 
 type t =
   | Empty
-  | Waiting
+  | Hashed(string)
   | Named(name, decklist)
   | Saved(saveKey, name, decklist);
 
 let keyGet = deck =>
   switch (deck) {
   | Empty => None
-  | Waiting => None
+  | Hashed(_) => None
   | Named(_) => None
   | Saved(saveKey, _name, _deck) => Some(saveKey)
   };
@@ -21,7 +23,7 @@ let keyGet = deck =>
 let keySet = (deck, saveKey) =>
   switch (deck) {
   | Empty => Empty
-  | Waiting => Waiting
+  | Hashed(hash) => Hashed(hash)
   | Named(name, deck) => Saved(saveKey, name, deck)
   | Saved(_saveKey, name, deck) => Saved(saveKey, name, deck)
   };
@@ -29,7 +31,7 @@ let keySet = (deck, saveKey) =>
 let nameGet = deck =>
   switch (deck) {
   | Empty => None
-  | Waiting => None
+  | Hashed(_hash) => None
   | Named(name, _deck) => Some(name)
   | Saved(_saveKey, name, _deck) => Some(name)
   };
@@ -39,16 +41,15 @@ let nameSet = (deck, name) =>
   | Saved(saveKey, _name, deck) => Saved(saveKey, name, deck)
   | Named(_name, deck) => Named(name, deck)
   | Empty => Named(name, emptyDecklist)
-  | Waiting => Waiting
+  | Hashed(hash) => Hashed(hash)
   };
 
 let empty = Empty;
-let waiting = Waiting;
 
 let unbox = deck =>
   switch (deck) {
   | Empty => emptyDecklist
-  | Waiting => emptyDecklist
+  | Hashed(_) => emptyDecklist
   | Named(_name, deck) => deck
   | Saved(_saveKey, _name, deck) => deck
   };
@@ -85,19 +86,20 @@ let isEmpty = deck =>
   /* TODO: not sure if I should check this */
   /* | Some({deck}) => Belt.Map.isEmpty(deck) */
   | Empty => true
-  | Waiting => false
+  | Hashed(_) => false
   | Named(_) => false
   | Saved(_) => false
   };
 
 let isWaiting = deck =>
   switch (deck) {
-  | Waiting => true
   | Empty => false
+  | Hashed(_) => false
   | Named(_) => false
   | Saved(_) => false
   };
 
+let asMap = deck => unbox(deck);
 let toArray = deck => unbox(deck)->Belt.Map.toArray;
 
 let reduce = (deck, init, fn) => unbox(deck)->Belt.Map.reduce(init, fn);
@@ -236,7 +238,7 @@ let total = deck => reduce(deck, 0, (total, _card, count) => count + total);
 
 let update = (deck, key, fn) =>
   switch (deck) {
-  | Waiting => Waiting
+  | Hashed(hash) => Hashed(hash)
   | Empty =>
     let newDeck = Belt.Map.update(emptyDecklist, key, fn);
     if (Belt.Map.isEmpty(newDeck)) {
@@ -347,158 +349,56 @@ let hasValidDeckSize = deck => total(deck) <= 40;
 
 let isValid = deck => hasValidDeckSize(deck) && hasValidGroupings(deck);
 
-let hash = deck => {
-  let version = 0;
-
-  let encodedVersion = Hash.toBase64(version);
-
-  let result = Hash.emptyResult(encodedVersion);
-
-  let encodeResult = reduce(deck, result, Hash.encodeCard);
-
-  let encodedDeck =
-    encodedVersion ++ String.concat("", encodeResult.cardHashes);
-
-  let base64Checksum = Hash.toBase64(encodeResult.checksum mod 64);
-
-  let encoded = encodedDeck ++ base64Checksum;
-  /* AiAASAhA */
-  if (Belt.List.size(encodeResult.cardHashes) > 0) {
-    Some(encoded);
-  } else {
-    None;
-  };
-};
-
 let query = {|
-query CardList($uids: [String!]!) {
-  characters: allCards(filter: {
-    AND: [
-      { type: Character },
-      { uid_in: $uids }
-    ]
-  }, orderBy: title_ASC) {
-    uid
-    rarity
-    number
-    set
-    type
-    title
-    subtitle
-    trait {
-      name
-    }
-    mp
-    stats {
+query Deck($hash: String!) {
+  deck(hash: $hash) {
+    card {
+      id
+      uid
+      rarity
+      number
+      set
       type
-      rank
+      title
+      subtitle
+      trait {
+        id
+        name
+      }
+      mp
+      stats(orderBy: type_ASC) {
+        id
+        type
+        rank
+      }
+      effect {
+        id
+        symbol
+        text
+      }
+      image {
+        id
+        thumbnail
+        small
+        medium
+      }
     }
-    effect {
-      symbol
-      text
-    }
-    image {
-      thumbnail
-      small
-      medium
-    }
-  }
-  events: allCards(filter: {
-    AND: [
-      { type: Event },
-      { uid_in: $uids }
-    ]
-  }, orderBy: title_ASC) {
-    uid
-    rarity
-    number
-    set
-    type
-    title
-    mp
-    effect {
-      symbol
-      text
-    }
-    image {
-      thumbnail
-      small
-      medium
-    }
-  }
-  battles: allCards(filter: {
-    AND: [
-      { type: Battle },
-      { uid_in: $uids }
-    ]
-  }, orderBy: title_ASC) {
-    uid
-    rarity
-    number
-    set
-    type
-    title
-    mp
-    stats(orderBy: type_ASC) {
-      type
-      rank
-    }
-    effect {
-      symbol
-      text
-    }
-    image {
-      thumbnail
-      small
-      medium
-    }
+    quantity
   }
 }
 |};
 
-let decode = json => json |> Json.Decode.dict(Json.Decode.int);
-
-let loadFromHash = (~key=?, ~name=?, hash) => {
-  let (result, resolve) = Repromise.make();
-
-  MyFetch.fetch(
-    "https://metax.toyboat.net/decodeDeck.php?output=metaxdb&hash=" ++ hash,
-  )
-  |> Repromise.map(result =>
-       switch (result) {
-       | Belt.Result.Ok(data) => decode(data)->Belt.Result.Ok
-       | Belt.Result.Error(msg) => Belt.Result.Error(msg)
-       }
+let decode = json =>
+  json
+  |> Json.Decode.field(
+       "deck",
+       Json.Decode.array(json =>
+         (
+           json |> Json.Decode.field("card", Card.decoder),
+           json |> Json.Decode.field("quantity", Json.Decode.int),
+         )
+       ),
      )
-  |> Repromise.wait(result =>
-       switch (result) {
-       | Belt.Result.Ok(dict) =>
-         let uids =
-           Js.Dict.keys(dict) |> Json.Encode.array(Json.Encode.string);
-         let vars = Json.Encode.object_([("uids", uids)]);
-         Query.send(query, vars, CardList.decode)
-         |> Js.Promise.then_(cards => {
-              let deckArray =
-                CardList.map(
-                  cards,
-                  card => {
-                    let uid = Card.uidGet(card)->Card.UID.toString;
-                    let count = Js.Dict.unsafeGet(dict, uid);
-                    (card, count);
-                  },
-                );
+  |> fromArray;
 
-              fromArray(~key?, ~name?, deckArray)->Belt.Result.Ok->resolve;
-              Js.Promise.resolve(cards);
-            })
-         |> Js.Promise.catch(err => {
-              Js.log(err);
-              Js.Promise.reject(Failure("wat"));
-            })
-         |> ignore;
-       | Belt.Result.Error(msg) => Belt.Result.Error(msg)->resolve
-       }
-     );
-
-  result;
-};
+let parse = decode;

@@ -16,6 +16,8 @@ module Styles = {
     ]);
 };
 
+module GetDeckQuery = ReasonApollo.CreateQuery(Deck);
+
 let component = ReasonReact.statelessComponent("Page.Deck");
 
 let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
@@ -54,16 +56,6 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
         PositionedList.Item({key: nextCard, value: count, size: 183}),
       |];
 
-  let cards = Deck.flatMap2(deck, init, mapper);
-  /*
-   I'm not too sure why my Header items cause the list to jump when restoring position
-   but if I render all elements up front, it doesn't jump.
-   This shouldn't be an issue because decks aren't super long.
-
-   TODO: Maybe add the `initialScrollIndex` to positioned list
-    */
-  let initialNumToRender = Belt.Array.length(cards);
-
   let renderHeader = title =>
     BsReactNative.(
       <View style=Styles.header>
@@ -75,14 +67,64 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   {
     ...component,
     render: _self =>
-      <PositionedList
-        data=cards
-        initialNumToRender
-        renderItem
-        renderHeader
-        position
-        onPersistPosition
-        keyExtractor
-      />,
+      switch (deck) {
+      | Empty => ReasonReact.null
+      | Named(_, _)
+      | Saved(_, _, _) =>
+        let data = Deck.flatMap2(deck, init, mapper);
+        /*
+         I'm not too sure why my Header items cause the list to jump when restoring position
+         but if I render all elements up front, it doesn't jump.
+         This shouldn't be an issue because decks aren't super long.
+
+         TODO: Maybe add the `initialScrollIndex` to positioned list
+          */
+        let initialNumToRender = Belt.Array.length(data);
+        <PositionedList
+          data
+          initialNumToRender
+          renderItem
+          renderHeader
+          position
+          onPersistPosition
+          keyExtractor
+        />;
+      | Hashed(deckHash) =>
+        let variables =
+          Json.Encode.object_([("hash", Json.Encode.string(deckHash))]);
+        <GetDeckQuery client=Apollo.client variables>
+          ...(
+               ({result}) =>
+                 switch (result) {
+                 | Loading => <Loading />
+                 | Error(error) =>
+                   BsReactNative.(
+                     <View>
+                       <Text> {ReasonReact.string(error##message)} </Text>
+                     </View>
+                   )
+                 | Data(deck) =>
+                   let data = Deck.flatMap2(deck, init, mapper);
+                   /*
+                    I'm not too sure why my Header items cause the list to jump when restoring position
+                    but if I render all elements up front, it doesn't jump.
+                    This shouldn't be an issue because decks aren't super long.
+
+                    TODO: Maybe add the `initialScrollIndex` to positioned list
+                     */
+                   let initialNumToRender = Belt.Array.length(data);
+                   <PositionedList
+                     data
+                     initialNumToRender
+                     renderItem
+                     renderHeader
+                     position
+                     onPersistPosition
+                     keyExtractor
+                   />;
+                 }
+             )
+        </GetDeckQuery>;
+      },
   };
 };
