@@ -32,6 +32,7 @@
     "bs-history": "^1.0.0",
     "bs-platform": "^4.0.0",
     "bs-react-native": "^0.10.0-rc.0",
+    "cuid": "^2.1.4",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
     "history": "^4.7.2",

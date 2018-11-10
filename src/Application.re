@@ -79,10 +79,8 @@ let create = () => {
         state.deckPosition,
         state.savedDeckPosition,
       );
-    let searchWithDeckName =
-      Belt.Option.mapWithDefault(deckName, search, deckName =>
-        search ++ "deckName=" ++ deckName
-      );
+    let searchWithDeckName = search ++ "&deckName=" ++ deckName;
+
     Oolong.Url.make(path, searchWithDeckName, hash);
   };
 
@@ -92,8 +90,9 @@ let create = () => {
 
   let search = (text, self) => self.Oolong.send(Search(text));
   let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
-  let loadDeck = (~key=?, deckName, hash, _, self) =>
-    self.Oolong.send(DeckLoaded(Hashed(hash)));
+  let loadDeck = (~key, deckName, hash, _, self) =>
+    /* TODO: This is turning every deck loaded into remote which we can't operate on */
+    self.Oolong.send(DeckLoaded(Remote(key, deckName, hash)));
   /* Deck.loadFromHash(~key?, ~name=deckName, hash)
      |> Repromise.wait(result =>
           switch (result) {
@@ -112,20 +111,12 @@ let create = () => {
   let persistSavedDeckPosition = (position, self) =>
     self.Oolong.send(PersistSavedDeckPosition(position));
 
-  let saveDeck = self =>
-    /* TODO: Indicator for saving deck (if this takes long/can fail) */
-    PrivateDeck.persist(self.Oolong.state.deck)
-    |> Repromise.wait(result =>
-         switch (result) {
-         | Belt.Result.Ok(deck) =>
-           if (Deck.isEmpty(deck)) {
-             self.Oolong.send(ClearDeck);
-           } else {
-             self.Oolong.send(StorePersistedDeck(deck));
-           }
-         | Belt.Result.Error(_) => self.Oolong.send(Error)
-         }
-       );
+  let saveDeck = self => {
+    let mutation = Apollo.gql(. PrivateDeck.Mutation.query);
+    let variables = Deck.encode(self.Oolong.state.deck);
+    let _ = Apollo.Client.mutate(~mutation, ~variables, client);
+    ();
+  };
 
   {
     ...program,
@@ -153,36 +144,36 @@ let create = () => {
         params
         ->QueryString.getString(~default="", "filter")
         ->Filter.fromString;
-      if (hash === "") {
-        Oolong.State({
-          page: Page.fromPath(path),
-          deck: Deck.empty,
-          filter,
-          cardListPosition,
-          deckPosition,
-          savedDeckPosition,
-        });
-      } else {
-        Oolong.StateWithSideEffects(
-          {
-            page: Page.fromPath(path),
-            deck: Deck.empty,
-            filter,
-            cardListPosition,
-            deckPosition,
-            savedDeckPosition,
-          },
-          self => self.Oolong.send(DeckRestored(Hashed(hash))),
-          /* Deck.loadFromHash(~name=?deckName, hash)
-             |> Repromise.wait(result =>
-                  switch (result) {
-                  | Belt.Result.Ok(deck) =>
-                    self.Oolong.send(DeckRestored(deck))
-                  | Belt.Result.Error(msg) => Js.log(msg)
-                  }
-                ), */
-        );
-      };
+      /* if (hash === "") { */
+      Oolong.State({
+        page: Page.fromPath(path),
+        deck: Deck.empty(),
+        filter,
+        cardListPosition,
+        deckPosition,
+        savedDeckPosition,
+      });
+      /* } else {
+           Oolong.StateWithSideEffects(
+             {
+               page: Page.fromPath(path),
+               deck: Deck.empty(),
+               filter,
+               cardListPosition,
+               deckPosition,
+               savedDeckPosition,
+             },
+             self => self.Oolong.send(DeckRestored(Remote(hash))),
+             /* Deck.loadFromHash(~name=?deckName, hash)
+                |> Repromise.wait(result =>
+                     switch (result) {
+                     | Belt.Result.Ok(deck) =>
+                       self.Oolong.send(DeckRestored(deck))
+                     | Belt.Result.Error(msg) => Js.log(msg)
+                     }
+                   ), */
+           );
+         }; */
     },
     fromRoute: (action, state) =>
       switch (action) {
@@ -193,7 +184,7 @@ let create = () => {
         let page = Page.fromPath(path);
         /* TODO: check this logic */
         page === SavedDecks && state.page === Deck ?
-          Oolong.State({...state, page, deck: Deck.empty}) :
+          Oolong.State({...state, page, deck: Deck.empty()}) :
           Oolong.State({...state, page});
       },
     toRoute: (action, state) =>
@@ -230,7 +221,7 @@ let create = () => {
         Oolong.Replace({
           ...state,
           page: state.page === Deck ? SavedDecks : state.page,
-          deck: Deck.empty,
+          deck: Deck.empty(),
           deckPosition: 0.0,
         })
       | PersistCardListPosition(cardListPosition) =>
@@ -329,7 +320,7 @@ let create = () => {
             <IconButton icon="arrow-back" onPress=disable />
             <ToolbarInput
               placeholder="Deck Name"
-              previous={Belt.Option.getWithDefault(Deck.nameGet(deck), "")}
+              previous={Deck.nameGet(deck)}
               onBlur=disable
               onSubmit={handle(renameDeck)}
             />
@@ -343,7 +334,7 @@ let create = () => {
               onPress=enable>
               <Icon name="edit" size=16 />
               <S> " " </S>
-              <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
+              <S> {Deck.nameGet(deck)} </S>
             </Text>
             <IconButton icon="playlist-remove" onPress={handle(clearDeck)} />
           </>
@@ -371,33 +362,16 @@ let create = () => {
         switch (savedDeck) {
         | Page.SavedDecks.Public({id, name, author, hash}) =>
           let deckName = Printf.sprintf("%s by %s", name, author);
-          <SavePrivateDeck client>
-            ...(
-                 (mutate, _) =>
-                   <TouchableOpacity
-                     onPress={
-                       () =>
-                         mutate(
-                           ~variables=
-                             Json.Encode.object_([
-                               ("key", Json.Encode.string(id)),
-                               ("name", Json.Encode.string(name)),
-                               ("hash", Json.Encode.string(hash)),
-                             ]),
-                           (),
-                         )
-                         |> ignore
-                     }>
-                     <View style=Styles.deck>
-                       <Text style=Styles.deckName numberOfLines=1>
-                         <S> deckName </S>
-                       </Text>
-                     </View>
-                   </TouchableOpacity>
-               )
-          </SavePrivateDeck>;
+          <TouchableOpacity
+            onPress={handle(loadDeck(~key=id, deckName, hash))}>
+            <View style=Styles.deck>
+              <Text style=Styles.deckName numberOfLines=1>
+                <S> deckName </S>
+              </Text>
+            </View>
+          </TouchableOpacity>;
         | Page.SavedDecks.Private({key, name, hash}) =>
-          <TouchableOpacity onPress=(() => ())>
+          <TouchableOpacity onPress={handle(loadDeck(~key, name, hash))}>
             <View style=Styles.deck>
               <Text style=Styles.deckName numberOfLines=1>
                 <S> name </S>
@@ -461,10 +435,6 @@ let create = () => {
                    if (Deck.isEmpty(deck)) {
                      <Link style path=Page.Path.savedDecks>
                        <LabeledIcon icon="view-list" label="Decks" />
-                     </Link>;
-                   } else if (Deck.isWaiting(deck)) {
-                     <Link style path=Page.Path.deck>
-                       <LabeledIcon icon="loop" label="Loading" />
                      </Link>;
                    } else {
                      <Link style path=Page.Path.deck>

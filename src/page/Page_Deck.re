@@ -68,9 +68,7 @@ let make = (~client, ~deck, ~position, ~onPersistPosition, renderChild) => {
     ...component,
     render: _self =>
       switch (deck) {
-      | Empty => ReasonReact.null
-      | Named(_, _)
-      | Saved(_, _, _) =>
+      | Local(_, _, _) =>
         let data = Deck.flatMap2(deck, init, mapper);
         /*
          I'm not too sure why my Header items cause the list to jump when restoring position
@@ -89,7 +87,7 @@ let make = (~client, ~deck, ~position, ~onPersistPosition, renderChild) => {
           onPersistPosition
           keyExtractor
         />;
-      | Hashed(deckHash) =>
+      | Remote(_, _, deckHash) =>
         let variables =
           Json.Encode.object_([("hash", Json.Encode.string(deckHash))]);
         <GetDeckQuery client variables>

@@ -3,100 +3,81 @@ module Hash = Deck_Hash;
 type decklist = Belt.Map.t(Card.Compare.t, int, Card.Compare.identity);
 let emptyDecklist = Belt.Map.make(~id=(module Card.Compare));
 
-type saveKey = string;
 type name = string;
+type uid = string;
+
+/* TODO: move out? */
+[@bs.module] external cuid: unit => uid = "cuid";
 
 type t =
-  | Empty
-  | Hashed(string)
-  | Named(name, decklist)
-  | Saved(saveKey, name, decklist);
+  | Remote(uid, name, string)
+  | Local(uid, name, decklist);
 
 let keyGet = deck =>
   switch (deck) {
-  | Empty => None
-  | Hashed(_) => None
-  | Named(_) => None
-  | Saved(saveKey, _name, _deck) => Some(saveKey)
-  };
-
-let keySet = (deck, saveKey) =>
-  switch (deck) {
-  | Empty => Empty
-  | Hashed(hash) => Hashed(hash)
-  | Named(name, deck) => Saved(saveKey, name, deck)
-  | Saved(_saveKey, name, deck) => Saved(saveKey, name, deck)
+  | Remote(uid, _, _) => uid
+  | Local(uid, _, _) => uid
   };
 
 let nameGet = deck =>
   switch (deck) {
-  | Empty => None
-  | Hashed(_hash) => None
-  | Named(name, _deck) => Some(name)
-  | Saved(_saveKey, name, _deck) => Some(name)
+  | Remote(_, name, _) => name
+  | Local(_, name, _) => name
   };
 
 let nameSet = (deck, name) =>
   switch (deck) {
-  | Saved(saveKey, _name, deck) => Saved(saveKey, name, deck)
-  | Named(_name, deck) => Named(name, deck)
-  | Empty => Named(name, emptyDecklist)
-  | Hashed(hash) => Hashed(hash)
+  /* TODO: wat */
+  | Remote(uid, _name, hash) => Remote(uid, name, hash)
+  | Local(uid, _name, deck) => Local(uid, name, deck)
   };
 
-let empty = Empty;
+let hashGet = deck =>
+  switch (deck) {
+  | Remote(_, _, hash) => hash
+  | Local(_, _, deck) => Belt.Option.getWithDefault(Hash.encode(deck), "")
+  };
+
+let untitled = () => {
+  let now = Js.Date.make();
+  let todayDate = Js.Date.toLocaleDateString(now);
+  let todayTime = Js.Date.toLocaleTimeString(now);
+  Printf.sprintf("Untitled - %s %s", todayDate, todayTime);
+};
+
+let empty = () => {
+  let uid = cuid();
+  let name = untitled();
+  Local(uid, name, emptyDecklist);
+};
 
 let unbox = deck =>
   switch (deck) {
-  | Empty => emptyDecklist
-  | Hashed(_) => emptyDecklist
-  | Named(_name, deck) => deck
-  | Saved(_saveKey, _name, deck) => deck
+  | Remote(_, _, _) => emptyDecklist
+  | Local(_saveKey, _name, deck) => deck
   };
 
 let forEach = (deck, iter) => unbox(deck)->Belt.Map.forEach(iter);
 
-let mergeMany = (deck, deckArray) =>
-  unbox(deck)->Belt.Map.mergeMany(deckArray);
+/* let mergeMany = (deck, deckArray) =>
+   unbox(deck)->Belt.Map.mergeMany(deckArray); */
 
 let make = (~key=?, ~name=?, decklist) => {
-  let deckName =
-    switch (name) {
-    | Some(name) => name
-    | None =>
-      let now = Js.Date.make();
-      let todayDate = Js.Date.toLocaleDateString(now);
-      let todayTime = Js.Date.toLocaleTimeString(now);
-      Printf.sprintf("Untitled - %s %s", todayDate, todayTime);
-    };
+  let deckName = Belt.Option.getWithDefault(name, untitled());
+  let uid = Belt.Option.getWithDefault(name, cuid());
 
-  switch (key) {
-  | None => Named(deckName, decklist)
-  | Some(saveKey) => Saved(saveKey, deckName, decklist)
-  };
+  Local(uid, deckName, decklist);
 };
 
 let fromArray = (~key=?, ~name=?, deckArray) => {
-  let deck = mergeMany(Empty, deckArray);
+  let deck = Belt.Map.mergeMany(emptyDecklist, deckArray);
   make(~key?, ~name?, deck);
 };
 
 let isEmpty = deck =>
   switch (deck) {
-  /* TODO: not sure if I should check this */
-  /* | Some({deck}) => Belt.Map.isEmpty(deck) */
-  | Empty => true
-  | Hashed(_) => false
-  | Named(_) => false
-  | Saved(_) => false
-  };
-
-let isWaiting = deck =>
-  switch (deck) {
-  | Empty => false
-  | Hashed(_) => false
-  | Named(_) => false
-  | Saved(_) => false
+  | Remote(_, _, hash) => String.length(hash) !== 0
+  | Local(_, _, deck) => Belt.Map.isEmpty(deck)
   };
 
 let asMap = deck => unbox(deck);
@@ -238,22 +219,9 @@ let total = deck => reduce(deck, 0, (total, _card, count) => count + total);
 
 let update = (deck, key, fn) =>
   switch (deck) {
-  | Hashed(hash) => Hashed(hash)
-  | Empty =>
-    let newDeck = Belt.Map.update(emptyDecklist, key, fn);
-    if (Belt.Map.isEmpty(newDeck)) {
-      Empty;
-    } else {
-      make(newDeck);
-    };
-  | Named(name, deck) =>
-    /* TODO: What happens if you "empty" a named deck? */
-    let newDeck = Belt.Map.update(deck, key, fn);
-    Named(name, newDeck);
-  | Saved(saveKey, name, deck) =>
-    /* TODO: What happens if you "empty" a saved deck? */
-    let newDeck = Belt.Map.update(deck, key, fn);
-    Saved(saveKey, name, newDeck);
+  | Remote(uid, name, hash) => Remote(uid, name, hash)
+  | Local(uid, name, deck) =>
+    Local(uid, name, Belt.Map.update(deck, key, fn))
   };
 
 let increment = (deck, card) => update(deck, card, maybeInc);
@@ -400,5 +368,12 @@ let decode = json =>
        ),
      )
   |> fromArray;
+
+let encode = deck =>
+  Json.Encode.object_([
+    ("key", Json.Encode.string(keyGet(deck))),
+    ("name", Json.Encode.string(nameGet(deck))),
+    ("hash", Json.Encode.string(hashGet(deck))),
+  ]);
 
 let parse = decode;
