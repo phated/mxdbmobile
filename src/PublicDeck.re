@@ -1,24 +1,16 @@
-type publicDeck = {
+type t = {
+  id: string,
   author: string,
   name: string,
   hash: string,
 };
 
-type t = array(publicDeck);
-
-let decode = json =>
-  json
-  |> Json.Decode.field(
-       "publicDecks",
-       Json.Decode.array(json =>
-         {
-           author: json |> Json.Decode.field("author", Json.Decode.string),
-           name: json |> Json.Decode.field("name", Json.Decode.string),
-           hash: json |> Json.Decode.field("hash", Json.Decode.string),
-         }
-       ),
-     );
-let parse = decode;
+let decode = json => {
+  id: json |> Json.Decode.field("id", Json.Decode.string),
+  author: json |> Json.Decode.field("author", Json.Decode.string),
+  name: json |> Json.Decode.field("name", Json.Decode.string),
+  hash: json |> Json.Decode.field("hash", Json.Decode.string),
+};
 
 let query = {|
 query {

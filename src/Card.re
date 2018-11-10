@@ -259,6 +259,7 @@ let decoder = json =>
        Json.Decode.map(ofEvent, Event.decoder),
        Json.Decode.map(ofBattle, Battle.decoder),
      ]);
+let parse = json => json |> Json.Decode.field("card", decoder);
 
 let uidGet =
   fun
@@ -370,7 +371,8 @@ module Compare =
 
 let query = {|
 query IndividualCard($uid: String) {
-  Card(uid: $uid) {
+  card: Card(uid: $uid) {
+    id
     uid
     rarity
     number
@@ -379,18 +381,22 @@ query IndividualCard($uid: String) {
     title
     subtitle
     trait {
+      id
       name
     }
     mp
     stats {
+      id
       type
       rank
     }
     effect {
+      id
       symbol
       text
     }
     image {
+      id
       thumbnail
       small
       medium

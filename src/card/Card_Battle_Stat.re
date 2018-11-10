@@ -84,11 +84,19 @@ let fromStatList: array(Card_Stat.t) => t =
     | [|Strength(rank)|] => Strength(rank)
     | [|Intelligence(rank)|] => Intelligence(rank)
     | [|Special(rank)|] => Special(rank)
-    /* Alphabetized */
-    | [|Intelligence(rank), Special(_)|] => IntelligenceSpecial(rank)
+    /* TODO: These are all valid combinations - ignoring ordering - it would be nice to clean this up */
+    | [|Intelligence(rank), Special(_)|]
+    | [|Special(rank), Intelligence(_)|] => IntelligenceSpecial(rank)
+    | [|Strength(rank), Intelligence(_)|]
     | [|Intelligence(rank), Strength(_)|] => StrengthIntelligence(rank)
+    | [|Strength(rank), Special(_)|]
     | [|Special(rank), Strength(_)|] => StrengthSpecial(rank)
-    | [|Intelligence(rank), Special(_), Strength(_)|] =>
+    | [|Strength(rank), Intelligence(_), Special(_)|]
+    | [|Strength(rank), Special(_), Intelligence(_)|]
+    | [|Intelligence(rank), Strength(_), Special(_)|]
+    | [|Intelligence(rank), Special(_), Strength(_)|]
+    | [|Special(rank), Strength(_), Intelligence(_)|]
+    | [|Special(rank), Intelligence(_), Strength(_)|] =>
       StrengthIntelligenceSpecial(rank)
     | _ => failwith("Invalid Battle Card stat list.")
     };

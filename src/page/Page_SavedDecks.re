@@ -1,5 +1,5 @@
 type t =
-  | Public(PublicDeck.publicDeck)
+  | Public(PublicDeck.t)
   | Private(PrivateDeck.t);
 
 let toPublic = deck => Public(deck);
@@ -37,61 +37,25 @@ let keyExtractor = (item, _idx) =>
   | PositionedList.Item({key}) => key
   };
 
-/* let toListItems = (privateDecks, publicDecks) => {
-     let data = Belt.MutableQueue.make();
+let toListItems = (privateDecks, publicDecks) => {
+  let data = Belt.MutableQueue.make();
 
-     if (Belt.Array.length(privateDecks) > 0) {
-       Belt.MutableQueue.add(data, PositionedList.Header("Saved Decks"));
-       Belt.Array.forEach(privateDecks, deck =>
-         Belt.MutableQueue.add(data, toItem(deck))
-       );
-     };
+  if (Belt.Array.length(privateDecks) > 0) {
+    Belt.MutableQueue.add(data, PositionedList.Header("Saved Decks"));
+    Belt.Array.forEach(privateDecks, deck =>
+      Belt.MutableQueue.add(data, toItem(deck))
+    );
+  };
 
-     if (Belt.Array.length(publicDecks) > 0) {
-       Belt.MutableQueue.add(data, PositionedList.Header("Public Decks"));
-       Belt.Array.forEach(publicDecks, deck =>
-         Belt.MutableQueue.add(data, toItem(deck))
-       );
-     };
+  if (Belt.Array.length(publicDecks) > 0) {
+    Belt.MutableQueue.add(data, PositionedList.Header("Public Decks"));
+    Belt.Array.forEach(publicDecks, deck =>
+      Belt.MutableQueue.add(data, toItem(deck))
+    );
+  };
 
-     Belt.MutableQueue.toArray(data);
-   };
-
-   let getPublicDecks = () =>
-      PublicDeck.getAll()
-      |> Repromise.map(result =>
-           switch (result) {
-           | Belt.Result.Ok(decks) =>
-             Belt.Array.map(decks, toPublic)->Belt.Result.Ok
-           | Belt.Result.Error(msg) => Belt.Result.Error(msg)
-           }
-         ); */
-
-/* let getDecks = self => {
-     let private = getPrivateDecks();
-
-     let public = getPublicDecks();
-
-     Repromise.all([private, public])
-     |> Repromise.map(results =>
-          switch (results) {
-          | [private, public] =>
-            let privateDecks = Belt.Result.getWithDefault(private, [||]);
-            let publicDecks = Belt.Result.getWithDefault(public, [||]);
-
-            let data = toListItems(privateDecks, publicDecks);
-
-            Belt.Result.Ok(data);
-          | _ => Belt.Result.Error("Invalid results")
-          }
-        )
-     |> Repromise.wait(result =>
-          switch (result) {
-          | Belt.Result.Ok(data) => self.ReasonReact.send(StoreData(data))
-          | Belt.Result.Error(msg) => Js.log(msg)
-          }
-        );
-   }; */
+  Belt.MutableQueue.toArray(data);
+};
 
 let renderHeader = title =>
   BsReactNative.(
@@ -100,14 +64,14 @@ let renderHeader = title =>
     </View>
   );
 
-module PublicDecksQuery = ReasonApollo.CreateQuery(PublicDeck);
+module DeckList = Apollo.CreateQuery(DeckList);
 
 let component = ReasonReact.statelessComponent("Page.SavedDecks");
 
-let make = (~position, ~onPersistPosition, renderItem) => {
+let make = (~client, ~position, ~onPersistPosition, renderItem) => {
   ...component,
   render: _self =>
-    <PublicDecksQuery client=Apollo.client>
+    <DeckList client>
       ...{
            ({result}) =>
              switch (result) {
@@ -119,11 +83,14 @@ let make = (~position, ~onPersistPosition, renderItem) => {
                  </View>
                )
              | Data(decks) =>
-               let data =
-                 Belt.Array.map(decks, item => item->toPublic->toItem);
+               let public = Belt.Array.map(decks.public, toPublic);
+               let private = Belt.Array.map(decks.private, toPrivate);
+               let data = toListItems(private, public);
+
                <PositionedList
                  data
                  renderItem
+                 renderHeader
                  position
                  onPersistPosition
                  initialNumToRender=15
@@ -131,5 +98,5 @@ let make = (~position, ~onPersistPosition, renderItem) => {
                />;
              }
          }
-    </PublicDecksQuery>,
+    </DeckList>,
 };

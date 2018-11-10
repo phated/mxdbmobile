@@ -16,11 +16,11 @@ module Styles = {
     ]);
 };
 
-module GetDeckQuery = ReasonApollo.CreateQuery(Deck);
+module GetDeckQuery = Apollo.CreateQuery(Deck);
 
 let component = ReasonReact.statelessComponent("Page.Deck");
 
-let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
+let make = (~client, ~deck, ~position, ~onPersistPosition, renderChild) => {
   let toHeader = card =>
     switch (card) {
     | Card.Character(_) =>
@@ -92,7 +92,7 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
       | Hashed(deckHash) =>
         let variables =
           Json.Encode.object_([("hash", Json.Encode.string(deckHash))]);
-        <GetDeckQuery client=Apollo.client variables>
+        <GetDeckQuery client variables>
           ...(
                ({result}) =>
                  switch (result) {

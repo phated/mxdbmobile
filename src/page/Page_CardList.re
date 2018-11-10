@@ -1,4 +1,4 @@
-module GetCardsQuery = ReasonApollo.CreateQuery(CardList);
+module GetCardsQuery = Apollo.CreateQuery(CardList);
 
 type action =
   | LoadData;
@@ -8,7 +8,7 @@ type state =
 
 let component = ReasonReact.reducerComponent("Page.CardList");
 
-let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
+let make = (~client, ~filter, ~position, ~onPersistPosition, renderChild) => {
   let renderItem = (card, _) => renderChild(card);
   /* TODO: move this back into PositionedList? */
   let keyExtractor = (item, _idx) =>
@@ -32,7 +32,7 @@ let make = (~filter, ~position, ~onPersistPosition, renderChild) => {
       switch (self.state) {
       | QuickRender => <Loading />
       | DataRender =>
-        <GetCardsQuery client=Apollo.client variables={Filter.encode(filter)}>
+        <GetCardsQuery client variables={Filter.encode(filter)}>
           ...(
                ({result}) =>
                  switch (result) {

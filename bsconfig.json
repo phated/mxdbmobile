@@ -7,11 +7,10 @@
   "refmt": 3,
   "bs-dependencies": [
     "reason-react",
-    "reason-apollo",
     "bs-react-native",
-    "bs-fetch",
     "@glennsl/bs-json",
     "bs-history",
+    "@reasonableconsulting/apollo",
     "@reasonableconsulting/oolong",
     "@reasonableconsulting/compare",
     "@reasonableconsulting/bs-victory",

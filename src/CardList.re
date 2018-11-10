@@ -42,7 +42,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
       name
     }
     mp
-    stats(orderBy: type_ASC) {
+    stats {
       id
       type
       rank
@@ -57,6 +57,7 @@ query CardList($title: String, $subtitle: String, $trait: String, $mp: Int, $eff
       thumbnail
       small
       medium
+      large
     }
   }
 }

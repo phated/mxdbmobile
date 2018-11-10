@@ -58,6 +58,8 @@ type state = {
   savedDeckPosition: float,
 };
 
+module SavePrivateDeck = Apollo.CreateMutation(PrivateDeck.Mutation);
+
 let create = () => {
   let serializeState = state => {
     Js.log(state);
@@ -85,6 +87,8 @@ let create = () => {
   };
 
   let program = Oolong.routerProgram(~serializeState, "Main App");
+
+  let client = ApolloClient.make();
 
   let search = (text, self) => self.Oolong.send(Search(text));
   let renameDeck = (text, self) => self.Oolong.send(RenameDeck(text));
@@ -365,17 +369,35 @@ let create = () => {
 
       let renderDeck = (_key, savedDeck) =>
         switch (savedDeck) {
-        | Page.SavedDecks.Public({name, author, hash}) =>
+        | Page.SavedDecks.Public({id, name, author, hash}) =>
           let deckName = Printf.sprintf("%s by %s", name, author);
-          <TouchableOpacity onPress={handle(loadDeck(deckName, hash))}>
-            <View style=Styles.deck>
-              <Text style=Styles.deckName numberOfLines=1>
-                <S> deckName </S>
-              </Text>
-            </View>
-          </TouchableOpacity>;
+          <SavePrivateDeck client>
+            ...(
+                 (mutate, _) =>
+                   <TouchableOpacity
+                     onPress={
+                       () =>
+                         mutate(
+                           ~variables=
+                             Json.Encode.object_([
+                               ("key", Json.Encode.string(id)),
+                               ("name", Json.Encode.string(name)),
+                               ("hash", Json.Encode.string(hash)),
+                             ]),
+                           (),
+                         )
+                         |> ignore
+                     }>
+                     <View style=Styles.deck>
+                       <Text style=Styles.deckName numberOfLines=1>
+                         <S> deckName </S>
+                       </Text>
+                     </View>
+                   </TouchableOpacity>
+               )
+          </SavePrivateDeck>;
         | Page.SavedDecks.Private({key, name, hash}) =>
-          <TouchableOpacity onPress={handle(loadDeck(~key, name, hash))}>
+          <TouchableOpacity onPress=(() => ())>
             <View style=Styles.deck>
               <Text style=Styles.deckName numberOfLines=1>
                 <S> name </S>
@@ -390,21 +412,21 @@ let create = () => {
         | Page.Cards =>
           let position = state.cardListPosition;
           let onPersistPosition = handle(persistCardListPosition);
-          <Page.CardList filter position onPersistPosition>
+          <Page.CardList client filter position onPersistPosition>
             ...cardListRender
           </Page.CardList>;
         | Page.IndividualCard(uid) =>
-          <Page.IndividualCard uid> ...cardRender </Page.IndividualCard>
+          <Page.IndividualCard client uid> ...cardRender </Page.IndividualCard>
         | Page.Deck =>
           let position = state.deckPosition;
           let onPersistPosition = handle(persistDeckPosition);
-          <Page.Deck deck position onPersistPosition>
+          <Page.Deck client deck position onPersistPosition>
             ...deckListRender
           </Page.Deck>;
         | Page.SavedDecks =>
           let position = state.savedDeckPosition;
           let onPersistPosition = handle(persistSavedDeckPosition);
-          <Page.SavedDecks position onPersistPosition>
+          <Page.SavedDecks client position onPersistPosition>
             ...renderDeck
           </Page.SavedDecks>;
         | Page.Stats => <Page.Stats deck />
