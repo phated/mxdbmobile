@@ -4,6 +4,6 @@ let root =
     Oolong.ReactProgram.make(
       ~program=Application.create,
       ~router=Router.router,
-      (),
+      [||],
     )
   );

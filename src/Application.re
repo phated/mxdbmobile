@@ -190,7 +190,7 @@ let create = () => {
       switch (action) {
       | Error =>
         Js.log("something went terribly wrong");
-        Oolong.Ignore;
+        Oolong.Replace(state);
       | StorePersistedDeck(deck) => Oolong.Replace({...state, deck})
       | Increment(card) =>
         let deck = Deck.increment(state.deck, card);

@@ -19,7 +19,7 @@
     "@glennsl/bs-json": "^3.0.0",
     "@reasonableconsulting/bs-victory": "0.0.0",
     "@reasonableconsulting/compare": "0.0.0",
-    "@reasonableconsulting/oolong": "file:../oolong",
+    "@reasonableconsulting/oolong": "0.0.0",
     "appcenter": "^1.7.1",
     "appcenter-analytics": "^1.7.1",
     "appcenter-crashes": "^1.7.1",
