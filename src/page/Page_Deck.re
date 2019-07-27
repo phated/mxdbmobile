@@ -47,9 +47,9 @@ let make = (~deck, ~position, ~onPersistPosition, renderChild) => {
   |];
 
   let mapper = ((prevCard, _), (nextCard, count)) =>
-    Card.isTypeEqual(prevCard, nextCard) ?
-      [|PositionedList.Item({key: nextCard, value: count, size: 183})|] :
-      [|
+    Card.isTypeEqual(prevCard, nextCard)
+      ? [|PositionedList.Item({key: nextCard, value: count, size: 183})|]
+      : [|
         toHeader(nextCard),
         PositionedList.Item({key: nextCard, value: count, size: 183}),
       |];

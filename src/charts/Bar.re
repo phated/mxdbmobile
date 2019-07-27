@@ -79,10 +79,10 @@ let make = (~data, _children) => {
             label=yAxisLabel
           />
           <Victory.Group style=groupStyles offset=9>
-            <Victory.Bar data={data[0]} style=barStyles />
-            <Victory.Bar data={data[1]} style=barStyles />
-            <Victory.Bar data={data[2]} style=barStyles />
-            <Victory.Bar data={data[3]} style=barStyles />
+            <Victory.Bar data={Array.get(data, 0)} style=barStyles />
+            <Victory.Bar data={Array.get(data, 1)} style=barStyles />
+            <Victory.Bar data={Array.get(data, 2)} style=barStyles />
+            <Victory.Bar data={Array.get(data, 3)} style=barStyles />
           </Victory.Group>
           <Victory.Axis
             style=xAxisStyles

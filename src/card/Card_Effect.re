@@ -46,8 +46,8 @@ let component = ReasonReact.statelessComponent("Card.Effect");
 
 let make = (~value, _children) => {
   let effectStyle =
-    Card_Symbol.hasSymbol(value.symbol) ?
-      Styles.effectWithSymbol : Styles.effectWithoutSymbol;
+    Card_Symbol.hasSymbol(value.symbol)
+      ? Styles.effectWithSymbol : Styles.effectWithoutSymbol;
 
   let effectText = Belt.Option.getWithDefault(value.text, "");
 

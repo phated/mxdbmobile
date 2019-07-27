@@ -5,12 +5,12 @@ let noop = _ => ();
 module Styles = {
   open BsReactNative.Style;
 
-  let iconWrapper = style([height(40.0 |. Pt), width(40.0 |. Pt)]);
+  let iconWrapper = style([height(40.0->Pt), width(40.0->Pt)]);
 
   let icon =
     style([
       color(Colors.Css.white),
-      margin(8.0 |. Pt),
+      margin(8.0->Pt),
       textAlignVertical(Center),
     ]);
 };

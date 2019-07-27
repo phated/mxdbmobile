@@ -25,7 +25,7 @@ let make =
   reducer: (action, _state) =>
     switch (action) {
     | UpdateText(text) => ReasonReact.Update(text)
-    | Submit => ReasonReact.SideEffects((self => onSubmit(self.state)))
+    | Submit => ReasonReact.SideEffects(self => onSubmit(self.state))
     },
   render: self =>
     BsReactNative.(

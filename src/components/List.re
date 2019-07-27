@@ -2,11 +2,7 @@ module Styles = {
   open BsReactNative.Style;
 
   let separator =
-    style([
-      flex(1.0),
-      height(1.0 |. Pt),
-      backgroundColor(Colors.Css.gray),
-    ]);
+    style([flex(1.0), height(1.0->Pt), backgroundColor(Colors.Css.gray)]);
 };
 
 let component = ReasonReact.statelessComponent("List");
