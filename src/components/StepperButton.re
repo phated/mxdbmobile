@@ -67,8 +67,11 @@ let make = (~direction, ~onPress, ~disabled, children) => {
     };
 
   let makeScale = scale =>
-    BsReactNative.Style.(
-      style([Transform.make(~scaleX=scale, ~scaleY=scale, ())])
+    BsReactNative.(
+      Style.transform([
+        Style.scaleX(Float(scale)),
+        Style.scaleY(Float(scale)),
+      ])
     );
 
   {
@@ -86,7 +89,12 @@ let make = (~direction, ~onPress, ~disabled, children) => {
       let onOff = disabled ? Styles.disabled : Styles.enabled;
 
       let style =
-        StyleSheet.flatten([scale, onOff, directional, Styles.container]);
+        StyleSheet.flatten([
+          Style.style([scale]),
+          onOff,
+          directional,
+          Styles.container,
+        ]);
 
       <TouchableWithoutFeedback
         hitSlop

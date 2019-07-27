@@ -40,7 +40,6 @@ yarn-error.log
 buck-out/
 \.buckd/
 *.keystore
-*.jks
 
 # fastlane
 #
@@ -56,6 +55,9 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
+# CocoaPods
+/ios/Pods/
+
 # Bucklescript
 .merlin
 .bsb.lock
@@ -64,3 +66,4 @@ buck-out/
 
 # Secrets
 android/app/src/main/assets/appcenter-config.json
+*.jks

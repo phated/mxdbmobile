@@ -20,9 +20,8 @@ type action =
 let component = ReasonReact.reducerComponent("Toolbar");
 
 let make = renderChild => {
-  let enable = (_event, self) => self.ReasonReact.send(ChangeMode(Enabled));
-  let disable = (_event, self) =>
-    self.ReasonReact.send(ChangeMode(Disabled));
+  let enable = ((), self) => self.ReasonReact.send(ChangeMode(Enabled));
+  let disable = ((), self) => self.ReasonReact.send(ChangeMode(Disabled));
 
   {
     ...component,

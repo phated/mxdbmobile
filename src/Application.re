@@ -182,9 +182,9 @@ let create = () => {
       | Pop(path, _search, _hash) =>
         let page = Page.fromPath(path);
         /* TODO: check this logic */
-        page === SavedDecks && state.page === Deck ?
-          Oolong.State({...state, page, deck: Deck.empty}) :
-          Oolong.State({...state, page});
+        page === SavedDecks && state.page === Deck
+          ? Oolong.State({...state, page, deck: Deck.empty})
+          : Oolong.State({...state, page});
       },
     toRoute: (action, state) =>
       switch (action) {
@@ -298,7 +298,7 @@ let create = () => {
         switch (mode) {
         | Toolbar.Enabled =>
           <>
-            <IconButton icon="arrow-back" onPress=disable />
+            <IconButton icon="arrow-back" onPress={_evt => disable()} />
             <ToolbarInput
               placeholder="Search"
               previous={Filter.toString(filter)}
@@ -309,14 +309,14 @@ let create = () => {
         | Toolbar.Disabled =>
           <>
             <Text style=Styles.title> <S> "MetaX Deck Builder" </S> </Text>
-            <IconButton icon="search" onPress=enable />
+            <IconButton icon="search" onPress={_evt => enable()} />
           </>
         };
       let deckListToolbarRender = (~enable, ~disable, mode) =>
         switch (mode) {
         | Toolbar.Enabled =>
           <>
-            <IconButton icon="arrow-back" onPress=disable />
+            <IconButton icon="arrow-back" onPress={_evt => disable()} />
             <ToolbarInput
               placeholder="Deck Name"
               previous={Belt.Option.getWithDefault(Deck.nameGet(deck), "")}
@@ -330,7 +330,7 @@ let create = () => {
               ellipsizeMode=`tail
               numberOfLines=1
               style=Styles.title
-              onPress=enable>
+              onPress={_evt => enable()}>
               <Icon name="edit" size=16 />
               <S> " " </S>
               <S> {Belt.Option.getWithDefault(Deck.nameGet(deck), "")} </S>
