@@ -75,7 +75,7 @@ let toListItems = (privateDecks, publicDecks) => {
 
 let getPrivateDecks = () =>
   PrivateDeck.getAll()
-  |> Repromise.map(result =>
+  ->Promise.map(result =>
        switch (result) {
        | Belt.Result.Ok(decks) =>
          Belt.Array.map(decks, toPrivate)->Belt.Result.Ok
@@ -84,7 +84,7 @@ let getPrivateDecks = () =>
      );
 let getPublicDecks = () =>
   PublicDeck.getAll()
-  |> Repromise.map(result =>
+  ->Promise.map(result =>
        switch (result) {
        | Belt.Result.Ok(decks) =>
          Belt.Array.map(decks, toPublic)->Belt.Result.Ok
@@ -97,8 +97,8 @@ let getDecks = self => {
 
   let public = getPublicDecks();
 
-  Repromise.all([private, public])
-  |> Repromise.map(results =>
+  Promise.all([private, public])
+  ->Promise.map(results =>
        switch (results) {
        | [private, public] =>
          let privateDecks = Belt.Result.getWithDefault(private, [||]);
@@ -110,7 +110,7 @@ let getDecks = self => {
        | _ => Belt.Result.Error("Invalid results")
        }
      )
-  |> Repromise.wait(result =>
+  ->Promise.get(result =>
        switch (result) {
        | Belt.Result.Ok(data) => self.ReasonReact.send(StoreData(data))
        | Belt.Result.Error(msg) => Js.log(msg)

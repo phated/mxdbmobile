@@ -13,10 +13,10 @@ let decode = json => {
 };
 
 let getAll = _ => {
-  let (result, resolve) = Repromise.make();
+  let (result, resolve) = Promise.pending();
 
   MyFetch.fetch("https://metax.toyboat.net/netdecker.php?json=true")
-  |> Repromise.wait(result =>
+  ->Promise.get(result =>
        switch (result) {
        | Belt.Result.Ok(data) =>
          switch (Js.Json.decodeArray(data)) {
