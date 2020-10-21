@@ -12,8 +12,8 @@ let getAll = () => {
   };
 
   Database.Decks.getAll()
-  |> Repromise.map(records => Belt.Array.map(records, toPrivateDeck))
-  |> Repromise.map(decks => Belt.Result.Ok(decks));
+  ->Promise.map(records => Belt.Array.map(records, toPrivateDeck))
+  ->Promise.map(decks => Belt.Result.Ok(decks));
 };
 
 let persist = deck => {
@@ -24,25 +24,25 @@ let persist = deck => {
   switch (maybeKey, maybeName, maybeHash) {
   | (Some(key), _, None) =>
     Database.Decks.delete(~key)
-    |> Repromise.map(
+    ->Promise.map(
          fun
          | Belt.Result.Ok(_key) => Belt.Result.Ok(Deck.empty)
          | Belt.Result.Error(msg) => Belt.Result.Error(msg),
        )
   | (None, Some(name), Some(hash)) =>
     Database.Decks.insert(~name, ~hash)
-    |> Repromise.map(
+    ->Promise.map(
          fun
          | Belt.Result.Ok(key) => Belt.Result.Ok(Deck.keySet(deck, key))
          | Belt.Result.Error(msg) => Belt.Result.Error(msg),
        )
   | (Some(key), Some(name), Some(hash)) =>
     Database.Decks.update(~key, ~name, ~hash)
-    |> Repromise.map(
+    ->Promise.map(
          fun
          | Belt.Result.Ok(_key) => Belt.Result.Ok(deck)
          | Belt.Result.Error(msg) => Belt.Result.Error(msg),
        )
-  | _ => Repromise.resolved(Belt.Result.Error("Invalid configuration"))
+  | _ => Promise.resolved(Belt.Result.Error("Invalid configuration"))
   };
 };

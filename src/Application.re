@@ -85,7 +85,7 @@ let create = () => {
   let loadDeck = (~key=?, deckName, hash, _, self) =>
     /* self.Oolong.send(NavigateTo(Loading)); */
     Deck.loadFromHash(~key?, ~name=deckName, hash)
-    |> Repromise.wait(result =>
+    ->Promise.get(result =>
          switch (result) {
          | Belt.Result.Ok(deck) => self.Oolong.send(DeckLoaded(deck))
          | Belt.Result.Error(msg) => Js.log(msg)
@@ -105,7 +105,7 @@ let create = () => {
   let saveDeck = self =>
     /* TODO: Indicator for saving deck (if this takes long/can fail) */
     PrivateDeck.persist(self.Oolong.state.deck)
-    |> Repromise.wait(result =>
+    ->Promise.get(result =>
          switch (result) {
          | Belt.Result.Ok(deck) =>
            if (Deck.isEmpty(deck)) {
@@ -164,7 +164,7 @@ let create = () => {
           },
           self =>
             Deck.loadFromHash(~name=?deckName, hash)
-            |> Repromise.wait(result =>
+            ->Promise.get(result =>
                  switch (result) {
                  | Belt.Result.Ok(deck) =>
                    self.Oolong.send(DeckRestored(deck))

@@ -14,7 +14,7 @@
     "@reasonableconsulting/oolong",
     "@reasonableconsulting/compare",
     "@reasonableconsulting/bs-victory",
-    "@aantron/repromise"
+    "reason-promise"
   ],
   "namespace": true,
   "reason": {

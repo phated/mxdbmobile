@@ -15,7 +15,6 @@
     "bundle-level": "browserify --standalone level --exclude react-native level.js | derequire > level.dist.js"
   },
   "dependencies": {
-    "@aantron/repromise": "^0.6.0",
     "@glennsl/bs-json": "^4.0.0",
     "@reasonableconsulting/bs-victory": "0.0.0",
     "@reasonableconsulting/compare": "0.0.0",
@@ -28,6 +27,7 @@
     "react-dom": "^16.5.2",
     "react-native": "0.60.4",
     "react-native-vector-icons": "^4.6.0",
+    "reason-promise": "^1.0.2",
     "reason-react": "^0.7.0",
     "victory": "^30.4.0"
   },
@@ -39,7 +39,7 @@
     "asyncstorage-down": "^4.0.1",
     "babel-jest": "^24.1.0",
     "browserify": "^16.2.2",
-    "bs-platform": "^5.0.6",
+    "bs-platform": "^7.0.1",
     "derequire": "^2.0.6",
     "jest": "^24.1.0",
     "level-packager": "^4.0.1",

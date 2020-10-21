@@ -459,18 +459,18 @@ query CardList($uids: [String!]!) {
 let decode = json => json |> Json.Decode.dict(Json.Decode.int);
 
 let loadFromHash = (~key=?, ~name=?, hash) => {
-  let (result, resolve) = Repromise.make();
+  let (result, resolve) = Promise.pending();
 
   MyFetch.fetch(
     "https://metax.toyboat.net/decodeDeck.php?output=metaxdb&hash=" ++ hash,
   )
-  |> Repromise.map(result =>
+  ->Promise.map(result =>
        switch (result) {
        | Belt.Result.Ok(data) => decode(data)->Belt.Result.Ok
        | Belt.Result.Error(msg) => Belt.Result.Error(msg)
        }
      )
-  |> Repromise.wait(result =>
+  ->Promise.get(result =>
        switch (result) {
        | Belt.Result.Ok(dict) =>
          let uids =
